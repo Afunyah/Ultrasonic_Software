@@ -5,7 +5,8 @@ using UnityEngine;
 public class LevParticle : MonoBehaviour
 {
     private Vector3 particlePos;
-    public bool selected;
+    private bool selected;
+
 
     void Start()
     {
@@ -15,9 +16,11 @@ public class LevParticle : MonoBehaviour
 
     void Update()
     {
-        if(this.selected){
-            // Debug.Log(this.gameObject.GetInstanceID());
-        }   
+    }
+
+    public List<Transducer> findNearbyTransducers(){
+        List<Transducer> trs = new List<Transducer>{};
+        return trs;
     }
 
     public void MoveX(int dir)
@@ -33,6 +36,10 @@ public class LevParticle : MonoBehaviour
     public void MoveZ(int dir)
     {
         this.transform.position += new Vector3(0, dir * 0.1F, 0);
+    }
+
+    public void SetSelect(bool sel){
+        selected = sel;
     }
 
     public void DeleteParticle()

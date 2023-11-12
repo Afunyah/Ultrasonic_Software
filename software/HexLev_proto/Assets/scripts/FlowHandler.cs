@@ -24,7 +24,6 @@ public class FlowHandler : MonoBehaviour
     public Material selectedMaterial;
     private bool isSelected;
 
-
     void Start()
     {
         isSelected = false;
@@ -45,7 +44,7 @@ public class FlowHandler : MonoBehaviour
                     // Deselect old particle and select particle hit
                     if (isSelected && selected != hitInfo.collider.gameObject)
                     {
-                        SelectedLevParticle.selected = false;
+                        SelectedLevParticle.SetSelect(false);
                         SelectedRenderer.material = normalMaterial;
                     }
 
@@ -53,14 +52,14 @@ public class FlowHandler : MonoBehaviour
                     selected = hitInfo.collider.gameObject;
                     SelectedLevParticle = selected.GetComponent<LevParticle>();
                     SelectedRenderer = selected.GetComponent<Renderer>();
-                    SelectedLevParticle.selected = isSelected;
+                    SelectedLevParticle.SetSelect(isSelected);
                     SelectedRenderer.material = selectedMaterial;
                 }
                 // Any other collider is hit
                 else if (isSelected)
                 {
                     isSelected = false;
-                    SelectedLevParticle.selected = isSelected;
+                    SelectedLevParticle.SetSelect(isSelected);
                     SelectedRenderer.material = normalMaterial;
                 }
             }
@@ -124,7 +123,7 @@ public class FlowHandler : MonoBehaviour
                     if (isSelected)
                     {
                         isSelected = false;
-                        SelectedLevParticle.selected = isSelected;
+                        SelectedLevParticle.SetSelect(isSelected);
                         SelectedRenderer.material = normalMaterial;
                     }
                 }
