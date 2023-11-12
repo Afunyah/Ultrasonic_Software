@@ -7,8 +7,8 @@ public class AddLevParticle : MonoBehaviour
 
     public GameObject levParticlePrefab;
     public GameObject instArea;
-
-    public void createParticle() {
+ 
+    public void CreateParticle() {
         GameObject levParticle = Instantiate(levParticlePrefab, instArea.transform.position, levParticlePrefab.transform.rotation);
     }
 }

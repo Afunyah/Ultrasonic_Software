@@ -36,9 +36,12 @@ kgrid = kWaveGrid(Nx, dx, Ny, dy, Nz, dz);
 
 % define the properties of the propagation medium
 medium.sound_speed = 1500 * ones(Nx, Ny, Nz);	% [m/s]
-medium.sound_speed(1:Nx/2, :, :) = 1800;        % [m/s]
 medium.density = 1000 * ones(Nx, Ny, Nz);       % [kg/m^3]
-medium.density(:, Ny/4:end, :) = 1200;          % [kg/m^3]
+
+% medium.sound_speed = 1500 * ones(Nx, Ny, Nz);	% [m/s]
+% medium.sound_speed(1:Nx/2, :, :) = 1800;        % [m/s]
+% medium.density = 1000 * ones(Nx, Ny, Nz);       % [kg/m^3]
+% medium.density(:, Ny/4:end, :) = 1200;          % [kg/m^3]
 
 % create the time array
 kgrid.makeTime(medium.sound_speed);
@@ -52,12 +55,12 @@ kgrid.makeTime(medium.sound_speed);
 
 % create empty array
 karray1 = kWaveArray('BLITolerance', 0.05, 'UpsamplingRate', 10);
-karray2 = kWaveArray;
+
 element_num     = 2;       % number of elements
 element_width   = 1e-3;     % width [m]
-element_length  = 10e-3;    % elevation height [m]
-element_pitch   = 2e-3;     % pitch [m]
-N=2;
+element_length  = 1e-3;    % elevation height [m]
+element_pitch   = 1.1e-3;     % pitch [m]
+N=element_num;
 w=10e-3;dif=5e-3;d=dif;
 ofs = 0.5e-3;
 % for i=1:N
@@ -71,11 +74,11 @@ ofs = 0.5e-3;
 for ind = 1:element_num
     
     % set element y position
-    x_pos = 0 - (element_num * element_pitch / 2 - element_pitch / 2) + (ind - 1) * element_pitch;
-    
-    % add element (see note in header)
-    karray1.addRectElement([x_pos, 0, kgrid.z_vec(1)], element_width, element_length, [0,0,0]);
-    
+%     x_pos = 0 - (element_num * element_pitch / 2 - element_pitch / 2) + (ind - 1) * element_pitch;
+    x_pos = 0 - (element_num * element_pitch / 1 - element_pitch / 1) + (ind - 1) * element_pitch*2;
+    % add element (see note in header) kgrid.z_vec(1)
+%     karray1.addRectElement([x_pos, 0, -1.6e-3], element_width, element_length, [0,0,0]);
+    karray1.addDiscElement([x_pos, 0, -1.6e-3], element_width,[x_pos,0,0]);
 end
 
 
@@ -99,7 +102,7 @@ source1.p_mask = karray1.getArrayBinaryMask(kgrid);
 
 source_freq = 40e3; % [Hz]
 source_mag = 0.5; % [Pa]
-source_phs = pi;
+source_phs = 0;
 source_freq = 2e6;  % [Hz]
 source_mag = 1;     % [Pa]
 
@@ -107,11 +110,16 @@ source_mag = 1;     % [Pa]
 sig = source_mag * sin(2 * pi * source_freq * kgrid.t_array + source_phs);
 source1_signal = zeros(3, length(sig));
 
-for i=1:2*N
+% for i=1:2*N
+%     source1_signal(i,:) = sig;
+%     j=i+1;
+%     source1_signal(j,:) = sig;
+% end
+
+for i=1:N
     source1_signal(i,:) = sig;
-    j=i+1;
-    source1_signal(j,:) = sig;
 end
+
 
 % get distributed source signals (this automatically returns a weighted
 % source signal for each grid point that forms part of the source)
@@ -138,22 +146,25 @@ sensor.mask = [x; y; z];
 sensor.record = {'p', 'p_final'};
 
 % input arguments
-input_args = {'DisplayMask', source.p_mask, 'DataCast', 'single', ...
-    'CartInterp', 'nearest'};
+% input_args = {'DisplayMask', source.p_mask, 'DataCast', 'single', 'CartInterp', 'nearest','PMLInside', false, 'PlotPML', false};
+input_args = {'DisplayMask', source.p_mask, 'DataCast', 'single', 'CartInterp', 'nearest','PMLInside', true, 'PlotPML', false};
+
 
 % run the simulation
 sensor_data = kspaceFirstOrder3D(kgrid, medium, source, sensor, input_args{:});
-
-% =========================================================================
-% VISUALISATION
-% =========================================================================
-
-% view final pressure field slice by slice
-flyThrough(sensor_data.p_final);
-
-% plot the position of the source and sensor
-voxelPlot(double(source.p_mask | cart2grid(kgrid, sensor.mask)));
-view(127, 18);
+% 
+% % =========================================================================
+% % VISUALISATION
+% % =========================================================================
+% 
+% % view final pressure field slice by slice
+% flyThrough(sensor_data.p_final);
+% 
+% % plot the position of the source and sensor
+fig=figure;
+voxelPlot_c(double(source.p_mask | cart2grid(kgrid, sensor.mask)), fig, 'AxisTight', false, 'Color', [0 0 1]);
+% voxelPlot_c(makeBall(20, 20, 20, 10, 10, 10, 4), fig, 'AxisTight', true, 'Color', [1 0 0]);
+% 
 
 % add the source mask to the pressure field
 p_final(source.p_mask ~= 0) = 1;
@@ -163,8 +174,7 @@ p_final(source.p_mask ~= 0) = 1;
 
 % plot the final pressure field in the x-y plane
 figure;
-imagesc(kgrid.y_vec * scale, kgrid.x_vec * scale, ...
-    squeeze(sensor_data.p_final(:, :, kgrid.Nz/2)), [-1, 1]);
+imagesc(kgrid.y_vec * scale, kgrid.x_vec * scale, squeeze(sensor_data.p_final(:, :, kgrid.Nz/2)), [-1, 1]);
 colormap(getColorMap);
 xlabel(['y-position [' prefix 'm]']);
 ylabel(['x-position [' prefix 'm]']);
@@ -178,3 +188,12 @@ colormap(getColorMap);
 ylabel('Sensor Position');
 xlabel('Time Step');
 colorbar;
+
+% plot the pressure field 
+figure;
+imagesc(scale * kgrid.z_vec, scale * kgrid.x_vec, squeeze(sensor_data.p_final(:, :, kgrid.Nz/2)));
+xlabel('Axial Position [mm]');
+ylabel('Lateral Position [mm]');
+axis image;
+title('Pressure Field');
+

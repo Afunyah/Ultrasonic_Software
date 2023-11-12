@@ -8,7 +8,6 @@ using UnityEngine;
 
 public class FlowHandler : MonoBehaviour
 {
-    private Renderer rend;
     public Material normalMaterial;
     public Material selectedMaterial;
     public new Camera camera;
@@ -16,8 +15,8 @@ public class FlowHandler : MonoBehaviour
     private GameObject selected;
     private bool isSelected;
 
-    private string selTag = "SELECTED";
-    private string unselTag = "Untagged";
+    private readonly string selTag = "SELECTED";
+    private readonly string unselTag = "Untagged";
 
     public GameObject uiCanvas;
 

@@ -19,7 +19,7 @@ public class MoveParticle : MonoBehaviour
         selectedParticle = GameObject.FindWithTag("SELECTED");
     }
 
-    public void moveX()
+    public void MoveX()
     {
         if (selectedParticle == null)
         {
@@ -28,7 +28,7 @@ public class MoveParticle : MonoBehaviour
         selectedParticle.transform.position += new Vector3(dir*0.1F, 0, 0);
     }
 
-    public void moveY()
+    public void MoveY()
     {
         if (selectedParticle == null)
         {
@@ -37,7 +37,7 @@ public class MoveParticle : MonoBehaviour
         selectedParticle.transform.position += new Vector3(0, 0, dir*0.1F);
     }
 
-    public void moveZ()
+    public void MoveZ()
     {
         if (selectedParticle == null)
         {
