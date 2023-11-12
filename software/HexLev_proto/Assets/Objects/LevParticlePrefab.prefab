@@ -44,10 +44,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 886552692302712913}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c575b023d6998416da1b2446b1b452ba, type: 3}
+  m_Script: {fileID: 11500000, guid: 456a295ae68804baaa7f1b09df2e957c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selectedMaterial: {fileID: 2100000, guid: 7c240aad6495345129a233eb15424d44, type: 2}
 --- !u!33 &5055894462692128378
 MeshFilter:
   m_ObjectHideFlags: 0

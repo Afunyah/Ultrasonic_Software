@@ -4,25 +4,25 @@ using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityEngine;
+using System.Xml.Schema;
 
 
 public class FlowHandler : MonoBehaviour
 {
-    public Material normalMaterial;
-    public Material selectedMaterial;
     public new Camera camera;
-
-    private GameObject selected;
-    private bool isSelected;
-
-    private readonly string selTag = "SELECTED";
-    private readonly string unselTag = "Untagged";
-
     public GameObject uiCanvas;
 
     private GraphicRaycaster m_Raycaster;
     private PointerEventData m_PointerEventData;
     private EventSystem m_EventSystem;
+
+    private GameObject selected;
+    private LevParticle SelectedLevParticle;
+    private Renderer SelectedRenderer;
+
+    public Material normalMaterial;
+    public Material selectedMaterial;
+    private bool isSelected;
 
 
     void Start()
@@ -33,34 +33,35 @@ public class FlowHandler : MonoBehaviour
     void Update()
     {
         // go over isselected logic. Defined here but also assigned throughout below
-        isSelected = (GameObject.FindWithTag("SELECTED")!=null);
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButtonDown(0))
         {
             Ray ray = camera.ScreenPointToRay(Input.mousePosition);
             // Check for collider hit
             if (Physics.Raycast(ray, out RaycastHit hitInfo))
             {
                 // Specifically check for levparticle hit
-                if (hitInfo.collider.gameObject.GetComponent<SelectParticle>() != null)
+                if (hitInfo.collider.gameObject.GetComponent<LevParticle>() != null)
                 {
                     // Deselect old particle and select particle hit
                     if (isSelected && selected != hitInfo.collider.gameObject)
                     {
-                        selected.GetComponent<Renderer>().material = normalMaterial;
-                        selected.tag = unselTag;
+                        SelectedLevParticle.selected = false;
+                        SelectedRenderer.material = normalMaterial;
                     }
 
-                    selected = hitInfo.collider.gameObject;
-                    selected.GetComponent<Renderer>().material = selectedMaterial;
-                    selected.tag = selTag;
                     isSelected = true;
+                    selected = hitInfo.collider.gameObject;
+                    SelectedLevParticle = selected.GetComponent<LevParticle>();
+                    SelectedRenderer = selected.GetComponent<Renderer>();
+                    SelectedLevParticle.selected = isSelected;
+                    SelectedRenderer.material = selectedMaterial;
                 }
                 // Any other collider is hit
                 else if (isSelected)
                 {
                     isSelected = false;
-                    selected.tag = unselTag;
-                    selected.GetComponent<Renderer>().material = normalMaterial;
+                    SelectedLevParticle.selected = isSelected;
+                    SelectedRenderer.material = normalMaterial;
                 }
             }
             else
@@ -77,32 +78,45 @@ public class FlowHandler : MonoBehaviour
 
                 if (uiHitList.Count != 0)
                 {
+
                     string uiCompName;
                     foreach (RaycastResult uiComp in uiHitList)
                     {
                         uiCompName = uiComp.gameObject.name;
-                        // Debug.Log("Hit " + uiComp.gameObject.name);
                         switch (uiCompName)
                         {
                             case "AddButton":
                                 break;
                             case "RemoveButton":
-                                if (isSelected)
-                                {
-                                    Debug.Log("Particle can be Removed!");
-                                }
+                                if (isSelected) { SelectedLevParticle.DeleteParticle(); }
+                                isSelected = false;
                                 break;
                             case "MoveButton":
-                                if (isSelected)
-                                {
-                                    Debug.Log("Particle can be Moved!");
-                                }
+                                if (isSelected) Debug.Log("Particle can be Moved!");
+                                break;
+                            case "xDown":
+                                if (isSelected) { SelectedLevParticle.MoveX(-1); }
+                                break;
+                            case "xUp":
+                                if (isSelected) { SelectedLevParticle.MoveX(1); }
+                                break;
+                            case "yDown":
+                                if (isSelected) { SelectedLevParticle.MoveY(-1); }
+                                break;
+                            case "yUp":
+                                if (isSelected) { SelectedLevParticle.MoveY(1); }
+                                break;
+                            case "zDown":
+                                if (isSelected) { SelectedLevParticle.MoveZ(-1); }
+                                break;
+                            case "zUp":
+                                if (isSelected) { SelectedLevParticle.MoveZ(1); }
                                 break;
                             default:
-                                Debug.Log("Null");
                                 break;
                         }
                     }
+
                 }
                 else
                 {
@@ -110,8 +124,8 @@ public class FlowHandler : MonoBehaviour
                     if (isSelected)
                     {
                         isSelected = false;
-                        selected.tag = unselTag;
-                        selected.GetComponent<Renderer>().material = normalMaterial;
+                        SelectedLevParticle.selected = isSelected;
+                        SelectedRenderer.material = normalMaterial;
                     }
                 }
 

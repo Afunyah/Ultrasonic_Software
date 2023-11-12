@@ -391,6 +391,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 153044873}
   m_CullTransparentMesh: 1
+--- !u!1 &162019810 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -8836264669275598930, guid: 9dee66e805eb24788b81af21a1fefe66, type: 3}
+  m_PrefabInstance: {fileID: 265170580}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &162019814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 162019810}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e6989e57b8b14eea87a1cbd064398d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &265170580
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -441,12 +458,20 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 9dee66e805eb24788b81af21a1fefe66, type: 3}
       propertyPath: m_Name
-      value: single_hex_model_bottom
+      value: BottomPlate
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: -8700617353114198275, guid: 9dee66e805eb24788b81af21a1fefe66, type: 3}
+    - {fileID: 65702495048144492, guid: 9dee66e805eb24788b81af21a1fefe66, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1449637449900155953, guid: 9dee66e805eb24788b81af21a1fefe66, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1741919966}
+    - targetCorrespondingSourceObject: {fileID: -8836264669275598930, guid: 9dee66e805eb24788b81af21a1fefe66, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 162019814}
   m_SourcePrefab: {fileID: 100100000, guid: 9dee66e805eb24788b81af21a1fefe66, type: 3}
 --- !u!4 &265170581 stripped
 Transform:
@@ -757,7 +782,6 @@ GameObject:
   - component: {fileID: 386673802}
   - component: {fileID: 386673801}
   - component: {fileID: 386673800}
-  - component: {fileID: 386673803}
   m_Layer: 5
   m_Name: zUp
   m_TagString: Untagged
@@ -828,19 +852,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 386673801}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 386673803}
-        m_TargetAssemblyTypeName: MoveParticle, Assembly-CSharp
-        m_MethodName: MoveZ
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &386673801
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -879,19 +891,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 386673798}
   m_CullTransparentMesh: 1
---- !u!114 &386673803
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 386673798}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27841302f52914222b5a35874416e0ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dir: 1
 --- !u!1 &697246199
 GameObject:
   m_ObjectHideFlags: 0
@@ -904,7 +903,6 @@ GameObject:
   - component: {fileID: 697246203}
   - component: {fileID: 697246202}
   - component: {fileID: 697246201}
-  - component: {fileID: 697246204}
   m_Layer: 5
   m_Name: xUp
   m_TagString: Untagged
@@ -975,19 +973,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 697246202}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 697246204}
-        m_TargetAssemblyTypeName: MoveParticle, Assembly-CSharp
-        m_MethodName: MoveX
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &697246202
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1026,19 +1012,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 697246199}
   m_CullTransparentMesh: 1
---- !u!114 &697246204
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 697246199}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27841302f52914222b5a35874416e0ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dir: 1
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -1413,7 +1386,6 @@ GameObject:
   - component: {fileID: 916929046}
   - component: {fileID: 916929045}
   - component: {fileID: 916929044}
-  - component: {fileID: 916929047}
   m_Layer: 5
   m_Name: xDown
   m_TagString: Untagged
@@ -1484,19 +1456,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 916929045}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 916929047}
-        m_TargetAssemblyTypeName: MoveParticle, Assembly-CSharp
-        m_MethodName: MoveX
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &916929045
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1535,19 +1495,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 916929042}
   m_CullTransparentMesh: 1
---- !u!114 &916929047
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 916929042}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27841302f52914222b5a35874416e0ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dir: -1
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -2442,7 +2389,6 @@ GameObject:
   - component: {fileID: 1132121731}
   - component: {fileID: 1132121730}
   - component: {fileID: 1132121729}
-  - component: {fileID: 1132121732}
   m_Layer: 5
   m_Name: yUp
   m_TagString: Untagged
@@ -2513,19 +2459,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1132121730}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1132121732}
-        m_TargetAssemblyTypeName: MoveParticle, Assembly-CSharp
-        m_MethodName: MoveY
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1132121730
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2564,19 +2498,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1132121727}
   m_CullTransparentMesh: 1
---- !u!114 &1132121732
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1132121727}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27841302f52914222b5a35874416e0ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dir: 1
 --- !u!1 &1175411012
 GameObject:
   m_ObjectHideFlags: 0
@@ -2589,7 +2510,6 @@ GameObject:
   - component: {fileID: 1175411016}
   - component: {fileID: 1175411015}
   - component: {fileID: 1175411014}
-  - component: {fileID: 1175411017}
   m_Layer: 5
   m_Name: yDown
   m_TagString: Untagged
@@ -2660,19 +2580,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1175411015}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1175411017}
-        m_TargetAssemblyTypeName: MoveParticle, Assembly-CSharp
-        m_MethodName: MoveY
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1175411015
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2711,19 +2619,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1175411012}
   m_CullTransparentMesh: 1
---- !u!114 &1175411017
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1175411012}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27841302f52914222b5a35874416e0ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dir: -1
 --- !u!1 &1247495892
 GameObject:
   m_ObjectHideFlags: 0
@@ -3008,6 +2903,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1355394173}
   - component: {fileID: 1355394174}
+  - component: {fileID: 1355394175}
   m_Layer: 0
   m_Name: HexLev
   m_TagString: Untagged
@@ -3049,6 +2945,18 @@ MonoBehaviour:
   selectedMaterial: {fileID: 2100000, guid: 7c240aad6495345129a233eb15424d44, type: 2}
   camera: {fileID: 1249173657}
   uiCanvas: {fileID: 367989039}
+--- !u!114 &1355394175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1355394172}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc2ff4087acd344eabd4d36c1c3200b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1374779399
 GameObject:
   m_ObjectHideFlags: 0
@@ -3704,6 +3612,23 @@ MonoBehaviour:
   m_FirstSelected: {fileID: 0}
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
+--- !u!1 &1741919962 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1449637449900155953, guid: 9dee66e805eb24788b81af21a1fefe66, type: 3}
+  m_PrefabInstance: {fileID: 265170580}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1741919966
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1741919962}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e6989e57b8b14eea87a1cbd064398d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1873033033
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3712,6 +3637,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1355394173}
     m_Modifications:
+    - target: {fileID: -8727021424060888477, guid: c6e4a9a5b6575406cb39489cea5699f7, type: 3}
+      propertyPath: m_Name
+      value: TopHex
+      objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c6e4a9a5b6575406cb39489cea5699f7, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.38399506
@@ -3758,10 +3687,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: c6e4a9a5b6575406cb39489cea5699f7, type: 3}
       propertyPath: m_Name
-      value: single_hex_model_top
+      value: TopPlate
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: -8700617353114198275, guid: c6e4a9a5b6575406cb39489cea5699f7, type: 3}
+    - {fileID: 65702495048144492, guid: c6e4a9a5b6575406cb39489cea5699f7, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c6e4a9a5b6575406cb39489cea5699f7, type: 3}
@@ -3810,7 +3741,6 @@ GameObject:
   - component: {fileID: 1915772826}
   - component: {fileID: 1915772825}
   - component: {fileID: 1915772824}
-  - component: {fileID: 1915772827}
   m_Layer: 5
   m_Name: zDown
   m_TagString: Untagged
@@ -3881,19 +3811,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1915772825}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1915772827}
-        m_TargetAssemblyTypeName: MoveParticle, Assembly-CSharp
-        m_MethodName: MoveZ
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1915772825
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3932,19 +3850,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1915772822}
   m_CullTransparentMesh: 1
---- !u!114 &1915772827
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1915772822}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27841302f52914222b5a35874416e0ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dir: -1
 --- !u!1 &2022319037
 GameObject:
   m_ObjectHideFlags: 0

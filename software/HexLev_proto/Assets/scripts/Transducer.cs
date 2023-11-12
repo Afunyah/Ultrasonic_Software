@@ -5,20 +5,32 @@ using UnityEngine;
 
 public class Transducer : MonoBehaviour
 {
-    private Vector3 TPosition;
-    // Start is called before the first frame update
+    private Vector3 tPosition;
+    private int tIndex;
+    private int tArr;
+    private int tPhase;
+    private int tAmplitude;
+
     void Start()
     {
-        TPosition = this.gameObject.transform.localPosition + this.gameObject.transform.parent.transform.localPosition;
-        BoxCollider Bcollider = this.AddComponent<BoxCollider>();
-        // Bcollider.center = this.transform.position;
-        Bcollider.size = new Vector3(0.006858086F,0.006858086F,0.01109307F);
-        // Debug.Log(TPosition);
     }
 
-    // Update is called once per frame
     void Update()
     {
-        Debug.Log(this.transform.position);
     }
+
+    public void Init(int arr, int ind)
+    {
+        tPhase = 0;
+        tAmplitude = 0;
+        tPosition = this.transform.position;
+        tArr = arr;
+        tIndex = ind;
+        float bCenter = tArr == 0 ? 0.008F : -0.005F;
+
+        BoxCollider Bcollider = this.AddComponent<BoxCollider>();
+        Bcollider.center = new Vector3(0, 0, bCenter);
+        Bcollider.size = new Vector3(0.006858086F, 0.006858086F, 0);
+    }
+
 }
