@@ -26,10 +26,15 @@ public class FlowHandler : MonoBehaviour
 
     private int trLayer;
 
+    private Vector3 spoint;
+    private Vector3 epoint;
+    private bool isCreatingTraj;
+
     void Start()
     {
         isSelected = false;
-        trLayer = 1<<6;
+        isCreatingTraj = false;
+        trLayer = 1 << 6;
     }
 
     void Update()
@@ -49,6 +54,7 @@ public class FlowHandler : MonoBehaviour
                     {
                         SelectedLevParticle.SetSelect(false);
                         SelectedRenderer.material = normalMaterial;
+                        isCreatingTraj = false;
                     }
 
                     isSelected = true;
@@ -115,6 +121,21 @@ public class FlowHandler : MonoBehaviour
                             case "zUp":
                                 if (isSelected) { SelectedLevParticle.MoveZ(1); }
                                 break;
+                            case "StartButton":
+                                if (isSelected)
+                                {
+                                    spoint = SelectedLevParticle.GetPosition();
+                                    isCreatingTraj = true;
+                                }
+                                break;
+                            case "EndButton":
+                                if (isSelected && isCreatingTraj)
+                                {
+                                    epoint = SelectedLevParticle.GetPosition();
+                                    SelectedLevParticle.AddTrajectory(spoint, epoint);
+                                    isCreatingTraj = false;
+                                }
+                                break;
                             default:
                                 break;
                         }
@@ -129,6 +150,7 @@ public class FlowHandler : MonoBehaviour
                         isSelected = false;
                         SelectedLevParticle.SetSelect(isSelected);
                         SelectedRenderer.material = normalMaterial;
+                        isCreatingTraj = false;
                     }
                 }
 
