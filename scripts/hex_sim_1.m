@@ -26,6 +26,9 @@ clearvars;
 % =========================================================================
 
 % create the computational grid
+% Nx = 64;            % number of grid points in the x direction
+% Ny = 64;            % number of grid points in the y direction
+% Nz = 64;            % number of grid points in the z direction
 Nx = 64;            % number of grid points in the x direction
 Ny = 64;            % number of grid points in the y direction
 Nz = 64;            % number of grid points in the z direction
@@ -33,6 +36,10 @@ dx = 0.1e-3;        % grid point spacing in the x direction [m]
 dy = 0.1e-3;        % grid point spacing in the y direction [m]
 dz = 0.1e-3;        % grid point spacing in the z direction [m]
 kgrid = kWaveGrid(Nx, dx, Ny, dy, Nz, dz);
+
+% define the properties of the propagation medium
+% medium.sound_speed = 1500 * ones(Nx, Ny, Nz);	% [m/s]
+% medium.density = 1000 * ones(Nx, Ny, Nz);       % [kg/m^3]
 
 % define the properties of the propagation medium
 medium.sound_speed = 1500 * ones(Nx, Ny, Nz);	% [m/s]
@@ -43,7 +50,9 @@ medium.density = 1000 * ones(Nx, Ny, Nz);       % [kg/m^3]
 % medium.density = 1000 * ones(Nx, Ny, Nz);       % [kg/m^3]
 % medium.density(:, Ny/4:end, :) = 1200;          % [kg/m^3]
 
-% create the time array
+% t_end = 60e-7;                  % [s]
+% kgrid.makeTime(medium.sound_speed, [], t_end);
+
 kgrid.makeTime(medium.sound_speed);
 
 
@@ -56,7 +65,7 @@ kgrid.makeTime(medium.sound_speed);
 % create empty array
 karray1 = kWaveArray('BLITolerance', 0.05, 'UpsamplingRate', 10);
 
-element_num     = 2;       % number of elements
+element_num     = 3;       % number of elements
 element_width   = 1e-3;     % width [m]
 element_length  = 1e-3;    % elevation height [m]
 element_pitch   = 1.1e-3;     % pitch [m]
@@ -78,7 +87,7 @@ for ind = 1:element_num
     x_pos = 0 - (element_num * element_pitch / 1 - element_pitch / 1) + (ind - 1) * element_pitch*2;
     % add element (see note in header) kgrid.z_vec(1)
 %     karray1.addRectElement([x_pos, 0, -1.6e-3], element_width, element_length, [0,0,0]);
-    karray1.addDiscElement([x_pos, 0, -1.6e-3], element_width,[x_pos,0,0]);
+    karray1.addDiscElement([x_pos, 0, -5e-3], element_width,[x_pos,0,0]);
 end
 
 
@@ -101,7 +110,7 @@ end
 source1.p_mask = karray1.getArrayBinaryMask(kgrid);
 
 source_freq = 40e3; % [Hz]
-source_mag = 0.5; % [Pa]
+source_mag = 2; % [Pa]
 source_phs = 0;
 source_freq = 2e6;  % [Hz]
 source_mag = 1;     % [Pa]
@@ -143,11 +152,11 @@ x = 20 * dx * ones(size(z));    % [m]
 sensor.mask = [x; y; z];
 
 % define the field parameters to record
-sensor.record = {'p', 'p_final'};
+sensor.record = {'p', 'p_final', 'p_max'};
 
 % input arguments
 % input_args = {'DisplayMask', source.p_mask, 'DataCast', 'single', 'CartInterp', 'nearest','PMLInside', false, 'PlotPML', false};
-input_args = {'DisplayMask', source.p_mask, 'DataCast', 'single', 'CartInterp', 'nearest','PMLInside', true, 'PlotPML', false};
+input_args = {'DisplayMask', display_mask, 'DataCast', 'single', 'CartInterp', 'nearest','PMLInside', true, 'PlotPML', false};
 
 
 % run the simulation
@@ -192,6 +201,7 @@ colorbar;
 % plot the pressure field 
 figure;
 imagesc(scale * kgrid.z_vec, scale * kgrid.x_vec, squeeze(sensor_data.p_final(:, :, kgrid.Nz/2)));
+
 xlabel('Axial Position [mm]');
 ylabel('Lateral Position [mm]');
 axis image;

@@ -11,6 +11,8 @@ public class Transducer : MonoBehaviour
     private int tPhase;
     private int tAmplitude;
 
+    private bool used;
+
     void Start()
     {
     }
@@ -19,18 +21,39 @@ public class Transducer : MonoBehaviour
     {
     }
 
-    public void Init(int arr, int ind)
+    public void Init(int arr, int ind, float bCenter_z)
     {
+        used = false;
         tPhase = 0;
         tAmplitude = 0;
         tPosition = this.transform.position;
         tArr = arr;
         tIndex = ind;
-        float bCenter = tArr == 0 ? 0.008F : -0.005F;
+        float bOff = tArr == 0 ? 1F : -1F;
+        if (arr == 1 && ind == 1)
+        {
+        }
 
         BoxCollider Bcollider = this.AddComponent<BoxCollider>();
-        Bcollider.center = new Vector3(0, 0, bCenter);
-        Bcollider.size = new Vector3(0.006858086F, 0.006858086F, 0);
+        // Bcollider.center = new Vector3(0, 0, (bCenter_z-this.gameObject.transform.position.y)/10-this.gameObject.transform.localPosition.z-bOff*((bCenter_z-this.gameObject.transform.position.y)/10));
+
+        // Bcollider.center = new Vector3(0, 0, ((bCenter_z - this.gameObject.transform.position.y) / 10 - (this.gameObject.transform.localPosition.z)) + 0);
+        Bcollider.center = new Vector3(0, 0, ((bCenter_z ) / 14.5813F )*bOff - bOff*0.00201F);
+
+        Bcollider.size = new Vector3(0.006858086F, 0.006858086F, ((bCenter_z ) / 10)*2 - 2*0.04F - 2*0.00201F);
+        this.gameObject.layer = LayerMask.NameToLayer("TransducerLayer");
+    }
+
+    public void Activate(){
+        used = true;
+    }
+
+    public void Deactivate(){
+        used = false;
+    }
+
+    public bool IsActive(){
+        return used;
     }
 
 }

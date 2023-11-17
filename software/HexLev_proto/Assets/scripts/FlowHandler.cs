@@ -24,9 +24,12 @@ public class FlowHandler : MonoBehaviour
     public Material selectedMaterial;
     private bool isSelected;
 
+    private int trLayer;
+
     void Start()
     {
         isSelected = false;
+        trLayer = 1<<6;
     }
 
     void Update()
@@ -36,7 +39,7 @@ public class FlowHandler : MonoBehaviour
         {
             Ray ray = camera.ScreenPointToRay(Input.mousePosition);
             // Check for collider hit
-            if (Physics.Raycast(ray, out RaycastHit hitInfo))
+            if (Physics.Raycast(ray, out RaycastHit hitInfo, 100f, ~trLayer))
             {
                 // Specifically check for levparticle hit
                 if (hitInfo.collider.gameObject.GetComponent<LevParticle>() != null)
@@ -74,6 +77,7 @@ public class FlowHandler : MonoBehaviour
 
                 List<RaycastResult> uiHitList = new List<RaycastResult>();
                 m_Raycaster.Raycast(m_PointerEventData, uiHitList);
+
 
                 if (uiHitList.Count != 0)
                 {
