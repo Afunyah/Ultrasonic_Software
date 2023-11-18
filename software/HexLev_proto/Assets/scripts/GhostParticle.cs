@@ -1,54 +1,58 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
 public class GhostParticle : MonoBehaviour
 {
 
     private Vector3 particlePos;
-    private List<Transducer> nearbyTransducers;
+    private List<Transducer> NearbyTransducers;
+    private float ColliderRadius;
 
+    void Awake(){
+        NearbyTransducers = new List<Transducer>();
+        ColliderRadius = this.GetComponent<SphereCollider>().radius/10;
+    }
 
     void Start()
     {
-        nearbyTransducers = new List<Transducer> { };
     }
 
 
     void Update()
     {
-        foreach (Transducer x in nearbyTransducers)
+        foreach (Transducer x in NearbyTransducers)
         {
             // Debug.Log(x.name);
         }
     }
 
+    public Vector3 GetPostion()
+    {
+        return this.particlePos;
+    }
+
+    public Vector2 GetXYPosition()
+    {
+        return new Vector2(this.particlePos.x, this.particlePos.y);
+    }
+
     public List<Transducer> FindNearbyTransducers()
     {
-        return nearbyTransducers;
-    }
-
-    private void OnTriggerStay(Collider other)
-    {
-        // Debug.Log(other.gameObject.name);
-        Transducer trs = other.gameObject.GetComponent<Transducer>();
-
-        if (trs != null && !trs.IsActive())
+        Collider[] forcedCollisions = Physics.OverlapSphere(this.transform.position, ColliderRadius);
+        foreach (Collider hitColliders in forcedCollisions)
         {
-            trs.Activate();
-            nearbyTransducers.Add(trs);
+            // this.gameObject.SendMessage("OnTriggerStay", hitColliders);
+            if(hitColliders.GetComponent<Transducer>()!=null){
+                Transducer trs = hitColliders.GetComponent<Transducer>();
+                this.NearbyTransducers.Add(trs);
+            }
         }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        // Debug.Log(other.gameObject.name);
-        Transducer trs = other.gameObject.GetComponent<Transducer>();
-
-        if (trs != null)
-        {
-            trs.Deactivate();
-            nearbyTransducers.Remove(trs);
-        }
+        
+        
+        return this.NearbyTransducers;
     }
 }

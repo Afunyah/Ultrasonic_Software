@@ -1,7 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using Unity.VisualScripting;
 using UnityEngine;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
 public class Transducer : MonoBehaviour
 {
@@ -54,6 +57,14 @@ public class Transducer : MonoBehaviour
 
     public bool IsActive(){
         return used;
+    }
+
+    public Vector3 GetPosition(){
+        return tPosition;
+    }
+
+    public Vector2 GetXYPosition(){
+        return new Vector2(this.GetPosition().x, this.GetPosition().y);
     }
 
 }
