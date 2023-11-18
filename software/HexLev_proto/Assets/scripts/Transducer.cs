@@ -64,7 +64,7 @@ public class Transducer : MonoBehaviour
     }
 
     public Vector2 GetXYPosition(){
-        return new Vector2(this.GetPosition().x, this.GetPosition().y);
+        return new Vector2(this.GetPosition().x, this.GetPosition().z);
     }
 
 }

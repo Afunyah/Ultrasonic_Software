@@ -128,14 +128,13 @@ public class LevParticle : MonoBehaviour
             GhostParticle ghost = GhostParticles[i];
             GhostParticle next_ghost = GhostParticles[i + 1];
             transducers = ghost.FindNearbyTransducers();
-            Debug.Log(transducers.Count);
             List<Transducer> sortedTransducers = transducers.OrderBy(x => Vector2.Distance(x.GetXYPosition(), next_ghost.GetXYPosition())).ToList();
 
-            if (i == 0)
+            if (i == 1)
             {
                 foreach (Transducer trs in sortedTransducers)
                 {
-                    // Debug.Log(trs.gameObject.name);
+                    Debug.Log(trs.gameObject.name);
                 }
             }
         }

@@ -15,6 +15,7 @@ public class GhostParticle : MonoBehaviour
     void Awake(){
         NearbyTransducers = new List<Transducer>();
         ColliderRadius = this.GetComponent<SphereCollider>().radius/10;
+        particlePos = this.transform.position;
     }
 
     void Start()
@@ -37,7 +38,7 @@ public class GhostParticle : MonoBehaviour
 
     public Vector2 GetXYPosition()
     {
-        return new Vector2(this.particlePos.x, this.particlePos.y);
+        return new Vector2(this.particlePos.x, this.particlePos.z);
     }
 
     public List<Transducer> FindNearbyTransducers()
