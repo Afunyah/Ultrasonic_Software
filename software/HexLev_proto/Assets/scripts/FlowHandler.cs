@@ -5,7 +5,9 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityEngine;
 using System.Xml.Schema;
-
+using System.Numerics;
+using Vector3 = UnityEngine.Vector3;
+using Vector2 = UnityEngine.Vector2;
 
 public class FlowHandler : MonoBehaviour
 {
@@ -30,11 +32,22 @@ public class FlowHandler : MonoBehaviour
     private Vector3 epoint;
     private bool isCreatingTraj;
 
+    private Vector2 tr;
+    private Vector2 g1;
+    private Vector2 g2;
+
     void Start()
     {
         isSelected = false;
         isCreatingTraj = false;
         trLayer = 1 << 6;
+        // tr = new Vector2(new Vector3(72.49f, 4.07f, 33.25f).x,new Vector3(72.49f, 4.07f, 33.25f).z);
+        // g1 = new Vector2(new Vector3(72.43f, 6.01f, 33.25f).x,new Vector3(72.43f, 6.01f, 33.25f).z);
+        // g2 = new Vector2(new Vector3(72.49f, 6.01f, 33.25f).x,new Vector3(72.49f, 6.01f, 33.25f).z);
+        
+        // Debug.Log(g1-g2);
+        // Debug.Log(tr-g2);
+        // Debug.Log(Vector2.SignedAngle(g1-g2,tr-g2));
     }
 
     void Update()
@@ -101,7 +114,36 @@ public class FlowHandler : MonoBehaviour
                                 isSelected = false;
                                 break;
                             case "MoveButton":
-                                if (isSelected) Debug.Log("Particle can be Moved!");
+                                if (isSelected)
+                                {
+                                    Debug.Log("Particle can be Moved!");
+                                    List<List<(List<GhostTransducerPositionData>, List<GhostTransducerPositionData>)>> FTTDList = SelectedLevParticle.GetFullTrajectoryTransducerDataList();
+
+                                    foreach (List<(List<GhostTransducerPositionData>, List<GhostTransducerPositionData>)> item in FTTDList)
+                                    {
+                                        foreach ((List<GhostTransducerPositionData>, List<GhostTransducerPositionData>) gtp in item)
+                                        {
+                                            for (int i = 0; i < gtp.Item1.Count; i++)
+                                            {
+                                                if (i == 0)
+                                                {
+                                                    Debug.Log("P2-T1 Data:");
+                                                    foreach (GhostTransducerPositionData gtpdat in gtp.Item1)
+                                                    {
+                                                        Debug.Log(gtpdat.trs.name + " { " + gtpdat.dist + ", " + gtpdat.ang + " }");
+                                                    }
+                                                    Debug.Log("P2-T2 Data:");
+                                                    foreach (GhostTransducerPositionData gtpdat in gtp.Item2)
+                                                    {
+                                                        Debug.Log(gtpdat.trs.name + " { " + gtpdat.dist + ", " + gtpdat.ang + " }");
+                                                    }
+                                                }
+                                            }
+                                        }
+
+
+                                    }
+                                }
                                 break;
                             case "xDown":
                                 if (isSelected) { SelectedLevParticle.MoveX(-1); }

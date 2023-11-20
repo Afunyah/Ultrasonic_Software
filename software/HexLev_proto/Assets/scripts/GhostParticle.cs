@@ -39,7 +39,7 @@ public class GhostParticle : MonoBehaviour
 
     public Vector2 GetXYPosition()
     {
-        return new Vector2(this.particlePos.x, this.particlePos.z);
+        return new Vector2(Mathf.Round(this.particlePos.x*100)/100, Mathf.Round(this.particlePos.z*100)/100);
     }
 
     public List<Transducer> FindNearbyTransducers()
