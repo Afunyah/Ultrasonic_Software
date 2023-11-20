@@ -19,8 +19,6 @@ public class LevParticle : MonoBehaviour
 
     private List<List<(List<GhostTransducerPositionData>, List<GhostTransducerPositionData>)>> FullTrajectoryTransducerDataList;
 
-    private bool isframe;
-
     void Awake()
     {
         Trajectories = new List<Trajectory> { };
@@ -32,7 +30,6 @@ public class LevParticle : MonoBehaviour
 
     void Start()
     {
-        isframe = false;
     }
 
     void Update()
@@ -273,7 +270,7 @@ public class GhostTransducerPositionData
 
         }
         this.dist = (gst2_xy - trs_xy).magnitude;
-        this.ang = Vector2.SignedAngle((gst1_xy - gst2_xy), (trs_xy-gst2_xy));
+        this.ang = Vector3.SignedAngle((gst1_xy - gst2_xy), (gst2_xy-trs_xy), Vector3.back);
     }
 }
 

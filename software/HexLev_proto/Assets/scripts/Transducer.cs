@@ -67,4 +67,20 @@ public class Transducer : MonoBehaviour
         return new Vector2(Mathf.Round(this.GetPosition().x*100)/100, Mathf.Round(this.GetPosition().z*100)/100);
     }
 
+    public int GetPhase(){
+        return this.tPhase;
+    }
+
+    public int GetAmplitude(){
+        return this.tAmplitude;
+    }
+
+    public void SetPhase(int p){
+        this.tPhase = p;
+    }
+
+    public void SetAmplitude(int a){
+        this.tAmplitude = a;
+    }
+
 }

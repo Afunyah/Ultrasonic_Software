@@ -44,7 +44,7 @@ public class FlowHandler : MonoBehaviour
         // tr = new Vector2(new Vector3(72.49f, 4.07f, 33.25f).x,new Vector3(72.49f, 4.07f, 33.25f).z);
         // g1 = new Vector2(new Vector3(72.43f, 6.01f, 33.25f).x,new Vector3(72.43f, 6.01f, 33.25f).z);
         // g2 = new Vector2(new Vector3(72.49f, 6.01f, 33.25f).x,new Vector3(72.49f, 6.01f, 33.25f).z);
-        
+
         // Debug.Log(g1-g2);
         // Debug.Log(tr-g2);
         // Debug.Log(Vector2.SignedAngle(g1-g2,tr-g2));
@@ -123,22 +123,19 @@ public class FlowHandler : MonoBehaviour
                                     {
                                         foreach ((List<GhostTransducerPositionData>, List<GhostTransducerPositionData>) gtp in item)
                                         {
-                                            for (int i = 0; i < gtp.Item1.Count; i++)
+
+                                            Debug.Log("P2-T1 Data:");
+                                            foreach (GhostTransducerPositionData gtpdat in gtp.Item1)
                                             {
-                                                if (i == 0)
-                                                {
-                                                    Debug.Log("P2-T1 Data:");
-                                                    foreach (GhostTransducerPositionData gtpdat in gtp.Item1)
-                                                    {
-                                                        Debug.Log(gtpdat.trs.name + " { " + gtpdat.dist + ", " + gtpdat.ang + " }");
-                                                    }
-                                                    Debug.Log("P2-T2 Data:");
-                                                    foreach (GhostTransducerPositionData gtpdat in gtp.Item2)
-                                                    {
-                                                        Debug.Log(gtpdat.trs.name + " { " + gtpdat.dist + ", " + gtpdat.ang + " }");
-                                                    }
-                                                }
+                                                Debug.Log(gtpdat.trs.name + " { " + gtpdat.dist + ", " + gtpdat.ang + " }");
                                             }
+                                            Debug.Log("P2-T2 Data:");
+                                            foreach (GhostTransducerPositionData gtpdat in gtp.Item2)
+                                            {
+                                                Debug.Log(gtpdat.trs.name + " { " + gtpdat.dist + ", " + gtpdat.ang + " }");
+                                            }
+
+
                                         }
 
 
