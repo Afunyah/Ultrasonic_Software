@@ -57,17 +57,17 @@ public class LevParticle : MonoBehaviour
 
     public void MoveX(int dir)
     {
-        this.transform.position += new Vector3(dir * 0.1F, 0, 0);
+        this.transform.position += new Vector3(dir * 0.12F, 0, 0);
     }
 
     public void MoveY(int dir)
     {
-        this.transform.position += new Vector3(0, 0, dir * 0.1F);
+        this.transform.position += new Vector3(0, 0, dir * 0.12F);
     }
 
     public void MoveZ(int dir)
     {
-        this.transform.position += new Vector3(0, dir * 0.1F, 0);
+        this.transform.position += new Vector3(0, dir * 0.12F, 0);
     }
 
     public void DeleteParticle()
@@ -88,7 +88,7 @@ public class LevParticle : MonoBehaviour
         {
             return;
         }
-        Trajectory traj = new Trajectory(A, B, 0.1f);
+        Trajectory traj = new Trajectory(A, B, 0.06f);
         Trajectories.Add(traj);
         this.AddGhostParticles();
     }
@@ -121,20 +121,40 @@ public class LevParticle : MonoBehaviour
     private void Something()
     {
         List<Transducer> transducers = new List<Transducer> { };
-
+        List<Transducer> next_transducers = new List<Transducer> { };
+        List<Transducer> next_transducers_filtered = new List<Transducer> { };
 
         for (int i = 0; i < GhostParticles.Count - 1; i++)
         {
             GhostParticle ghost = GhostParticles[i];
             GhostParticle next_ghost = GhostParticles[i + 1];
             transducers = ghost.FindNearbyTransducers();
-            List<Transducer> sortedTransducers = transducers.OrderBy(x => Vector2.Distance(x.GetXYPosition(), next_ghost.GetXYPosition())).ToList();
+            next_transducers = next_ghost.FindNearbyTransducers();
 
-            if (i == 1)
+            next_transducers_filtered = next_transducers.Except(transducers).ToList();
+
+            List<GhostTransducerPositionData> p2t1List = new List<GhostTransducerPositionData> { };
+            List<GhostTransducerPositionData> p2t2List = new List<GhostTransducerPositionData> { };
+            foreach (Transducer trs in transducers)
             {
-                foreach (Transducer trs in sortedTransducers)
+                p2t1List.Add(new GhostTransducerPositionData(trs, ghost,  next_ghost));
+            }
+            foreach (Transducer trs in next_transducers_filtered)
+            {
+                p2t2List.Add(new GhostTransducerPositionData(trs, ghost,  next_ghost));
+            }
+
+            if (i == 0)
+            {
+                Debug.Log("P2-T1 Data:");
+                foreach (GhostTransducerPositionData gtpdat in p2t1List)
                 {
-                    Debug.Log(trs.gameObject.name);
+                    Debug.Log(gtpdat.trs.name + " { " + gtpdat.dist + ", " + gtpdat.ang + " }");
+                }
+                Debug.Log("P2-T2 Data:");
+                foreach (GhostTransducerPositionData gtpdat in p2t2List)
+                {
+                    Debug.Log(gtpdat.trs.name + " { " + gtpdat.dist + ", " + gtpdat.ang + " }");
                 }
             }
         }
@@ -184,6 +204,29 @@ public class Trajectory
         return p;
     }
 
+}
+
+public class GhostTransducerPositionData
+{
+    public readonly float dist;
+    public readonly float ang;
+
+    public readonly Transducer trs;
+    public readonly GhostParticle gst1;
+    public readonly GhostParticle gst2;
+
+    public GhostTransducerPositionData(Transducer tr, GhostParticle gs1, GhostParticle gs2)
+    {
+        this.trs = tr;
+        this.gst1 = gs1;
+        this.gst2 = gs2;
+        Vector2 trs_xy = trs.GetXYPosition();
+        Vector2 gst1_xy = gst1.GetXYPosition();
+        Vector2 gst2_xy = gst2.GetXYPosition();
+        Vector2 p2_diff = gst2_xy - trs_xy;
+        this.dist = p2_diff.magnitude;
+        this.ang = Vector2.Angle(gst1_xy-gst2_xy, p2_diff);
+    }
 }
 
 

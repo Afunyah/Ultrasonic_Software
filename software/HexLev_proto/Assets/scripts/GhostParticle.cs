@@ -14,8 +14,9 @@ public class GhostParticle : MonoBehaviour
 
     void Awake(){
         NearbyTransducers = new List<Transducer>();
-        ColliderRadius = this.GetComponent<SphereCollider>().radius/10;
+        ColliderRadius = this.GetComponent<SphereCollider>().radius*this.transform.localScale.x;
         particlePos = this.transform.position;
+        this.gameObject.layer = LayerMask.NameToLayer("TransducerLayer");
     }
 
     void Start()
