@@ -1,18 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO.Ports;
 using Unity.VisualScripting;
 using UnityEngine;
 
 public class StateInit : MonoBehaviour
 {
 
+    private SerialPort ArduinoSerial;
     private List<Transducer> BottArray;
     private List<Transducer> TopArray;
     private float HexCntr_z;
 
     void Awake()
     {
+        ArduinoSerial = new SerialPort("/dev/tty.", 9600);
         BottArray = new List<Transducer> { };
         TopArray = new List<Transducer> { };
     }
@@ -54,7 +57,7 @@ public class StateInit : MonoBehaviour
 
     }
 
-    public void CalculateStateChange()
+    private List<List<List<(Transducer, int, int)>>> CalculateStateChange()
     {
         List<List<List<(Transducer, int, int)>>> CombinedPATList = new List<List<List<(Transducer, int, int)>>> { };
 
@@ -91,20 +94,79 @@ public class StateInit : MonoBehaviour
 
 
 
-        foreach (List<List<(Transducer, int, int)>> PartiPatList in CombinedPATList)
-        {
-            Debug.Log("Particle X: ");
-            foreach (List<(Transducer, int, int)> item in PartiPatList)
-            {
-                foreach ((Transducer, int, int) dat in item)
-                {
-                    Debug.Log(dat.Item1 + " {Phase: " + dat.Item2 + " Amplitude: " + dat.Item3 + " }");
-                }
-            }
-        }
+        // foreach (List<List<(Transducer, int, int)>> PartiPatList in CombinedPATList)
+        // {
+        //     Debug.Log("Particle X: ");
+        //     foreach (List<(Transducer, int, int)> item in PartiPatList)
+        //     {
+        //         foreach ((Transducer, int, int) dat in item)
+        //         {
+        //             Debug.Log(dat.Item1 + " {Phase: " + dat.Item2 + " Amplitude: " + dat.Item3 + " }");
+        //         }
+        //     }
+        // }
+
+        return CombinedPATList;
     }
 
-    // public bool Update
+    public bool UpdateLevState()
+    {
+        bool exhausted = false;
+
+        List<List<List<(Transducer, int, int)>>> CombinedPATList = this.CalculateStateChange();
+
+        while (!exhausted)
+        {
+            exhausted = true;
+            List<(Transducer, int, int)> ActionList = new List<(Transducer, int, int)> { };
+            foreach (List<List<(Transducer, int, int)>> ParticlePATList in CombinedPATList)
+            {
+                if (ParticlePATList.Count != 0)
+                {
+                    ActionList.AddRange(ParticlePATList[0]);
+                    ParticlePATList.RemoveAt(0);
+                    exhausted = false;
+                }
+            }
+
+            foreach ((Transducer, int, int) PATrsData in ActionList)
+            {
+                PATrsData.Item1.SetPhase(PATrsData.Item2);
+                PATrsData.Item1.SetAmplitude(PATrsData.Item3);
+
+                int fpga_addr = 0;
+                int bank_num = 0;
+                string pixel_num = PATrsData.Item1.name;
+                int config_data = PATrsData.Item2 + PATrsData.Item3;
+                string serial_command = string.Format("SET_PIXEL {0} {1} {2} {3}", fpga_addr, bank_num, pixel_num, config_data);
+                Debug.Log(serial_command);
+                // try
+                // {
+                //     while (!ArduinoSerial.IsOpen)
+                //     {
+                //         ArduinoSerial.Open();
+                //         ArduinoSerial.ReadTimeout = 100;
+                //     }
+
+                //     bool ack = false;
+                //     while (!ack)
+                //     {
+                //         ArduinoSerial.WriteLine(serial_command);
+                //         ack = bool.Parse(ArduinoSerial.ReadLine());
+                //         ArduinoSerial.BaseStream.Flush();
+                //     }
+                // }
+                // catch (System.Exception e)
+                // {
+                //     Debug.LogException(e);
+                //     return false;
+                // }
+
+            }
+        }
+
+        return true;
+    }
 
     public (Transducer, int, int) ConvertGTPDtoPhaseAmplitude(GhostTransducerPositionData gtpd, bool far)
     {
@@ -160,5 +222,10 @@ public class StateInit : MonoBehaviour
 
 
         return (trs, phase, amplitude);
+    }
+
+    public void OnApplicationQuit()
+    {
+        ArduinoSerial.Close();
     }
 }

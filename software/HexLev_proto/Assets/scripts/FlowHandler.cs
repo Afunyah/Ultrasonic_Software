@@ -133,7 +133,7 @@ public class FlowHandler : MonoBehaviour
                                     //     }
                                     // }
                                 }
-                                this.GetComponent<StateInit>().CalculateStateChange();
+                                this.GetComponent<StateInit>().UpdateLevState();
                                 break;
                             case "xDown":
                                 if (isSelected) { SelectedLevParticle.MoveX(-1); }
