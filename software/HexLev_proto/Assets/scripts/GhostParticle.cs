@@ -12,15 +12,21 @@ public class GhostParticle : MonoBehaviour
     private List<Transducer> NearbyTransducers;
     private float ColliderRadius;
 
-    void Awake(){
+    void Awake()
+    {
         NearbyTransducers = new List<Transducer>();
-        ColliderRadius = this.GetComponent<SphereCollider>().radius*this.transform.localScale.x;
+        ColliderRadius = this.GetComponent<SphereCollider>().radius * this.transform.localScale.x;
         particlePos = this.transform.position;
         this.gameObject.layer = LayerMask.NameToLayer("TransducerLayer");
     }
 
+    void OnValidate(){
+        particlePos = this.transform.position;
+    }
+
     void Start()
     {
+
     }
 
 
@@ -37,9 +43,13 @@ public class GhostParticle : MonoBehaviour
         return this.particlePos;
     }
 
+    public Vector2 GetXYPositionRounded()
+    {
+        return new Vector2(Mathf.Round(this.particlePos.x * 100) / 100, Mathf.Round(this.particlePos.z * 100) / 100);
+    }
     public Vector2 GetXYPosition()
     {
-        return new Vector2(Mathf.Round(this.particlePos.x*100)/100, Mathf.Round(this.particlePos.z*100)/100);
+        return new Vector2(this.particlePos.x, this.particlePos.z);
     }
 
     public List<Transducer> FindNearbyTransducers()
@@ -48,13 +58,14 @@ public class GhostParticle : MonoBehaviour
         foreach (Collider hitColliders in forcedCollisions)
         {
             // this.gameObject.SendMessage("OnTriggerStay", hitColliders);
-            if(hitColliders.GetComponent<Transducer>()!=null){
+            if (hitColliders.GetComponent<Transducer>() != null)
+            {
                 Transducer trs = hitColliders.GetComponent<Transducer>();
                 this.NearbyTransducers.Add(trs);
             }
         }
-        
-        
+
+
         return this.NearbyTransducers;
     }
 }

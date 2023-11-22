@@ -41,45 +41,59 @@ public class Transducer : MonoBehaviour
         // Bcollider.center = new Vector3(0, 0, (bCenter_z-this.gameObject.transform.position.y)/10-this.gameObject.transform.localPosition.z-bOff*((bCenter_z-this.gameObject.transform.position.y)/10));
 
         // Bcollider.center = new Vector3(0, 0, ((bCenter_z - this.gameObject.transform.position.y) / 10 - (this.gameObject.transform.localPosition.z)) + 0);
-        Bcollider.center = new Vector3(0, 0, ((bCenter_z ) / 14.5813F )*bOff - bOff*0.00201F);
+        Bcollider.center = new Vector3(0, 0, ((bCenter_z) / 14.5813F) * bOff - bOff * 0.00201F);
 
-        Bcollider.size = new Vector3(0.006858086F, 0.006858086F, ((bCenter_z ) / 10)*2 - 2*0.04F - 2*0.00201F);
+        Bcollider.size = new Vector3(0.006858086F, 0.006858086F, ((bCenter_z) / 10) * 2 - 2 * 0.04F - 2 * 0.00201F);
         this.gameObject.layer = LayerMask.NameToLayer("TransducerLayer");
     }
 
-    public void Activate(){
+    public void Activate()
+    {
         used = true;
     }
 
-    public void Deactivate(){
+    public void Deactivate()
+    {
         used = false;
     }
 
-    public bool IsActive(){
+    public bool IsActive()
+    {
         return used;
     }
 
-    public Vector3 GetPosition(){
+    public Vector3 GetPosition()
+    {
         return tPosition;
     }
 
-    public Vector2 GetXYPosition(){
-        return new Vector2(Mathf.Round(this.GetPosition().x*100)/100, Mathf.Round(this.GetPosition().z*100)/100);
+    public Vector2 GetXYPositionRounded()
+    {
+        return new Vector2(Mathf.Round(this.GetPosition().x * 100) / 100, Mathf.Round(this.GetPosition().z * 100) / 100);
     }
 
-    public int GetPhase(){
+    public Vector2 GetXYPosition()
+    {
+        return new Vector2(this.GetPosition().x, this.GetPosition().z);
+    }
+
+    public int GetPhase()
+    {
         return this.tPhase;
     }
 
-    public int GetAmplitude(){
+    public int GetAmplitude()
+    {
         return this.tAmplitude;
     }
 
-    public void SetPhase(int p){
+    public void SetPhase(int p)
+    {
         this.tPhase = p;
     }
 
-    public void SetAmplitude(int a){
+    public void SetAmplitude(int a)
+    {
         this.tAmplitude = a;
     }
 

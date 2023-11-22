@@ -116,31 +116,24 @@ public class FlowHandler : MonoBehaviour
                             case "MoveButton":
                                 if (isSelected)
                                 {
-                                    Debug.Log("Particle can be Moved!");
-                                    List<List<(List<GhostTransducerPositionData>, List<GhostTransducerPositionData>)>> FTTDList = SelectedLevParticle.GetFullTrajectoryTransducerDataList();
+                                    // Debug.Log("Particle can be Moved!");
+                                    // List<(List<GhostTransducerPositionData>, List<GhostTransducerPositionData>)> FTTDList = SelectedLevParticle.GetFullTrajectoryTransducerDataList();
 
-                                    foreach (List<(List<GhostTransducerPositionData>, List<GhostTransducerPositionData>)> item in FTTDList)
-                                    {
-                                        foreach ((List<GhostTransducerPositionData>, List<GhostTransducerPositionData>) gtp in item)
-                                        {
-
-                                            Debug.Log("P2-T1 Data:");
-                                            foreach (GhostTransducerPositionData gtpdat in gtp.Item1)
-                                            {
-                                                Debug.Log(gtpdat.trs.name + " { " + gtpdat.dist + ", " + gtpdat.ang + " }");
-                                            }
-                                            Debug.Log("P2-T2 Data:");
-                                            foreach (GhostTransducerPositionData gtpdat in gtp.Item2)
-                                            {
-                                                Debug.Log(gtpdat.trs.name + " { " + gtpdat.dist + ", " + gtpdat.ang + " }");
-                                            }
-
-
-                                        }
-
-
-                                    }
+                                    // foreach ((List<GhostTransducerPositionData>, List<GhostTransducerPositionData>) gtp in FTTDList)
+                                    // {
+                                    //     Debug.Log("P2-T1 Data:");
+                                    //     foreach (GhostTransducerPositionData gtpdat in gtp.Item1)
+                                    //     {
+                                    //         Debug.Log(gtpdat.trs.name + " { " + gtpdat.GetDist() + ", " + gtpdat.ang + " }");
+                                    //     }
+                                    //     Debug.Log("P2-T2 Data:");
+                                    //     foreach (GhostTransducerPositionData gtpdat in gtp.Item2)
+                                    //     {
+                                    //         Debug.Log(gtpdat.trs.name + " { " + gtpdat.GetDist() + ", " + gtpdat.ang + " }");
+                                    //     }
+                                    // }
                                 }
+                                this.GetComponent<StateInit>().CalculateStateChange();
                                 break;
                             case "xDown":
                                 if (isSelected) { SelectedLevParticle.MoveX(-1); }

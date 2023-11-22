@@ -17,7 +17,7 @@ public class LevParticle : MonoBehaviour
     public GameObject ghostParticlePrefab;
     private GameObject ghostParent;
 
-    private List<List<(List<GhostTransducerPositionData>, List<GhostTransducerPositionData>)>> FullTrajectoryTransducerDataList;
+    private List<(List<GhostTransducerPositionData>, List<GhostTransducerPositionData>)> FullTrajectoryTransducerDataList;
 
     void Awake()
     {
@@ -25,7 +25,7 @@ public class LevParticle : MonoBehaviour
         ghostParent = new GameObject("ghostParent");
         particlePos = this.transform.position;
         selected = false;
-        FullTrajectoryTransducerDataList = new List<List<(List<GhostTransducerPositionData>, List<GhostTransducerPositionData>)>> { };
+        FullTrajectoryTransducerDataList = new List<(List<GhostTransducerPositionData>, List<GhostTransducerPositionData>)> { };
     }
 
     void Start()
@@ -111,13 +111,14 @@ public class LevParticle : MonoBehaviour
 
                 traj.AddGhostParticle(ghost.GetComponent<GhostParticle>());
             }
-            this.FullTrajectoryTransducerDataList.Add(traj.GetTrajectoryTransducerData());
+            this.FullTrajectoryTransducerDataList.AddRange(traj.GetTrajectoryTransducerData());
         }
     }
 
-    public List<List<(List<GhostTransducerPositionData>, List<GhostTransducerPositionData>)>> GetFullTrajectoryTransducerDataList(){
+    public List<(List<GhostTransducerPositionData>, List<GhostTransducerPositionData>)> GetFullTrajectoryTransducerDataList()
+    {
         return this.FullTrajectoryTransducerDataList;
-    } 
+    }
 }
 
 
@@ -199,36 +200,39 @@ public class Trajectory
 
             p2t1List = new List<GhostTransducerPositionData> { };
             p2t2List = new List<GhostTransducerPositionData> { };
+            float p2t1max = 0.0f;
+            float p2t2max = 0.0f;
             foreach (Transducer trs in transducers)
             {
-                p2t1List.Add(new GhostTransducerPositionData(trs, ghost, next_ghost));
+                GhostTransducerPositionData gtpd = new GhostTransducerPositionData(trs, ghost, next_ghost);
+                p2t1List.Add(gtpd);
+                p2t1max = gtpd.GetDist() > p2t1max ? gtpd.GetDist() : p2t1max;
             }
             foreach (Transducer trs in next_transducers_filtered)
             {
-                p2t2List.Add(new GhostTransducerPositionData(trs, ghost, next_ghost));
+                GhostTransducerPositionData gtpd = new GhostTransducerPositionData(trs, ghost, next_ghost);
+                p2t2List.Add(gtpd);
+                p2t2max = gtpd.GetDist() > p2t2max ? gtpd.GetDist() : p2t2max;
             }
+            // this.StandardiseTrajectoryTransducerData(p2t1List, p2t1max);
+            // this.StandardiseTrajectoryTransducerData(p2t2List, p2t2max);
 
             this.TrajectoryTransducerData.Add((p2t1List, p2t2List));
+        }
+    }
 
-            // if (i == 0)
-            // {
-            //     Debug.Log("P2-T1 Data:");
-            //     foreach (GhostTransducerPositionData gtpdat in p2t1List)
-            //     {
-            //         Debug.Log(gtpdat.trs.name + " { " + gtpdat.dist + ", " + gtpdat.ang + " }");
-            //     }
-            //     Debug.Log("P2-T2 Data:");
-            //     foreach (GhostTransducerPositionData gtpdat in p2t2List)
-            //     {
-            //         Debug.Log(gtpdat.trs.name + " { " + gtpdat.dist + ", " + gtpdat.ang + " }");
-            //     }
-            // }
+    private void StandardiseTrajectoryTransducerData(List<GhostTransducerPositionData> gtpd_list, float d_max)
+    {
+        foreach (GhostTransducerPositionData gtpd in gtpd_list)
+        {
+            gtpd.DivideDist(d_max);
         }
     }
 
     public List<(List<GhostTransducerPositionData>, List<GhostTransducerPositionData>)> GetTrajectoryTransducerData()
     {
-        if(this.TrajectoryTransducerData.Count==0){
+        if (this.TrajectoryTransducerData.Count == 0)
+        {
             this.CalculateTrajectoryTransducerData();
         }
         return this.TrajectoryTransducerData;
@@ -239,7 +243,7 @@ public class Trajectory
 
 public class GhostTransducerPositionData
 {
-    public readonly float dist;
+    private float dist;
     public readonly float ang;
 
     public readonly Transducer trs;
@@ -251,26 +255,21 @@ public class GhostTransducerPositionData
         this.trs = tr;
         this.gst1 = gs1;
         this.gst2 = gs2;
-        Vector2 trs_xy = trs.GetXYPosition();
-        Vector2 gst1_xy = gst1.GetXYPosition();
-        Vector2 gst2_xy = gst2.GetXYPosition();
-        if(tr.name=="Transducer.184"){
-            // Debug.Log(trs_xy);
-            // Debug.Log(gst1_xy);
-            // Debug.Log(gst2_xy);
-            // Debug.Log(gst1_xy-gst2_xy);
-            // Debug.Log(trs_xy-gst2_xy);
-            // Vector2 pp = gst1_xy-gst2_xy;
-            // Vector2 cc = trs_xy-gst2_xy;
-            // Debug.Log(pp.ToString("F5"));
-            // Debug.Log(cc.ToString("F5"));
-            // Debug.Log(Vector2.SignedAngle(gst1_xy-gst2_xy,trs_xy-gst2_xy));
-            // Debug.Log(Vector2.SignedAngle(pp,cc));
-            // Debug.Log(Vector2.SignedAngle(new Vector2(-0.06001f,0.00f), new Vector2(-0.001f,0.0005f)));
+        Vector2 trs_xy = trs.GetXYPositionRounded();
+        Vector2 gst1_xy = gst1.GetXYPositionRounded();
+        Vector2 gst2_xy = gst2.GetXYPositionRounded();
 
-        }
-        this.dist = (gst2_xy - trs_xy).magnitude;
-        this.ang = Vector3.SignedAngle((gst1_xy - gst2_xy), (gst2_xy-trs_xy), Vector3.back);
+        this.dist = (gst2.GetXYPosition() - trs.GetXYPosition()).magnitude;
+        this.ang = Vector3.SignedAngle((gst1_xy - gst2_xy), (gst2_xy - trs_xy), Vector3.back);
+    }
+
+    public float GetDist()
+    {
+        return this.dist;
+    }
+    public void DivideDist(float d)
+    {
+        this.dist /= d;
     }
 }
 
