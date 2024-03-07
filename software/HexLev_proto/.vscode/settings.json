@@ -51,5 +51,7 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "HexLev_proto.sln"
+    "dotnet.defaultSolution": "HexLev_proto.sln",
+    "C_Cpp.doxygen.generatedStyle": "///",
+    "editor.formatOnType": true
 }

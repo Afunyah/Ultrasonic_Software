@@ -1,0 +1,124 @@
+\doxysection{State\+Init Class Reference}
+\hypertarget{class_state_init}{}\label{class_state_init}\index{StateInit@{StateInit}}
+
+
+Initialises the program state\+: handles external interfacing and control algorithms.  
+
+
+Inheritance diagram for State\+Init\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_state_init}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_state_init_a377285370b8c0693b1111a516756c656}\label{class_state_init_a377285370b8c0693b1111a516756c656} 
+void {\bfseries Initialize\+Arrays} ()
+\begin{DoxyCompactList}\small\item\em Adds transducers to their respective plate arrays. The transducers are pre-\/labelled in Unity Editor. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_state_init_a849c919f3356bc94f6a9e79f59e2044d}{Update\+Lev\+State}} ()
+\begin{DoxyCompactList}\small\item\em Updates the state of the physical levitator. Interfaces with an arduino TODO\+: (Dependency) Implement updator for large array when PCB and Transducers are available Current placeholde uses debug values. \end{DoxyCompactList}\item 
+\Hypertarget{class_state_init_a2fce13e2d9140a951d3b5957474740c1}\label{class_state_init_a2fce13e2d9140a951d3b5957474740c1} 
+int {\bfseries Convert\+GTPDto\+Phase\+Amplitude} (\mbox{\hyperlink{class_ghost_transducer_position_data}{Ghost\+Transducer\+Position\+Data}} gtpd, bool far)
+\item 
+\Hypertarget{class_state_init_a139877be6f5100dcdf86ae971e36e43b}\label{class_state_init_a139877be6f5100dcdf86ae971e36e43b} 
+void {\bfseries On\+Application\+Quit} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_state_init_af64556a1a6ff6342a4eeae02a7cc9cee}{Transducer}}
+\begin{DoxyCompactList}\small\item\em Converts \doxylink{class_ghost_transducer_position_data}{Ghost\+Transducer\+Position\+Data} to phase and amplitude. The current placeholder is a crude implementation which switches phases and amplitudes from low to high based on distances and angles. The positions availabe are Triangle (T, 3 transducers), Between (B, 2 transducers), Center (C, 1 transducer) TODO\+: (Dependency) Implement solver for large array when PCB and Transducers are available. \end{DoxyCompactList}\item 
+\Hypertarget{class_state_init_a2e4db646073df3fae61c99390f17d99e}\label{class_state_init_a2e4db646073df3fae61c99390f17d99e} 
+{\bfseries int}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_state_init_a363c2dc3b44c16c607fe160e2b7c4dbf}\label{class_state_init_a363c2dc3b44c16c607fe160e2b7c4dbf} 
+void {\bfseries Awake} ()
+\item 
+\Hypertarget{class_state_init_a81af5edeb1441331e7c800b3aa25e498}\label{class_state_init_a81af5edeb1441331e7c800b3aa25e498} 
+void {\bfseries Start} ()
+\item 
+\Hypertarget{class_state_init_ab1926dca0b25ee78c8dcaf4a60391d0a}\label{class_state_init_ab1926dca0b25ee78c8dcaf4a60391d0a} 
+void {\bfseries Update} ()
+\item 
+List$<$ List$<$ List$<$(\mbox{\hyperlink{class_transducer}{Transducer}}, int, int)$>$ $>$ $>$ \mbox{\hyperlink{class_state_init_a04e0bdbbdf76a73a9d63879c9892f3b9}{Calculate\+State\+Change}} ()
+\begin{DoxyCompactList}\small\item\em Calculates the state change for needed to advance all particles per timestep. The combined PAT (Phase-\/\+Array-\/\+Time) list is returned. The Combined\+PATList represents a combination of the Phase and Amplidute formats of each trajectory for each particle The \textquotesingle{}Time\textquotesingle{} aspect is introduced when each movement of each particle is aligned. This indicates that Move 1 of every particle occurs in the same step, then Move 2 of every particle occurs next... \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_state_init_ab08c4fc0dcbf3999d840e08ce91a0d24}\label{class_state_init_ab08c4fc0dcbf3999d840e08ce91a0d24} 
+Serial\+Port {\bfseries Arduino\+Serial}
+\begin{DoxyCompactList}\small\item\em Serial Port for arduino. Will differ based on ports and OS. \end{DoxyCompactList}\item 
+\Hypertarget{class_state_init_a8db344b00c2fd9761b9c2f28b5b42164}\label{class_state_init_a8db344b00c2fd9761b9c2f28b5b42164} 
+List$<$ \mbox{\hyperlink{class_transducer}{Transducer}} $>$ {\bfseries Bott\+Array}
+\begin{DoxyCompactList}\small\item\em Array of transducers for bottom plate. \end{DoxyCompactList}\item 
+\Hypertarget{class_state_init_a491474c12488e909d6e0dbe0a0927463}\label{class_state_init_a491474c12488e909d6e0dbe0a0927463} 
+List$<$ \mbox{\hyperlink{class_transducer}{Transducer}} $>$ {\bfseries Top\+Array}
+\begin{DoxyCompactList}\small\item\em Array of transducers for top plate. \end{DoxyCompactList}\item 
+\Hypertarget{class_state_init_a80ad1b3f26486334335413b9c9569e47}\label{class_state_init_a80ad1b3f26486334335413b9c9569e47} 
+float {\bfseries Hex\+Cntr\+\_\+z}
+\begin{DoxyCompactList}\small\item\em Z-\/axis value of the levitator centre. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Initialises the program state\+: handles external interfacing and control algorithms. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_state_init_a04e0bdbbdf76a73a9d63879c9892f3b9}\label{class_state_init_a04e0bdbbdf76a73a9d63879c9892f3b9} 
+\index{StateInit@{StateInit}!CalculateStateChange@{CalculateStateChange}}
+\index{CalculateStateChange@{CalculateStateChange}!StateInit@{StateInit}}
+\doxysubsubsection{\texorpdfstring{CalculateStateChange()}{CalculateStateChange()}}
+{\footnotesize\ttfamily List$<$ List$<$ List$<$(\mbox{\hyperlink{class_transducer}{Transducer}}, int, int)$>$ $>$ $>$ State\+Init.\+Calculate\+State\+Change (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Calculates the state change for needed to advance all particles per timestep. The combined PAT (Phase-\/\+Array-\/\+Time) list is returned. The Combined\+PATList represents a combination of the Phase and Amplidute formats of each trajectory for each particle The \textquotesingle{}Time\textquotesingle{} aspect is introduced when each movement of each particle is aligned. This indicates that Move 1 of every particle occurs in the same step, then Move 2 of every particle occurs next... 
+
+\begin{DoxyReturn}{Returns}
+A list of lists containing lists of 3-\/item tuples. (\doxylink{class_transducer}{Transducer}, Phase, Amplitude)
+\end{DoxyReturn}
+\Hypertarget{class_state_init_a849c919f3356bc94f6a9e79f59e2044d}\label{class_state_init_a849c919f3356bc94f6a9e79f59e2044d} 
+\index{StateInit@{StateInit}!UpdateLevState@{UpdateLevState}}
+\index{UpdateLevState@{UpdateLevState}!StateInit@{StateInit}}
+\doxysubsubsection{\texorpdfstring{UpdateLevState()}{UpdateLevState()}}
+{\footnotesize\ttfamily bool State\+Init.\+Update\+Lev\+State (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Updates the state of the physical levitator. Interfaces with an arduino TODO\+: (Dependency) Implement updator for large array when PCB and Transducers are available Current placeholde uses debug values. 
+
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_state_init_af64556a1a6ff6342a4eeae02a7cc9cee}\label{class_state_init_af64556a1a6ff6342a4eeae02a7cc9cee} 
+\index{StateInit@{StateInit}!Transducer@{Transducer}}
+\index{Transducer@{Transducer}!StateInit@{StateInit}}
+\doxysubsubsection{\texorpdfstring{Transducer}{Transducer}}
+{\footnotesize\ttfamily State\+Init.\+Transducer}
+
+
+
+Converts \doxylink{class_ghost_transducer_position_data}{Ghost\+Transducer\+Position\+Data} to phase and amplitude. The current placeholder is a crude implementation which switches phases and amplitudes from low to high based on distances and angles. The positions availabe are Triangle (T, 3 transducers), Between (B, 2 transducers), Center (C, 1 transducer) TODO\+: (Dependency) Implement solver for large array when PCB and Transducers are available. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em gtpd} & \doxylink{class_ghost_transducer_position_data}{Ghost\+Transducer\+Position\+Data} to extract data from\\
+\hline
+{\em far} & Indicates whether a transducer is within the Area-\/\+Of-\/\+Interest of a particle (currently unused)\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+State\+Init.\+cs\end{DoxyCompactItemize}

@@ -1,0 +1,114 @@
+\doxysection{Ghost\+Particle Class Reference}
+\hypertarget{class_ghost_particle}{}\label{class_ghost_particle}\index{GhostParticle@{GhostParticle}}
+
+
+A ghost particle for keeping track of a \doxylink{class_lev_particle}{Lev\+Particle}\textquotesingle{}s trajectory. Faded and slighlty transparent partices placed along points of a trajectory to indicate future positions of particles. Useful in checking for path collisions and visualising the workspace.  
+
+
+Inheritance diagram for Ghost\+Particle\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_ghost_particle}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+Vector3 \mbox{\hyperlink{class_ghost_particle_a30ebb9551a5486b6ce48052558374dae}{Get\+Postion}} ()
+\begin{DoxyCompactList}\small\item\em Gets the position of the ghost particle. \end{DoxyCompactList}\item 
+Vector2 \mbox{\hyperlink{class_ghost_particle_aff437f1ed0852e9f440fd45cf5a96008}{Get\+XYPosition\+Rounded}} ()
+\begin{DoxyCompactList}\small\item\em Gets the rounded 2D coordinates of the ghost particle. The z-\/coordinate is used as the y-\/coordinate, as in the Unity space. \end{DoxyCompactList}\item 
+Vector2 \mbox{\hyperlink{class_ghost_particle_a97cb088f134fb1a9ea651133bc56d557}{Get\+XYPosition}} ()
+\begin{DoxyCompactList}\small\item\em Gets the unrounded 2D coordinates of the ghost particle. The z-\/coordinate is used as the y-\/coordinate, as in the Unity space. \end{DoxyCompactList}\item 
+List$<$ \mbox{\hyperlink{class_transducer}{Transducer}} $>$ \mbox{\hyperlink{class_ghost_particle_a40959abf99bcdff5c541d9d4f37b876c}{Find\+Nearby\+Transducers}} ()
+\begin{DoxyCompactList}\small\item\em Finds Transducers in the vicinity of the ghost particle. The position of transducers and ghost particles are projected onto a 2D plane. This is done by checking collisions between the Sphere\+Collider and elongated colliders of the Transducers. The closeness is defined by the Sphere\+Collider radius. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_ghost_particle_a46a94597aa678a51d9af3dace4703c9a}\label{class_ghost_particle_a46a94597aa678a51d9af3dace4703c9a} 
+void {\bfseries Awake} ()
+\item 
+\Hypertarget{class_ghost_particle_a3028d60be0c1a4bfc018b3159abf406d}\label{class_ghost_particle_a3028d60be0c1a4bfc018b3159abf406d} 
+void {\bfseries On\+Validate} ()
+\item 
+\Hypertarget{class_ghost_particle_a9f8567ebb664cdffc00bec4e589a08a2}\label{class_ghost_particle_a9f8567ebb664cdffc00bec4e589a08a2} 
+void {\bfseries Start} ()
+\item 
+\Hypertarget{class_ghost_particle_a0d1d1e94fef65ab24379a338e5df4a34}\label{class_ghost_particle_a0d1d1e94fef65ab24379a338e5df4a34} 
+void {\bfseries Update} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_ghost_particle_a7983443ed94d501f40cddf9f6fca9399}\label{class_ghost_particle_a7983443ed94d501f40cddf9f6fca9399} 
+Vector3 {\bfseries particle\+Pos}
+\begin{DoxyCompactList}\small\item\em Stores the coordinates of the ghost. \end{DoxyCompactList}\item 
+\Hypertarget{class_ghost_particle_ae296851f3994a7c5ecde5a76572ce343}\label{class_ghost_particle_ae296851f3994a7c5ecde5a76572ce343} 
+List$<$ \mbox{\hyperlink{class_transducer}{Transducer}} $>$ {\bfseries Nearby\+Transducers}
+\begin{DoxyCompactList}\small\item\em Stores a list of nearby Transducers to be used in controlling the movement of a \doxylink{class_lev_particle}{Lev\+Particle} when it reaches this \doxylink{class_ghost_particle}{Ghost\+Particle}. \end{DoxyCompactList}\item 
+\Hypertarget{class_ghost_particle_a5f0205ca9f1e443eff5d1f81fceb8aeb}\label{class_ghost_particle_a5f0205ca9f1e443eff5d1f81fceb8aeb} 
+float {\bfseries Collider\+Radius}
+\begin{DoxyCompactList}\small\item\em Specifies the radius of the sphere collider used to determine nearby Transducers. Provided by the Sphere\+Collider in the Unity editor. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A ghost particle for keeping track of a \doxylink{class_lev_particle}{Lev\+Particle}\textquotesingle{}s trajectory. Faded and slighlty transparent partices placed along points of a trajectory to indicate future positions of particles. Useful in checking for path collisions and visualising the workspace. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_ghost_particle_a40959abf99bcdff5c541d9d4f37b876c}\label{class_ghost_particle_a40959abf99bcdff5c541d9d4f37b876c} 
+\index{GhostParticle@{GhostParticle}!FindNearbyTransducers@{FindNearbyTransducers}}
+\index{FindNearbyTransducers@{FindNearbyTransducers}!GhostParticle@{GhostParticle}}
+\doxysubsubsection{\texorpdfstring{FindNearbyTransducers()}{FindNearbyTransducers()}}
+{\footnotesize\ttfamily List$<$ \mbox{\hyperlink{class_transducer}{Transducer}} $>$ Ghost\+Particle.\+Find\+Nearby\+Transducers (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Finds Transducers in the vicinity of the ghost particle. The position of transducers and ghost particles are projected onto a 2D plane. This is done by checking collisions between the Sphere\+Collider and elongated colliders of the Transducers. The closeness is defined by the Sphere\+Collider radius. 
+
+\begin{DoxyReturn}{Returns}
+A list of nearby \doxylink{class_transducer}{Transducer} objects
+\end{DoxyReturn}
+\Hypertarget{class_ghost_particle_a30ebb9551a5486b6ce48052558374dae}\label{class_ghost_particle_a30ebb9551a5486b6ce48052558374dae} 
+\index{GhostParticle@{GhostParticle}!GetPostion@{GetPostion}}
+\index{GetPostion@{GetPostion}!GhostParticle@{GhostParticle}}
+\doxysubsubsection{\texorpdfstring{GetPostion()}{GetPostion()}}
+{\footnotesize\ttfamily Vector3 Ghost\+Particle.\+Get\+Postion (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Gets the position of the ghost particle. 
+
+\begin{DoxyReturn}{Returns}
+Position of the ghost particle
+\end{DoxyReturn}
+\Hypertarget{class_ghost_particle_a97cb088f134fb1a9ea651133bc56d557}\label{class_ghost_particle_a97cb088f134fb1a9ea651133bc56d557} 
+\index{GhostParticle@{GhostParticle}!GetXYPosition@{GetXYPosition}}
+\index{GetXYPosition@{GetXYPosition}!GhostParticle@{GhostParticle}}
+\doxysubsubsection{\texorpdfstring{GetXYPosition()}{GetXYPosition()}}
+{\footnotesize\ttfamily Vector2 Ghost\+Particle.\+Get\+XYPosition (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Gets the unrounded 2D coordinates of the ghost particle. The z-\/coordinate is used as the y-\/coordinate, as in the Unity space. 
+
+\begin{DoxyReturn}{Returns}
+(x,y) vector coordinates of the ghost particle
+\end{DoxyReturn}
+\Hypertarget{class_ghost_particle_aff437f1ed0852e9f440fd45cf5a96008}\label{class_ghost_particle_aff437f1ed0852e9f440fd45cf5a96008} 
+\index{GhostParticle@{GhostParticle}!GetXYPositionRounded@{GetXYPositionRounded}}
+\index{GetXYPositionRounded@{GetXYPositionRounded}!GhostParticle@{GhostParticle}}
+\doxysubsubsection{\texorpdfstring{GetXYPositionRounded()}{GetXYPositionRounded()}}
+{\footnotesize\ttfamily Vector2 Ghost\+Particle.\+Get\+XYPosition\+Rounded (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Gets the rounded 2D coordinates of the ghost particle. The z-\/coordinate is used as the y-\/coordinate, as in the Unity space. 
+
+\begin{DoxyReturn}{Returns}
+(x,y) rounded vector coordinates of the ghost particle
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+Ghost\+Particle.\+cs\end{DoxyCompactItemize}

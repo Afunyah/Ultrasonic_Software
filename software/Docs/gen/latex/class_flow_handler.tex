@@ -1,0 +1,81 @@
+\doxysection{Flow\+Handler Class Reference}
+\hypertarget{class_flow_handler}{}\label{class_flow_handler}\index{FlowHandler@{FlowHandler}}
+
+
+Manages the workflow of the program. Graphic Raycasters are used to determine interaction with UI elements such as menus and buttons, as well selecting and moving particles.  
+
+
+Inheritance diagram for Flow\+Handler\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_flow_handler}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_flow_handler_af7b9c791e417757e69d2f27e7a292282}\label{class_flow_handler_af7b9c791e417757e69d2f27e7a292282} 
+new Camera {\bfseries camera}
+\begin{DoxyCompactList}\small\item\em Camera reference to main Hex\+Cam. Provided within the Unity editor. \end{DoxyCompactList}\item 
+\Hypertarget{class_flow_handler_aaa934fcbf66da8cba1681c8b432adc55}\label{class_flow_handler_aaa934fcbf66da8cba1681c8b432adc55} 
+Game\+Object {\bfseries ui\+Canvas}
+\begin{DoxyCompactList}\small\item\em UI Canvas element for buttons and text. Provided within the Unity editor. \end{DoxyCompactList}\item 
+\Hypertarget{class_flow_handler_a4323d087ee3059dcf489f64622dad188}\label{class_flow_handler_a4323d087ee3059dcf489f64622dad188} 
+Material {\bfseries normal\+Material}
+\begin{DoxyCompactList}\small\item\em Material asset for specifying the visual properties of a normal unselected \doxylink{class_lev_particle}{Lev\+Particle}. Provided within the Unity editor. \end{DoxyCompactList}\item 
+\Hypertarget{class_flow_handler_ae2eb45b328f1b3f27249aca925f58f26}\label{class_flow_handler_ae2eb45b328f1b3f27249aca925f58f26} 
+Material {\bfseries selected\+Material}
+\begin{DoxyCompactList}\small\item\em Material asset for specifying the visual properties of the selected \doxylink{class_lev_particle}{Lev\+Particle}. Provided within the Unity editor. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_flow_handler_a22f8a13dfda31e1a13072134b3ae142d}\label{class_flow_handler_a22f8a13dfda31e1a13072134b3ae142d} 
+void {\bfseries Start} ()
+\item 
+\Hypertarget{class_flow_handler_aefaf335858070a9003896a14cd494087}\label{class_flow_handler_aefaf335858070a9003896a14cd494087} 
+void {\bfseries Update} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_flow_handler_a106b9de12c2fc2e32cc5f7241b23ad65}\label{class_flow_handler_a106b9de12c2fc2e32cc5f7241b23ad65} 
+Graphic\+Raycaster {\bfseries m\+\_\+\+Raycaster}
+\begin{DoxyCompactList}\small\item\em Graphic\+Raycaster element of the ui\+Canvas. Used to detect user hits on graphic elements. \end{DoxyCompactList}\item 
+\Hypertarget{class_flow_handler_a1707dd751443c567cc2cfd490021bdbf}\label{class_flow_handler_a1707dd751443c567cc2cfd490021bdbf} 
+Event\+System {\bfseries m\+\_\+\+Event\+System}
+\begin{DoxyCompactList}\small\item\em Stores interaction elements as events. Provided within the Unity Editor. \end{DoxyCompactList}\item 
+\Hypertarget{class_flow_handler_a4b03aa0bf8f1dea40f4b6f37cdc4d60d}\label{class_flow_handler_a4b03aa0bf8f1dea40f4b6f37cdc4d60d} 
+Pointer\+Event\+Data {\bfseries m\+\_\+\+Pointer\+Event\+Data}
+\begin{DoxyCompactList}\small\item\em Stores mouse pointer information. \end{DoxyCompactList}\item 
+\Hypertarget{class_flow_handler_ad90e33f77c45544489fe4e22205baf03}\label{class_flow_handler_ad90e33f77c45544489fe4e22205baf03} 
+Game\+Object {\bfseries selected}
+\begin{DoxyCompactList}\small\item\em References the currently selected particle as a Gameobject. \end{DoxyCompactList}\item 
+\Hypertarget{class_flow_handler_ac9c3a6336519a285118babb55e70e0ab}\label{class_flow_handler_ac9c3a6336519a285118babb55e70e0ab} 
+\mbox{\hyperlink{class_lev_particle}{Lev\+Particle}} {\bfseries Selected\+Lev\+Particle}
+\begin{DoxyCompactList}\small\item\em References the currently selected particle as a \doxylink{class_lev_particle}{Lev\+Particle}. \end{DoxyCompactList}\item 
+\Hypertarget{class_flow_handler_a92d322c329e86bef09b5bf089256097e}\label{class_flow_handler_a92d322c329e86bef09b5bf089256097e} 
+Renderer {\bfseries Selected\+Renderer}
+\begin{DoxyCompactList}\small\item\em Holds the Renderer properties of the selected \doxylink{class_lev_particle}{Lev\+Particle}. \end{DoxyCompactList}\item 
+\Hypertarget{class_flow_handler_a23d26b7745f3607153103868bff0c23f}\label{class_flow_handler_a23d26b7745f3607153103868bff0c23f} 
+bool {\bfseries is\+Selected}
+\begin{DoxyCompactList}\small\item\em Keeps track of whether a \doxylink{class_lev_particle}{Lev\+Particle} is selected or not. \end{DoxyCompactList}\item 
+\Hypertarget{class_flow_handler_a7afb48f9818b14cd3cfdab12a4f0abf1}\label{class_flow_handler_a7afb48f9818b14cd3cfdab12a4f0abf1} 
+int {\bfseries tr\+Layer}
+\begin{DoxyCompactList}\small\item\em Specifies the transducer layer as set in Unity. This layer is excluded from the raycaster. \end{DoxyCompactList}\item 
+\Hypertarget{class_flow_handler_a541861f7d3e2f5f5dc9f93ba015340cf}\label{class_flow_handler_a541861f7d3e2f5f5dc9f93ba015340cf} 
+Vector3 {\bfseries spoint}
+\begin{DoxyCompactList}\small\item\em Coordinates of the start point for the selected \doxylink{class_lev_particle}{Lev\+Particle}\textquotesingle{}s trajectory. \end{DoxyCompactList}\item 
+\Hypertarget{class_flow_handler_a07d6608fc5fec9f342ceb95d103b3ccf}\label{class_flow_handler_a07d6608fc5fec9f342ceb95d103b3ccf} 
+Vector3 {\bfseries epoint}
+\begin{DoxyCompactList}\small\item\em Coordinates of the end point for the selected \doxylink{class_lev_particle}{Lev\+Particle}\textquotesingle{}s trajectory. \end{DoxyCompactList}\item 
+\Hypertarget{class_flow_handler_af6f0473a28905fb2fd6a295102679991}\label{class_flow_handler_af6f0473a28905fb2fd6a295102679991} 
+bool {\bfseries is\+Creating\+Traj}
+\begin{DoxyCompactList}\small\item\em Keeps track of whether a trajectory is being created or not. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Manages the workflow of the program. Graphic Raycasters are used to determine interaction with UI elements such as menus and buttons, as well selecting and moving particles. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+Flow\+Handler.\+cs\end{DoxyCompactItemize}

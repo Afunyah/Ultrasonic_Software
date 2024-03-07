@@ -1,0 +1,51 @@
+\doxysection{Camera\+Movement Class Reference}
+\hypertarget{class_camera_movement}{}\label{class_camera_movement}\index{CameraMovement@{CameraMovement}}
+
+
+Controls the zoom level by physically moving the camera within the space. The camera moves towards the levitator (as a fixed point). This class is attached to the Hex\+Cam camera within Unity.  
+
+
+Inheritance diagram for Camera\+Movement\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_camera_movement}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_camera_movement_ac35a9d6d291735e4649d1d431b259629}\label{class_camera_movement_ac35a9d6d291735e4649d1d431b259629} 
+Transform {\bfseries Dummy\+Object}
+\begin{DoxyCompactList}\small\item\em Game\+Object Transform to act as an anchor point for the camera. A dummy object for the centre of the levitator. \end{DoxyCompactList}\item 
+\Hypertarget{class_camera_movement_afd414f8704ba6427eb6be492d5d6c1b1}\label{class_camera_movement_afd414f8704ba6427eb6be492d5d6c1b1} 
+float {\bfseries position\+Speed} = 0.\+1F
+\begin{DoxyCompactList}\small\item\em Specifies the speed at which the camera moves. Provided in the Unity editor. \end{DoxyCompactList}\item 
+\Hypertarget{class_camera_movement_a93483cdb45f523bcc4756f92e4887ac1}\label{class_camera_movement_a93483cdb45f523bcc4756f92e4887ac1} 
+int {\bfseries max\+Zoom} = 90
+\begin{DoxyCompactList}\small\item\em Specifies how close the camera can move towards the dummy (levitator centre). \end{DoxyCompactList}\item 
+\Hypertarget{class_camera_movement_a9663fb9c0cdac57a44974f3c7eda96d0}\label{class_camera_movement_a9663fb9c0cdac57a44974f3c7eda96d0} 
+int {\bfseries min\+Zoom} = 23
+\begin{DoxyCompactList}\small\item\em Specifies how far the camera can move away from the dummy (levitator centre). \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_camera_movement_a3d5bf0407152d0e16efafa655bfc15e9}\label{class_camera_movement_a3d5bf0407152d0e16efafa655bfc15e9} 
+void {\bfseries Start} ()
+\item 
+\Hypertarget{class_camera_movement_a6d70b582440500fff98506ebd3e9050e}\label{class_camera_movement_a6d70b582440500fff98506ebd3e9050e} 
+void {\bfseries Update} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_camera_movement_a67d6019a854b616886765f5af8c53625}\label{class_camera_movement_a67d6019a854b616886765f5af8c53625} 
+Vector3 {\bfseries Camera\+Position}
+\begin{DoxyCompactList}\small\item\em Stores the camera position as 3D-\/coordinates. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Controls the zoom level by physically moving the camera within the space. The camera moves towards the levitator (as a fixed point). This class is attached to the Hex\+Cam camera within Unity. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+Camera\+Movement.\+cs\end{DoxyCompactItemize}

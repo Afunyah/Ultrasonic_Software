@@ -1,0 +1,63 @@
+\doxysection{Ghost\+Transducer\+Position\+Data Class Reference}
+\hypertarget{class_ghost_transducer_position_data}{}\label{class_ghost_transducer_position_data}\index{GhostTransducerPositionData@{GhostTransducerPositionData}}
+
+
+This class contains data for a given transducer along a path and the corresponding \textquotesingle{}previous\textquotesingle{} and \textquotesingle{}next\textquotesingle{} ghost particles The angle of exit/approach and magnitude stored in this class is used to determine the amplitude and phase control of surrounding transducers.  
+
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_ghost_transducer_position_data_a2ba48309d11c95f28e133b9ba2cf7539}\label{class_ghost_transducer_position_data_a2ba48309d11c95f28e133b9ba2cf7539} 
+{\bfseries Ghost\+Transducer\+Position\+Data} (\mbox{\hyperlink{class_transducer}{Transducer}} tr, \mbox{\hyperlink{class_ghost_particle}{Ghost\+Particle}} gs1, \mbox{\hyperlink{class_ghost_particle}{Ghost\+Particle}} gs2)
+\item 
+float \mbox{\hyperlink{class_ghost_transducer_position_data_a71f4be84de362b9936fe42e316f5fd74}{Get\+Dist}} ()
+\begin{DoxyCompactList}\small\item\em Returns the \textquotesingle{}next\textquotesingle{} distance. \end{DoxyCompactList}\item 
+\Hypertarget{class_ghost_transducer_position_data_a035e35f2042fcea97b1348595946ebcc}\label{class_ghost_transducer_position_data_a035e35f2042fcea97b1348595946ebcc} 
+void {\bfseries Divide\+Dist} (float d)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_ghost_transducer_position_data_a96547a76f01662dcb40cebbed4341e29}\label{class_ghost_transducer_position_data_a96547a76f01662dcb40cebbed4341e29} 
+readonly float {\bfseries ang}
+\item 
+\Hypertarget{class_ghost_transducer_position_data_aa45d92abedd149bf4777a5c3a6542b6e}\label{class_ghost_transducer_position_data_aa45d92abedd149bf4777a5c3a6542b6e} 
+readonly \mbox{\hyperlink{class_transducer}{Transducer}} {\bfseries trs}
+\item 
+\Hypertarget{class_ghost_transducer_position_data_a3891a36356cda62b00bb515d71ef517d}\label{class_ghost_transducer_position_data_a3891a36356cda62b00bb515d71ef517d} 
+readonly \mbox{\hyperlink{class_ghost_particle}{Ghost\+Particle}} {\bfseries gst1}
+\item 
+\Hypertarget{class_ghost_transducer_position_data_a7283e52b3ad00e7d4299c6ede181b8bd}\label{class_ghost_transducer_position_data_a7283e52b3ad00e7d4299c6ede181b8bd} 
+readonly \mbox{\hyperlink{class_ghost_particle}{Ghost\+Particle}} {\bfseries gst2}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_ghost_transducer_position_data_ae925d18c7992a3761405a708f7a6e684}\label{class_ghost_transducer_position_data_ae925d18c7992a3761405a708f7a6e684} 
+float {\bfseries dist}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+This class contains data for a given transducer along a path and the corresponding \textquotesingle{}previous\textquotesingle{} and \textquotesingle{}next\textquotesingle{} ghost particles The angle of exit/approach and magnitude stored in this class is used to determine the amplitude and phase control of surrounding transducers. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_ghost_transducer_position_data_a71f4be84de362b9936fe42e316f5fd74}\label{class_ghost_transducer_position_data_a71f4be84de362b9936fe42e316f5fd74} 
+\index{GhostTransducerPositionData@{GhostTransducerPositionData}!GetDist@{GetDist}}
+\index{GetDist@{GetDist}!GhostTransducerPositionData@{GhostTransducerPositionData}}
+\doxysubsubsection{\texorpdfstring{GetDist()}{GetDist()}}
+{\footnotesize\ttfamily float Ghost\+Transducer\+Position\+Data.\+Get\+Dist (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Returns the \textquotesingle{}next\textquotesingle{} distance. 
+
+\begin{DoxyReturn}{Returns}
+The distance beween the transducer and the next ghost particle
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+Lev\+Particle.\+cs\end{DoxyCompactItemize}

@@ -1,0 +1,183 @@
+\doxysection{Trajectory Class Reference}
+\hypertarget{class_trajectory}{}\label{class_trajectory}\index{Trajectory@{Trajectory}}
+
+
+This class contains \doxylink{class_trajectory}{Trajectory} data related to a given \doxylink{class_lev_particle}{Lev\+Particle}.  
+
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_trajectory_af54036237d6ae586e2634dbc156a1a34}\label{class_trajectory_af54036237d6ae586e2634dbc156a1a34} 
+{\bfseries Trajectory} (Vector3 A, Vector3 B, float res)
+\item 
+Vector3 \mbox{\hyperlink{class_trajectory_a36abc369ec59c59560c0b9a623718edb}{Get\+Start\+Point}} ()
+\begin{DoxyCompactList}\small\item\em Gets the start point of the trajectory. \end{DoxyCompactList}\item 
+Vector3 \mbox{\hyperlink{class_trajectory_aa45e33aed36fb40810c790aee910c4ce}{Get\+End\+Point}} ()
+\begin{DoxyCompactList}\small\item\em Gets the end point of the trajectory. \end{DoxyCompactList}\item 
+List$<$ Vector3 $>$ \mbox{\hyperlink{class_trajectory_af35871045cac6233805faed2867ee43d}{Get\+Path}} ()
+\item 
+List$<$ Vector3 $>$ \mbox{\hyperlink{class_trajectory_a69abf10e616871b3168525b39f193658}{Calculate\+Path}} ()
+\begin{DoxyCompactList}\small\item\em Calculate the path using the resolution of the trajectory. Places points inbetween the start and end points. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_trajectory_ab9ec39fd91317309a806497b3169cfc9}{Add\+Ghost\+Particle}} (\mbox{\hyperlink{class_ghost_particle}{Ghost\+Particle}} gst)
+\begin{DoxyCompactList}\small\item\em Adds a \doxylink{class_ghost_particle}{Ghost\+Particle} along the trajectory. \end{DoxyCompactList}\item 
+List$<$ \mbox{\hyperlink{class_ghost_particle}{Ghost\+Particle}} $>$ \mbox{\hyperlink{class_trajectory_aa516f787e94ea0d6f072d7a74001f41a}{Get\+Ghost\+Particles}} ()
+\begin{DoxyCompactList}\small\item\em Gets the list of Ghost\+Particles for the trajectory. \end{DoxyCompactList}\item 
+List$<$(List$<$ \mbox{\hyperlink{class_ghost_transducer_position_data}{Ghost\+Transducer\+Position\+Data}} $>$, List$<$ \mbox{\hyperlink{class_ghost_transducer_position_data}{Ghost\+Transducer\+Position\+Data}} $>$)$>$ \mbox{\hyperlink{class_trajectory_a4d7365d686663956ddfe457c5f598584}{Get\+Trajectory\+Transducer\+Data}} ()
+\begin{DoxyCompactList}\small\item\em Returns data which relates points on a trajectory to transducers surrounding the trajectory. See \doxylink{class_trajectory_a35f4482b70dae825420a4b0847170ae4}{Calculate\+Trajectory\+Transducer\+Data()}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_trajectory_a35f4482b70dae825420a4b0847170ae4}\label{class_trajectory_a35f4482b70dae825420a4b0847170ae4} 
+void {\bfseries Calculate\+Trajectory\+Transducer\+Data} ()
+\begin{DoxyCompactList}\small\item\em From the nearby transducers on a given path, calculate near and far transducers to be used by the chosen phase and amplitude manipulation method. This takes into account two ghost particles in sequence, allowing for the future moves of the particle to be predicted The transducers involved for each ghost particle are separated, with the intersecting transducers being allocated to the nearer ghost Adds a tuple of lists to the Trajectory\+Transducer\+Data The first element contains \doxylink{class_ghost_transducer_position_data}{Ghost\+Transducer\+Position\+Data} pertaining to \textquotesingle{}Postion 2, \doxylink{class_transducer}{Transducer} 1\textquotesingle{} The second element contains \doxylink{class_ghost_transducer_position_data}{Ghost\+Transducer\+Position\+Data} pertaining to \textquotesingle{}Postion 2, \doxylink{class_transducer}{Transducer} 2\textquotesingle{}. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_trajectory_a9f5a419e3c5b703cb72f8f496f46c57a}{Standardise\+Trajectory\+Transducer\+Data}} (List$<$ \mbox{\hyperlink{class_ghost_transducer_position_data}{Ghost\+Transducer\+Position\+Data}} $>$ gtpd\+\_\+list, float d\+\_\+max)
+\begin{DoxyCompactList}\small\item\em Standardises (min-\/max) the distances in trajectory data. Useful for debugging purposes. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_trajectory_af283ca21a20123c46cc9b73f637c7f69}\label{class_trajectory_af283ca21a20123c46cc9b73f637c7f69} 
+readonly Vector3 {\bfseries Start\+Point}
+\begin{DoxyCompactList}\small\item\em 3D-\/coordinates specifying the start point of the trajectory. \end{DoxyCompactList}\item 
+readonly Vector3 \mbox{\hyperlink{class_trajectory_acb571d19fdeefb2cdd0e4f0e1c5708a6}{End\+Point}}
+\item 
+\Hypertarget{class_trajectory_a4f4aa3501f5a52e029fef38e0d757f9b}\label{class_trajectory_a4f4aa3501f5a52e029fef38e0d757f9b} 
+readonly List$<$ Vector3 $>$ {\bfseries t\+Path}
+\begin{DoxyCompactList}\small\item\em A list of 3D-\/coordinates (points) connecting the start point to the end point. \end{DoxyCompactList}\item 
+\Hypertarget{class_trajectory_a1e0e6f4ad38ce43aa710edfed1d85976}\label{class_trajectory_a1e0e6f4ad38ce43aa710edfed1d85976} 
+readonly float {\bfseries Res}
+\begin{DoxyCompactList}\small\item\em The resolution of the trajectory in Unity units. Controls the frequency of intermediate points. \end{DoxyCompactList}\item 
+\Hypertarget{class_trajectory_a0ca43a4e3092c197898fde12cede7992}\label{class_trajectory_a0ca43a4e3092c197898fde12cede7992} 
+List$<$ \mbox{\hyperlink{class_ghost_particle}{Ghost\+Particle}} $>$ {\bfseries Ghost\+Particles}
+\begin{DoxyCompactList}\small\item\em Stores the list of Ghost\+Particles along the trajectory. \end{DoxyCompactList}\item 
+\Hypertarget{class_trajectory_a85648b3fa71c74237de4c3ceebfa5653}\label{class_trajectory_a85648b3fa71c74237de4c3ceebfa5653} 
+List$<$(List$<$ \mbox{\hyperlink{class_ghost_transducer_position_data}{Ghost\+Transducer\+Position\+Data}} $>$, List$<$ \mbox{\hyperlink{class_ghost_transducer_position_data}{Ghost\+Transducer\+Position\+Data}} $>$)$>$ {\bfseries Trajectory\+Transducer\+Data}
+\begin{DoxyCompactList}\small\item\em Stores the list of data relating the Ghost\+Particles and Transducers along the trajectory. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+This class contains \doxylink{class_trajectory}{Trajectory} data related to a given \doxylink{class_lev_particle}{Lev\+Particle}. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_trajectory_ab9ec39fd91317309a806497b3169cfc9}\label{class_trajectory_ab9ec39fd91317309a806497b3169cfc9} 
+\index{Trajectory@{Trajectory}!AddGhostParticle@{AddGhostParticle}}
+\index{AddGhostParticle@{AddGhostParticle}!Trajectory@{Trajectory}}
+\doxysubsubsection{\texorpdfstring{AddGhostParticle()}{AddGhostParticle()}}
+{\footnotesize\ttfamily void Trajectory.\+Add\+Ghost\+Particle (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_ghost_particle}{Ghost\+Particle}}}]{gst }\end{DoxyParamCaption})}
+
+
+
+Adds a \doxylink{class_ghost_particle}{Ghost\+Particle} along the trajectory. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em gst} & \doxylink{class_ghost_particle}{Ghost\+Particle} to be added\\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_trajectory_a69abf10e616871b3168525b39f193658}\label{class_trajectory_a69abf10e616871b3168525b39f193658} 
+\index{Trajectory@{Trajectory}!CalculatePath@{CalculatePath}}
+\index{CalculatePath@{CalculatePath}!Trajectory@{Trajectory}}
+\doxysubsubsection{\texorpdfstring{CalculatePath()}{CalculatePath()}}
+{\footnotesize\ttfamily List$<$ Vector3 $>$ Trajectory.\+Calculate\+Path (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Calculate the path using the resolution of the trajectory. Places points inbetween the start and end points. 
+
+\begin{DoxyReturn}{Returns}
+List of all the points along the trajectory
+\end{DoxyReturn}
+\Hypertarget{class_trajectory_aa45e33aed36fb40810c790aee910c4ce}\label{class_trajectory_aa45e33aed36fb40810c790aee910c4ce} 
+\index{Trajectory@{Trajectory}!GetEndPoint@{GetEndPoint}}
+\index{GetEndPoint@{GetEndPoint}!Trajectory@{Trajectory}}
+\doxysubsubsection{\texorpdfstring{GetEndPoint()}{GetEndPoint()}}
+{\footnotesize\ttfamily Vector3 Trajectory.\+Get\+End\+Point (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Gets the end point of the trajectory. 
+
+\begin{DoxyReturn}{Returns}
+3D-\/\+Coordinates of the end point
+\end{DoxyReturn}
+\Hypertarget{class_trajectory_aa516f787e94ea0d6f072d7a74001f41a}\label{class_trajectory_aa516f787e94ea0d6f072d7a74001f41a} 
+\index{Trajectory@{Trajectory}!GetGhostParticles@{GetGhostParticles}}
+\index{GetGhostParticles@{GetGhostParticles}!Trajectory@{Trajectory}}
+\doxysubsubsection{\texorpdfstring{GetGhostParticles()}{GetGhostParticles()}}
+{\footnotesize\ttfamily List$<$ \mbox{\hyperlink{class_ghost_particle}{Ghost\+Particle}} $>$ Trajectory.\+Get\+Ghost\+Particles (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Gets the list of Ghost\+Particles for the trajectory. 
+
+\begin{DoxyReturn}{Returns}
+List of Ghost\+Particles
+\end{DoxyReturn}
+\Hypertarget{class_trajectory_af35871045cac6233805faed2867ee43d}\label{class_trajectory_af35871045cac6233805faed2867ee43d} 
+\index{Trajectory@{Trajectory}!GetPath@{GetPath}}
+\index{GetPath@{GetPath}!Trajectory@{Trajectory}}
+\doxysubsubsection{\texorpdfstring{GetPath()}{GetPath()}}
+{\footnotesize\ttfamily List$<$ Vector3 $>$ Trajectory.\+Get\+Path (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Gets the path of the trajectory.
+
+\begin{DoxyReturn}{Returns}
+List containing 3D-\/\+Coordinates of all points along the trajectory
+\end{DoxyReturn}
+\Hypertarget{class_trajectory_a36abc369ec59c59560c0b9a623718edb}\label{class_trajectory_a36abc369ec59c59560c0b9a623718edb} 
+\index{Trajectory@{Trajectory}!GetStartPoint@{GetStartPoint}}
+\index{GetStartPoint@{GetStartPoint}!Trajectory@{Trajectory}}
+\doxysubsubsection{\texorpdfstring{GetStartPoint()}{GetStartPoint()}}
+{\footnotesize\ttfamily Vector3 Trajectory.\+Get\+Start\+Point (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Gets the start point of the trajectory. 
+
+\begin{DoxyReturn}{Returns}
+3D-\/\+Coordinates of the start point
+\end{DoxyReturn}
+\Hypertarget{class_trajectory_a4d7365d686663956ddfe457c5f598584}\label{class_trajectory_a4d7365d686663956ddfe457c5f598584} 
+\index{Trajectory@{Trajectory}!GetTrajectoryTransducerData@{GetTrajectoryTransducerData}}
+\index{GetTrajectoryTransducerData@{GetTrajectoryTransducerData}!Trajectory@{Trajectory}}
+\doxysubsubsection{\texorpdfstring{GetTrajectoryTransducerData()}{GetTrajectoryTransducerData()}}
+{\footnotesize\ttfamily List$<$(List$<$ \mbox{\hyperlink{class_ghost_transducer_position_data}{Ghost\+Transducer\+Position\+Data}} $>$, List$<$ \mbox{\hyperlink{class_ghost_transducer_position_data}{Ghost\+Transducer\+Position\+Data}} $>$)$>$ Trajectory.\+Get\+Trajectory\+Transducer\+Data (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Returns data which relates points on a trajectory to transducers surrounding the trajectory. See \doxylink{class_trajectory_a35f4482b70dae825420a4b0847170ae4}{Calculate\+Trajectory\+Transducer\+Data()}. 
+
+\begin{DoxyReturn}{Returns}
+A list of tuples containing a pair of lists (\doxylink{class_ghost_transducer_position_data}{Ghost\+Transducer\+Position\+Data})
+\end{DoxyReturn}
+\Hypertarget{class_trajectory_a9f5a419e3c5b703cb72f8f496f46c57a}\label{class_trajectory_a9f5a419e3c5b703cb72f8f496f46c57a} 
+\index{Trajectory@{Trajectory}!StandardiseTrajectoryTransducerData@{StandardiseTrajectoryTransducerData}}
+\index{StandardiseTrajectoryTransducerData@{StandardiseTrajectoryTransducerData}!Trajectory@{Trajectory}}
+\doxysubsubsection{\texorpdfstring{StandardiseTrajectoryTransducerData()}{StandardiseTrajectoryTransducerData()}}
+{\footnotesize\ttfamily void Trajectory.\+Standardise\+Trajectory\+Transducer\+Data (\begin{DoxyParamCaption}\item[{List$<$ \mbox{\hyperlink{class_ghost_transducer_position_data}{Ghost\+Transducer\+Position\+Data}} $>$}]{gtpd\+\_\+list,  }\item[{float}]{d\+\_\+max }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Standardises (min-\/max) the distances in trajectory data. Useful for debugging purposes. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em gtpd\+\_\+list} & \doxylink{class_ghost_transducer_position_data}{Ghost\+Transducer\+Position\+Data} list on trajectory\\
+\hline
+{\em d\+\_\+max} & Maximum distance on trajectory\\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_trajectory_acb571d19fdeefb2cdd0e4f0e1c5708a6}\label{class_trajectory_acb571d19fdeefb2cdd0e4f0e1c5708a6} 
+\index{Trajectory@{Trajectory}!EndPoint@{EndPoint}}
+\index{EndPoint@{EndPoint}!Trajectory@{Trajectory}}
+\doxysubsubsection{\texorpdfstring{EndPoint}{EndPoint}}
+{\footnotesize\ttfamily readonly Vector3 Trajectory.\+End\+Point\hspace{0.3cm}{\ttfamily [private]}}
+
+3D-\/coordinates specifying the end point of the trajectory. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+Lev\+Particle.\+cs\end{DoxyCompactItemize}

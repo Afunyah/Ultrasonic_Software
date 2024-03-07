@@ -1,0 +1,186 @@
+\doxysection{Lev\+Particle Class Reference}
+\hypertarget{class_lev_particle}{}\label{class_lev_particle}\index{LevParticle@{LevParticle}}
+
+
+A \doxylink{class_lev_particle}{Lev\+Particle} is a particle to be levitated within the space. This class is attached to a particle by \doxylink{class_add_lev_particle}{Add\+Lev\+Particle}, which is controlled by the \doxylink{class_flow_handler}{Flow\+Handler}. All the information concerning a particle is stored in this class; trajectory, ghosts, postion, status etc.  
+
+
+Inheritance diagram for Lev\+Particle\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_lev_particle}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+Vector3 \mbox{\hyperlink{class_lev_particle_a8fb2a863cea5ff10fb331ab917c3f73a}{Get\+Position}} ()
+\begin{DoxyCompactList}\small\item\em Gets the postion of the particle. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_lev_particle_ab10b0164328c0612e3c2e48848e23be5}{Set\+Select}} (bool sel)
+\begin{DoxyCompactList}\small\item\em Sets the select status of the particle. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_lev_particle_aec11f0b3f78ea66bb2467966d1d3f205}{MoveX}} (int dir)
+\begin{DoxyCompactList}\small\item\em Moves the particle in the x-\/direction. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_lev_particle_a0d084039a3d2482df5be593bcf0a254a}{MoveY}} (int dir)
+\begin{DoxyCompactList}\small\item\em Moves the particle in the y-\/direction. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_lev_particle_a455b42c3f2ce2aa67e6942509b3f5600}{MoveZ}} (int dir)
+\begin{DoxyCompactList}\small\item\em Moves the particle in the z-\/direction. \end{DoxyCompactList}\item 
+\Hypertarget{class_lev_particle_aa5c5fd3b92bb0c5e40e939d3eea2c372}\label{class_lev_particle_aa5c5fd3b92bb0c5e40e939d3eea2c372} 
+void {\bfseries Delete\+Particle} ()
+\begin{DoxyCompactList}\small\item\em Deletes the particle. This also removes the ghost particles. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_lev_particle_a040ed474d064f1047b42b76ab0b5755a}{Add\+Trajectory}} (Vector3 A, Vector3 B)
+\begin{DoxyCompactList}\small\item\em Creates and adds a new \doxylink{class_trajectory}{Trajectory} to the list of the particle\textquotesingle{}s \doxylink{class_trajectory}{Trajectory}. The startpoint of the trajectory must be the same as the endpoint of the previous trajectory (if it exists). \end{DoxyCompactList}\item 
+List$<$(List$<$ \mbox{\hyperlink{class_ghost_transducer_position_data}{Ghost\+Transducer\+Position\+Data}} $>$, List$<$ \mbox{\hyperlink{class_ghost_transducer_position_data}{Ghost\+Transducer\+Position\+Data}} $>$)$>$ \mbox{\hyperlink{class_lev_particle_ab78d13e8c1f18757615e694811888faa}{Get\+Full\+Trajectory\+Transducer\+Data\+List}} ()
+\begin{DoxyCompactList}\small\item\em Gets the full trajectory-\/transducer data list. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_lev_particle_a9b8128021acd7123e3f1b615c707f7e8}\label{class_lev_particle_a9b8128021acd7123e3f1b615c707f7e8} 
+Game\+Object {\bfseries ghost\+Particle\+Prefab}
+\begin{DoxyCompactList}\small\item\em Prefab indicating the Ghost\+Particles along trajectories. Provided within the Unity editor. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_lev_particle_a0835f6da8328e63c71106b710759f97d}\label{class_lev_particle_a0835f6da8328e63c71106b710759f97d} 
+void {\bfseries Awake} ()
+\item 
+\Hypertarget{class_lev_particle_af9c7824541adcb0c6c1ca44578ca7d62}\label{class_lev_particle_af9c7824541adcb0c6c1ca44578ca7d62} 
+void {\bfseries Start} ()
+\item 
+\Hypertarget{class_lev_particle_ae4ea422f34139bb9936abea65092809d}\label{class_lev_particle_ae4ea422f34139bb9936abea65092809d} 
+void {\bfseries Update} ()
+\item 
+\Hypertarget{class_lev_particle_a3d56b46b94de17a331b6f00f643338d8}\label{class_lev_particle_a3d56b46b94de17a331b6f00f643338d8} 
+void {\bfseries Create\+Ghost\+Particles} ()
+\begin{DoxyCompactList}\small\item\em Creates Ghost\+Particles along the particle\textquotesingle{}s trajectory. The ghost parent is deleted and recreated. To this effect, all the previous ghost particles are deleted and created from the trajectories list. This function is called by the Add\+Trajectory function. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_lev_particle_a3f62849f3eeba0f8df666dd694b05954}\label{class_lev_particle_a3f62849f3eeba0f8df666dd694b05954} 
+Vector3 {\bfseries particle\+Pos}
+\begin{DoxyCompactList}\small\item\em Stores the position of the particle. \end{DoxyCompactList}\item 
+\Hypertarget{class_lev_particle_adee0728efcd5b652c49eaf6b3a6c23ab}\label{class_lev_particle_adee0728efcd5b652c49eaf6b3a6c23ab} 
+bool {\bfseries selected}
+\begin{DoxyCompactList}\small\item\em Keeps track of whether the particle is selected or not. \end{DoxyCompactList}\item 
+\Hypertarget{class_lev_particle_aa1172c79e0d4dd93c701c5576846cd75}\label{class_lev_particle_aa1172c79e0d4dd93c701c5576846cd75} 
+List$<$ \mbox{\hyperlink{class_trajectory}{Trajectory}} $>$ {\bfseries Trajectories}
+\begin{DoxyCompactList}\small\item\em Stores a list of \doxylink{class_trajectory}{Trajectory} objects. Multiple trajectories can be chained. \end{DoxyCompactList}\item 
+\Hypertarget{class_lev_particle_a78885bc4eb5111ecac3ce3303cd747d8}\label{class_lev_particle_a78885bc4eb5111ecac3ce3303cd747d8} 
+Game\+Object {\bfseries ghost\+Parent}
+\begin{DoxyCompactList}\small\item\em Gameobject which holds the Ghost\+Particles of the particle. Each \doxylink{class_lev_particle}{Lev\+Particle} keeps track of its ghosts. \end{DoxyCompactList}\item 
+\Hypertarget{class_lev_particle_ac2a5f34a8ba48d62386a1a554b19c774}\label{class_lev_particle_ac2a5f34a8ba48d62386a1a554b19c774} 
+List$<$(List$<$ \mbox{\hyperlink{class_ghost_transducer_position_data}{Ghost\+Transducer\+Position\+Data}} $>$, List$<$ \mbox{\hyperlink{class_ghost_transducer_position_data}{Ghost\+Transducer\+Position\+Data}} $>$)$>$ {\bfseries Full\+Trajectory\+Transducer\+Data\+List}
+\begin{DoxyCompactList}\small\item\em Stores a list of tuples which contains a pair of data. The first element of the tuple describes the relationship between a target position and a current transducer. The second element of the tuple describes the relationship between a target position and the next transducer. The list of these tuples describes the full trajectory in terms of target positions and involved transducers, step-\/by-\/step. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A \doxylink{class_lev_particle}{Lev\+Particle} is a particle to be levitated within the space. This class is attached to a particle by \doxylink{class_add_lev_particle}{Add\+Lev\+Particle}, which is controlled by the \doxylink{class_flow_handler}{Flow\+Handler}. All the information concerning a particle is stored in this class; trajectory, ghosts, postion, status etc. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_lev_particle_a040ed474d064f1047b42b76ab0b5755a}\label{class_lev_particle_a040ed474d064f1047b42b76ab0b5755a} 
+\index{LevParticle@{LevParticle}!AddTrajectory@{AddTrajectory}}
+\index{AddTrajectory@{AddTrajectory}!LevParticle@{LevParticle}}
+\doxysubsubsection{\texorpdfstring{AddTrajectory()}{AddTrajectory()}}
+{\footnotesize\ttfamily void Lev\+Particle.\+Add\+Trajectory (\begin{DoxyParamCaption}\item[{Vector3}]{A,  }\item[{Vector3}]{B }\end{DoxyParamCaption})}
+
+
+
+Creates and adds a new \doxylink{class_trajectory}{Trajectory} to the list of the particle\textquotesingle{}s \doxylink{class_trajectory}{Trajectory}. The startpoint of the trajectory must be the same as the endpoint of the previous trajectory (if it exists). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em A} & 3D-\/coordinates indicating the start point of the trajectory\\
+\hline
+{\em B} & 3D-\/coordinates indicating the end point of the trajectory\\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_lev_particle_ab78d13e8c1f18757615e694811888faa}\label{class_lev_particle_ab78d13e8c1f18757615e694811888faa} 
+\index{LevParticle@{LevParticle}!GetFullTrajectoryTransducerDataList@{GetFullTrajectoryTransducerDataList}}
+\index{GetFullTrajectoryTransducerDataList@{GetFullTrajectoryTransducerDataList}!LevParticle@{LevParticle}}
+\doxysubsubsection{\texorpdfstring{GetFullTrajectoryTransducerDataList()}{GetFullTrajectoryTransducerDataList()}}
+{\footnotesize\ttfamily List$<$(List$<$ \mbox{\hyperlink{class_ghost_transducer_position_data}{Ghost\+Transducer\+Position\+Data}} $>$, List$<$ \mbox{\hyperlink{class_ghost_transducer_position_data}{Ghost\+Transducer\+Position\+Data}} $>$)$>$ Lev\+Particle.\+Get\+Full\+Trajectory\+Transducer\+Data\+List (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Gets the full trajectory-\/transducer data list. 
+
+\begin{DoxyReturn}{Returns}
+List of the trajectory-\/transducer data list
+\end{DoxyReturn}
+\Hypertarget{class_lev_particle_a8fb2a863cea5ff10fb331ab917c3f73a}\label{class_lev_particle_a8fb2a863cea5ff10fb331ab917c3f73a} 
+\index{LevParticle@{LevParticle}!GetPosition@{GetPosition}}
+\index{GetPosition@{GetPosition}!LevParticle@{LevParticle}}
+\doxysubsubsection{\texorpdfstring{GetPosition()}{GetPosition()}}
+{\footnotesize\ttfamily Vector3 Lev\+Particle.\+Get\+Position (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Gets the postion of the particle. 
+
+\begin{DoxyReturn}{Returns}
+3D coordinates of the particle
+\end{DoxyReturn}
+\Hypertarget{class_lev_particle_aec11f0b3f78ea66bb2467966d1d3f205}\label{class_lev_particle_aec11f0b3f78ea66bb2467966d1d3f205} 
+\index{LevParticle@{LevParticle}!MoveX@{MoveX}}
+\index{MoveX@{MoveX}!LevParticle@{LevParticle}}
+\doxysubsubsection{\texorpdfstring{MoveX()}{MoveX()}}
+{\footnotesize\ttfamily void Lev\+Particle.\+MoveX (\begin{DoxyParamCaption}\item[{int}]{dir }\end{DoxyParamCaption})}
+
+
+
+Moves the particle in the x-\/direction. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em dir} & Specifies the direction. -\/1 indicates backwards and 1 indicates forward.\\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_lev_particle_a0d084039a3d2482df5be593bcf0a254a}\label{class_lev_particle_a0d084039a3d2482df5be593bcf0a254a} 
+\index{LevParticle@{LevParticle}!MoveY@{MoveY}}
+\index{MoveY@{MoveY}!LevParticle@{LevParticle}}
+\doxysubsubsection{\texorpdfstring{MoveY()}{MoveY()}}
+{\footnotesize\ttfamily void Lev\+Particle.\+MoveY (\begin{DoxyParamCaption}\item[{int}]{dir }\end{DoxyParamCaption})}
+
+
+
+Moves the particle in the y-\/direction. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em dir} & Specifies the direction. -\/1 indicates backwards and 1 indicates forward.\\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_lev_particle_a455b42c3f2ce2aa67e6942509b3f5600}\label{class_lev_particle_a455b42c3f2ce2aa67e6942509b3f5600} 
+\index{LevParticle@{LevParticle}!MoveZ@{MoveZ}}
+\index{MoveZ@{MoveZ}!LevParticle@{LevParticle}}
+\doxysubsubsection{\texorpdfstring{MoveZ()}{MoveZ()}}
+{\footnotesize\ttfamily void Lev\+Particle.\+MoveZ (\begin{DoxyParamCaption}\item[{int}]{dir }\end{DoxyParamCaption})}
+
+
+
+Moves the particle in the z-\/direction. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em dir} & Specifies the direction. -\/1 indicates backwards and 1 indicates forward.\\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_lev_particle_ab10b0164328c0612e3c2e48848e23be5}\label{class_lev_particle_ab10b0164328c0612e3c2e48848e23be5} 
+\index{LevParticle@{LevParticle}!SetSelect@{SetSelect}}
+\index{SetSelect@{SetSelect}!LevParticle@{LevParticle}}
+\doxysubsubsection{\texorpdfstring{SetSelect()}{SetSelect()}}
+{\footnotesize\ttfamily void Lev\+Particle.\+Set\+Select (\begin{DoxyParamCaption}\item[{bool}]{sel }\end{DoxyParamCaption})}
+
+
+
+Sets the select status of the particle. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sel} & The particle is selected?\\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+Lev\+Particle.\+cs\end{DoxyCompactItemize}

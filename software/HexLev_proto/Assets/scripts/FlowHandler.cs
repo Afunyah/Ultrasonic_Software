@@ -9,50 +9,97 @@ using System.Numerics;
 using Vector3 = UnityEngine.Vector3;
 using Vector2 = UnityEngine.Vector2;
 
+/// <summary>
+/// Manages the workflow of the program.
+/// Graphic Raycasters are used to determine interaction with UI elements such as menus and buttons, as well selecting and moving particles.
+/// </summary>
 public class FlowHandler : MonoBehaviour
 {
+    /// <summary>
+    /// Camera reference to main HexCam. Provided within the Unity editor.
+    /// </summary>
     public new Camera camera;
+
+    /// <summary>
+    /// UI Canvas element for buttons and text. Provided within the Unity editor. 
+    /// </summary>
     public GameObject uiCanvas;
 
+    /// <summary>
+    /// GraphicRaycaster element of the uiCanvas. Used to detect user hits on graphic elements.
+    /// </summary>
     private GraphicRaycaster m_Raycaster;
-    private PointerEventData m_PointerEventData;
+
+    /// <summary>
+    /// Stores interaction elements as events. Provided within the Unity Editor.
+    /// </summary>
     private EventSystem m_EventSystem;
 
+    /// <summary>
+    /// Stores mouse pointer information.
+    /// </summary>
+    private PointerEventData m_PointerEventData;
+    
+    /// <summary>
+    /// References the currently selected particle as a Gameobject.
+    /// </summary>
     private GameObject selected;
+
+    /// <summary>
+    /// References the currently selected particle as a LevParticle.
+    /// </summary>
     private LevParticle SelectedLevParticle;
+
+    /// <summary>
+    /// Holds the Renderer properties of the selected LevParticle.
+    /// </summary>
     private Renderer SelectedRenderer;
 
+    /// <summary>
+    /// Material asset for specifying the visual properties of a normal unselected LevParticle. Provided within the Unity editor.
+    /// </summary>
     public Material normalMaterial;
+
+    /// <summary>
+    /// Material asset for specifying the visual properties of the selected LevParticle. Provided within the Unity editor.
+    /// </summary>
     public Material selectedMaterial;
+
+    /// <summary>
+    /// Keeps track of whether a LevParticle is selected or not.
+    /// </summary>
     private bool isSelected;
 
+    /// <summary>
+    /// Specifies the transducer layer as set in Unity. This layer is excluded from the raycaster. 
+    /// </summary>
     private int trLayer;
 
+    /// <summary>
+    /// Coordinates of the start point for the selected LevParticle's trajectory.
+    /// </summary>
     private Vector3 spoint;
-    private Vector3 epoint;
-    private bool isCreatingTraj;
 
-    private Vector2 tr;
-    private Vector2 g1;
-    private Vector2 g2;
+    /// <summary>
+    /// Coordinates of the end point for the selected LevParticle's trajectory.
+    /// </summary>
+    private Vector3 epoint;
+
+    /// <summary>
+    /// Keeps track of whether a trajectory is being created or not.
+    /// </summary>
+    private bool isCreatingTraj;
 
     void Start()
     {
         isSelected = false;
         isCreatingTraj = false;
-        trLayer = 1 << 6;
-        // tr = new Vector2(new Vector3(72.49f, 4.07f, 33.25f).x,new Vector3(72.49f, 4.07f, 33.25f).z);
-        // g1 = new Vector2(new Vector3(72.43f, 6.01f, 33.25f).x,new Vector3(72.43f, 6.01f, 33.25f).z);
-        // g2 = new Vector2(new Vector3(72.49f, 6.01f, 33.25f).x,new Vector3(72.49f, 6.01f, 33.25f).z);
-
-        // Debug.Log(g1-g2);
-        // Debug.Log(tr-g2);
-        // Debug.Log(Vector2.SignedAngle(g1-g2,tr-g2));
+        trLayer = 1 << 6; // Set Transducer Layer
     }
 
     void Update()
     {
-        // go over isselected logic. Defined here but also assigned throughout below
+        // Hit Handler
         if (Input.GetMouseButtonDown(0))
         {
             Ray ray = camera.ScreenPointToRay(Input.mousePosition);
@@ -70,6 +117,7 @@ public class FlowHandler : MonoBehaviour
                         isCreatingTraj = false;
                     }
 
+                    // Get properties of selected particle
                     isSelected = true;
                     selected = hitInfo.collider.gameObject;
                     SelectedLevParticle = selected.GetComponent<LevParticle>();
@@ -97,10 +145,9 @@ public class FlowHandler : MonoBehaviour
                 List<RaycastResult> uiHitList = new List<RaycastResult>();
                 m_Raycaster.Raycast(m_PointerEventData, uiHitList);
 
-
+                // Filter hit on UI components
                 if (uiHitList.Count != 0)
                 {
-
                     string uiCompName;
                     foreach (RaycastResult uiComp in uiHitList)
                     {
@@ -116,22 +163,6 @@ public class FlowHandler : MonoBehaviour
                             case "MoveButton":
                                 if (isSelected)
                                 {
-                                    // Debug.Log("Particle can be Moved!");
-                                    // List<(List<GhostTransducerPositionData>, List<GhostTransducerPositionData>)> FTTDList = SelectedLevParticle.GetFullTrajectoryTransducerDataList();
-
-                                    // foreach ((List<GhostTransducerPositionData>, List<GhostTransducerPositionData>) gtp in FTTDList)
-                                    // {
-                                    //     Debug.Log("P2-T1 Data:");
-                                    //     foreach (GhostTransducerPositionData gtpdat in gtp.Item1)
-                                    //     {
-                                    //         Debug.Log(gtpdat.trs.name + " { " + gtpdat.GetDist() + ", " + gtpdat.ang + " }");
-                                    //     }
-                                    //     Debug.Log("P2-T2 Data:");
-                                    //     foreach (GhostTransducerPositionData gtpdat in gtp.Item2)
-                                    //     {
-                                    //         Debug.Log(gtpdat.trs.name + " { " + gtpdat.GetDist() + ", " + gtpdat.ang + " }");
-                                    //     }
-                                    // }
                                 }
                                 this.GetComponent<StateInit>().UpdateLevState();
                                 break;
@@ -156,6 +187,7 @@ public class FlowHandler : MonoBehaviour
                             case "StartButton":
                                 if (isSelected)
                                 {
+                                    // Read startpoint and enter trajectory mode
                                     spoint = SelectedLevParticle.GetPosition();
                                     isCreatingTraj = true;
                                 }
@@ -163,6 +195,7 @@ public class FlowHandler : MonoBehaviour
                             case "EndButton":
                                 if (isSelected && isCreatingTraj)
                                 {
+                                    // Read endpoint and create trajectory
                                     epoint = SelectedLevParticle.GetPosition();
                                     SelectedLevParticle.AddTrajectory(spoint, epoint);
                                     isCreatingTraj = false;

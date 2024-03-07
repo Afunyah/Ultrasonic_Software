@@ -1,0 +1,211 @@
+\doxysection{Transducer Class Reference}
+\hypertarget{class_transducer}{}\label{class_transducer}\index{Transducer@{Transducer}}
+
+
+Class for storing transducer data.  
+
+
+Inheritance diagram for Transducer\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_transducer}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_transducer_a5df97d5439c3833f826e51dd633cf634}{Init}} (int arr, int ind, float b\+Center\+\_\+z)
+\begin{DoxyCompactList}\small\item\em Initialises the transducer by assigning an array (plate) and index to it. \end{DoxyCompactList}\item 
+\Hypertarget{class_transducer_a327c1727d6e9f15d06062116ca875ec1}\label{class_transducer_a327c1727d6e9f15d06062116ca875ec1} 
+void {\bfseries Activate} ()
+\begin{DoxyCompactList}\small\item\em Turns the transducer on. \end{DoxyCompactList}\item 
+\Hypertarget{class_transducer_a74b186ee8f5ebce58d5cf5e9d8437a03}\label{class_transducer_a74b186ee8f5ebce58d5cf5e9d8437a03} 
+void {\bfseries Deactivate} ()
+\begin{DoxyCompactList}\small\item\em Turns the transducer off. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_transducer_a99f5a6cc63040b47deacdda50b083306}{Is\+Active}} ()
+\begin{DoxyCompactList}\small\item\em Gets the state of the transducer; on or off. \end{DoxyCompactList}\item 
+Vector3 \mbox{\hyperlink{class_transducer_a62beb427c3d0e48d500d7d4ef7ac58f4}{Get\+Position}} ()
+\begin{DoxyCompactList}\small\item\em Gets the XYZ postion of the transducer. \end{DoxyCompactList}\item 
+Vector2 \mbox{\hyperlink{class_transducer_ac701f310f9a3f4ab9a4752e0a62d9ad8}{Get\+XYPosition\+Rounded}} ()
+\begin{DoxyCompactList}\small\item\em Gets the XY postion of the transducer rounded to the nearest integer. \end{DoxyCompactList}\item 
+Vector2 \mbox{\hyperlink{class_transducer_a28a8b93ac6b26a0562ce27ad1f700598}{Get\+XYPosition}} ()
+\begin{DoxyCompactList}\small\item\em Gets the XY postion of the transducer. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_transducer_a8752a32d24b8e7405712a5cd7a3961f4}{Get\+Phase}} ()
+\begin{DoxyCompactList}\small\item\em Returns the phase of the transducer. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_transducer_a671394bcce452df4193a5765f59c5202}{Get\+Amplitude}} ()
+\begin{DoxyCompactList}\small\item\em Returns the amplitude of the transducer. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_transducer_adfd3907d68d5d47a2075699336fa6892}{Set\+Phase}} (int p)
+\begin{DoxyCompactList}\small\item\em Sets the phase of the transducer. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_transducer_a280e55e1de8a608d1e986ab9687bbad6}{Set\+Amplitude}} (int a)
+\begin{DoxyCompactList}\small\item\em Sets the amplitude of the transducer. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_transducer_a491ad47ce302e7ab53a72106fa588425}\label{class_transducer_a491ad47ce302e7ab53a72106fa588425} 
+void {\bfseries Start} ()
+\item 
+\Hypertarget{class_transducer_aef99deb9ac4b8ce9c4edf270f6f21246}\label{class_transducer_aef99deb9ac4b8ce9c4edf270f6f21246} 
+void {\bfseries Update} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_transducer_a27b0867263fd4fcc791af967e1d73f2c}\label{class_transducer_a27b0867263fd4fcc791af967e1d73f2c} 
+Vector3 {\bfseries t\+Position}
+\item 
+\Hypertarget{class_transducer_aa46b9dab0b55f302fb08f2a42637dda1}\label{class_transducer_aa46b9dab0b55f302fb08f2a42637dda1} 
+int {\bfseries t\+Index}
+\item 
+\Hypertarget{class_transducer_ab476f0ab41a95cbdfc4d2659b7dc8977}\label{class_transducer_ab476f0ab41a95cbdfc4d2659b7dc8977} 
+int {\bfseries t\+Arr}
+\item 
+\Hypertarget{class_transducer_a6dc073e8038b956008b4550b439415aa}\label{class_transducer_a6dc073e8038b956008b4550b439415aa} 
+int {\bfseries t\+Phase}
+\item 
+\Hypertarget{class_transducer_a779f2bf63578648b028d4407482e1f76}\label{class_transducer_a779f2bf63578648b028d4407482e1f76} 
+int {\bfseries t\+Amplitude}
+\item 
+\Hypertarget{class_transducer_abe6d905be38502459d7cdb652e34b958}\label{class_transducer_abe6d905be38502459d7cdb652e34b958} 
+bool {\bfseries used}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Class for storing transducer data. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_transducer_a671394bcce452df4193a5765f59c5202}\label{class_transducer_a671394bcce452df4193a5765f59c5202} 
+\index{Transducer@{Transducer}!GetAmplitude@{GetAmplitude}}
+\index{GetAmplitude@{GetAmplitude}!Transducer@{Transducer}}
+\doxysubsubsection{\texorpdfstring{GetAmplitude()}{GetAmplitude()}}
+{\footnotesize\ttfamily int Transducer.\+Get\+Amplitude (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Returns the amplitude of the transducer. 
+
+\begin{DoxyReturn}{Returns}
+Currently, Amplitude as a percentage
+\end{DoxyReturn}
+\Hypertarget{class_transducer_a8752a32d24b8e7405712a5cd7a3961f4}\label{class_transducer_a8752a32d24b8e7405712a5cd7a3961f4} 
+\index{Transducer@{Transducer}!GetPhase@{GetPhase}}
+\index{GetPhase@{GetPhase}!Transducer@{Transducer}}
+\doxysubsubsection{\texorpdfstring{GetPhase()}{GetPhase()}}
+{\footnotesize\ttfamily int Transducer.\+Get\+Phase (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Returns the phase of the transducer. 
+
+\begin{DoxyReturn}{Returns}
+Currently, Phase as a percentage
+\end{DoxyReturn}
+\Hypertarget{class_transducer_a62beb427c3d0e48d500d7d4ef7ac58f4}\label{class_transducer_a62beb427c3d0e48d500d7d4ef7ac58f4} 
+\index{Transducer@{Transducer}!GetPosition@{GetPosition}}
+\index{GetPosition@{GetPosition}!Transducer@{Transducer}}
+\doxysubsubsection{\texorpdfstring{GetPosition()}{GetPosition()}}
+{\footnotesize\ttfamily Vector3 Transducer.\+Get\+Position (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Gets the XYZ postion of the transducer. 
+
+\begin{DoxyReturn}{Returns}
+3D position vector
+\end{DoxyReturn}
+\Hypertarget{class_transducer_a28a8b93ac6b26a0562ce27ad1f700598}\label{class_transducer_a28a8b93ac6b26a0562ce27ad1f700598} 
+\index{Transducer@{Transducer}!GetXYPosition@{GetXYPosition}}
+\index{GetXYPosition@{GetXYPosition}!Transducer@{Transducer}}
+\doxysubsubsection{\texorpdfstring{GetXYPosition()}{GetXYPosition()}}
+{\footnotesize\ttfamily Vector2 Transducer.\+Get\+XYPosition (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Gets the XY postion of the transducer. 
+
+\begin{DoxyReturn}{Returns}
+2D position vector
+\end{DoxyReturn}
+\Hypertarget{class_transducer_ac701f310f9a3f4ab9a4752e0a62d9ad8}\label{class_transducer_ac701f310f9a3f4ab9a4752e0a62d9ad8} 
+\index{Transducer@{Transducer}!GetXYPositionRounded@{GetXYPositionRounded}}
+\index{GetXYPositionRounded@{GetXYPositionRounded}!Transducer@{Transducer}}
+\doxysubsubsection{\texorpdfstring{GetXYPositionRounded()}{GetXYPositionRounded()}}
+{\footnotesize\ttfamily Vector2 Transducer.\+Get\+XYPosition\+Rounded (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Gets the XY postion of the transducer rounded to the nearest integer. 
+
+\begin{DoxyReturn}{Returns}
+2D position vector
+\end{DoxyReturn}
+\Hypertarget{class_transducer_a5df97d5439c3833f826e51dd633cf634}\label{class_transducer_a5df97d5439c3833f826e51dd633cf634} 
+\index{Transducer@{Transducer}!Init@{Init}}
+\index{Init@{Init}!Transducer@{Transducer}}
+\doxysubsubsection{\texorpdfstring{Init()}{Init()}}
+{\footnotesize\ttfamily void Transducer.\+Init (\begin{DoxyParamCaption}\item[{int}]{arr,  }\item[{int}]{ind,  }\item[{float}]{b\+Center\+\_\+z }\end{DoxyParamCaption})}
+
+
+
+Initialises the transducer by assigning an array (plate) and index to it. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em arr} & The parent plate, either top or bottom\\
+\hline
+\end{DoxyParams}
+\texorpdfstring{$<$}{<}param name="{}ind"{} The index of the transducer, to match any physical implementation\texorpdfstring{$>$}{>}
+
+
+\begin{DoxyParams}{Parameters}
+{\em b\+Center\+\_\+z} & Specifies the center of the transducer collider \\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_transducer_a99f5a6cc63040b47deacdda50b083306}\label{class_transducer_a99f5a6cc63040b47deacdda50b083306} 
+\index{Transducer@{Transducer}!IsActive@{IsActive}}
+\index{IsActive@{IsActive}!Transducer@{Transducer}}
+\doxysubsubsection{\texorpdfstring{IsActive()}{IsActive()}}
+{\footnotesize\ttfamily bool Transducer.\+Is\+Active (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Gets the state of the transducer; on or off. 
+
+\begin{DoxyReturn}{Returns}
+True if transducer is on
+\end{DoxyReturn}
+\Hypertarget{class_transducer_a280e55e1de8a608d1e986ab9687bbad6}\label{class_transducer_a280e55e1de8a608d1e986ab9687bbad6} 
+\index{Transducer@{Transducer}!SetAmplitude@{SetAmplitude}}
+\index{SetAmplitude@{SetAmplitude}!Transducer@{Transducer}}
+\doxysubsubsection{\texorpdfstring{SetAmplitude()}{SetAmplitude()}}
+{\footnotesize\ttfamily void Transducer.\+Set\+Amplitude (\begin{DoxyParamCaption}\item[{int}]{a }\end{DoxyParamCaption})}
+
+
+
+Sets the amplitude of the transducer. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em a} & Amplitude (currently 0\%-\/100\%)\\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_transducer_adfd3907d68d5d47a2075699336fa6892}\label{class_transducer_adfd3907d68d5d47a2075699336fa6892} 
+\index{Transducer@{Transducer}!SetPhase@{SetPhase}}
+\index{SetPhase@{SetPhase}!Transducer@{Transducer}}
+\doxysubsubsection{\texorpdfstring{SetPhase()}{SetPhase()}}
+{\footnotesize\ttfamily void Transducer.\+Set\+Phase (\begin{DoxyParamCaption}\item[{int}]{p }\end{DoxyParamCaption})}
+
+
+
+Sets the phase of the transducer. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p} & Phase (currently 0\%-\/100\%)\\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+Transducer.\+cs\end{DoxyCompactItemize}

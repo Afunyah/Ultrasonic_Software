@@ -1,0 +1,17 @@
+\chapter{Hex\+Lev Control Software}
+\hypertarget{index}{}\label{index}\index{HexLev Control Software@{HexLev Control Software}}
+\label{index_md__2_users_2marcelafunyah_2_bridge_2_warwick_2work_2_y_e_a_r4_2_e_s410_2proj__files_2software_2_r_e_a_d_m_e}%
+\Hypertarget{index_md__2_users_2marcelafunyah_2_bridge_2_warwick_2work_2_y_e_a_r4_2_e_s410_2proj__files_2software_2_r_e_a_d_m_e}%
+ The Hex\+Lev Control Center is a protoype software developed in Unity game engine to aid the control of the levitator.
+
+The simplified UI acts an interface between the user and the levitator, abstracting Serial and SPI comms involving the Arduino and FPGAs.
+
+The software allows for the creation, deletion and movement of mutliple particles along user-\/defined trajectories in 3D.\hypertarget{index_autotoc_md1}{}\doxysubsubsection{\texorpdfstring{Operation}{Operation}}\label{index_autotoc_md1}
+The current version of the software is a prototype and uses a crude implementation for a movement algortihm (see documentation for more details)
+
+The user is at liberty to build the program and run it as a standalone application, however it may be useful to use the program within the Unity editor as this provides users with further technical insight. Pressing the \textquotesingle{}Play\textquotesingle{} button within the Unity editor runs the program.
+
+The UI allows for common user input such as mouse clicks, dragging and scrolling. Devices llke joysticks and controllers may be used as Unity provides basic functionality, though it is not recommended in this case.\hypertarget{index_autotoc_md2}{}\doxysubsubsection{\texorpdfstring{Notes}{Notes}}\label{index_autotoc_md2}
+The current prototype version snaps particles to positons, employing a rigid 0-\/100\% scheme. The code will be updated with a solver for the final product.
+
+The Arduino serial code contains test structures for serial debugging purposes, so a small levitator can be attached and controlled. 
