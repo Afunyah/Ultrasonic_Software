@@ -12,6 +12,7 @@ using System;
 /// </summary>
 public class StateInit : MonoBehaviour
 {
+    
 
     /// <summary>
     /// Serial Port for arduino. Will differ based on ports and OS

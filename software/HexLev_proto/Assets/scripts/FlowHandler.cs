@@ -8,6 +8,7 @@ using System.Xml.Schema;
 using System.Numerics;
 using Vector3 = UnityEngine.Vector3;
 using Vector2 = UnityEngine.Vector2;
+using System.Runtime.InteropServices;
 
 /// <summary>
 /// Manages the workflow of the program.
@@ -15,6 +16,12 @@ using Vector2 = UnityEngine.Vector2;
 /// </summary>
 public class FlowHandler : MonoBehaviour
 {
+
+    [DllImport("__Internal")]
+    private static extern void solver(double particlePosX, double particlePosY, double particlePosZ, double[] outputArg1);
+
+    double[] phses = new double [1442];
+    
     /// <summary>
     /// Camera reference to main HexCam. Provided within the Unity editor.
     /// </summary>
@@ -165,6 +172,7 @@ public class FlowHandler : MonoBehaviour
                                 {
                                 }
                                 this.GetComponent<StateInit>().UpdateLevState();
+                                // solver(0, 0, 0, phses);
                                 break;
                             case "xDown":
                                 if (isSelected) { SelectedLevParticle.MoveX(-1); }
