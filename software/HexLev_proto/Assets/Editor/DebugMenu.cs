@@ -14,66 +14,66 @@ public static class DebugMenu
         }
     }
 
-    [MenuItem("Debug/Print Transducer Distances")]
-    public static void CalcTransducers()
-    {
-        GhostParticle ghost1 = GameObject.Find("Sphere_1").AddComponent<GhostParticle>();
-        GhostParticle ghost2 = GameObject.Find("Sphere_2").AddComponent<GhostParticle>();
-        float HexCntr_z = GameObject.Find("HexCenter").GetComponent<Transform>().transform.localPosition.y;
-        List<Transform> selectedObjects = Selection.transforms.ToList();
+    // [MenuItem("Debug/Print Transducer Distances")]
+    // public static void CalcTransducers()
+    // {
+    //     GhostParticle ghost1 = GameObject.Find("Sphere_1").AddComponent<GhostParticle>();
+    //     GhostParticle ghost2 = GameObject.Find("Sphere_2").AddComponent<GhostParticle>();
+    //     float HexCntr_z = GameObject.Find("HexCenter").GetComponent<Transform>().transform.localPosition.y;
+    //     List<Transform> selectedObjects = Selection.transforms.ToList();
 
-        // 303, 213, 224
-        // 304, 214, 225, 235
-        // 291, 184, 290, 183, 289
-        // 189, 101, 114, 125
-        // 190, 102, 115
-        List<int> trsnums = new List<int> { 303, 213, 224, 304, 214, 225, 235, 291, 184, 290, 183, 289, 189, 101, 114, 125, 190, 102, 115 };
-        List<Transform> transducers = new List<Transform> { };
-        foreach (int item in trsnums)
-        {
-            transducers.Add(GameObject.Find(string.Concat("HexLev/BottomPlate/BottomTransducers/Transducer.", item.ToString())).GetComponent<Transform>());
-        }
+    //     // 303, 213, 224
+    //     // 304, 214, 225, 235
+    //     // 291, 184, 290, 183, 289
+    //     // 189, 101, 114, 125
+    //     // 190, 102, 115
+    //     List<int> trsnums = new List<int> { 303, 213, 224, 304, 214, 225, 235, 291, 184, 290, 183, 289, 189, 101, 114, 125, 190, 102, 115 };
+    //     List<Transform> transducers = new List<Transform> { };
+    //     foreach (int item in trsnums)
+    //     {
+    //         transducers.Add(GameObject.Find(string.Concat("HexLev/BottomPlate/BottomTransducers/Transducer.", item.ToString())).GetComponent<Transform>());
+    //     }
 
-        selectedObjects = transducers;
+    //     selectedObjects = transducers;
 
-        List<GhostTransducerPositionData> gtpdatlist = new List<GhostTransducerPositionData> { };
-        foreach (Transform trsf in selectedObjects)
-        {
-            Transducer tr = trsf.gameObject.AddComponent<Transducer>();
-            tr.Init(0, 0, HexCntr_z);
+    //     List<GhostTransducerPositionData> gtpdatlist = new List<GhostTransducerPositionData> { };
+    //     foreach (Transform trsf in selectedObjects)
+    //     {
+    //         Transducer tr = trsf.gameObject.AddComponent<Transducer>();
+    //         tr.Init(0, 0, HexCntr_z);
 
-            GhostTransducerPositionData gtpdat = new GhostTransducerPositionData(tr, ghost1.GetComponent<GhostParticle>(), ghost2.GetComponent<GhostParticle>());
-            gtpdatlist.Add(gtpdat);
-        }
+    //         GhostTransducerPositionData gtpdat = new GhostTransducerPositionData(tr, ghost1.GetComponent<GhostParticle>(), ghost2.GetComponent<GhostParticle>());
+    //         gtpdatlist.Add(gtpdat);
+    //     }
 
-        gtpdatlist = gtpdatlist.OrderBy(x => x.GetDist()).ToList();
+    //     gtpdatlist = gtpdatlist.OrderBy(x => x.GetDist()).ToList();
 
-        foreach (GhostTransducerPositionData gtpdat in gtpdatlist)
-        {
-            Debug.Log(gtpdat.trs.name + " { " + gtpdat.GetDist() + ", " + gtpdat.ang + " }");
-        }
+    //     foreach (GhostTransducerPositionData gtpdat in gtpdatlist)
+    //     {
+    //         Debug.Log(gtpdat.trs.name + " { " + gtpdat.GetDist() + ", " + gtpdat.ang + " }");
+    //     }
 
-        foreach (Transform trsf in selectedObjects)
-        {
-            GameObject.DestroyImmediate(trsf.GetComponent<Transducer>());
-            GameObject.DestroyImmediate(trsf.GetComponent<BoxCollider>());
-            GameObject.DestroyImmediate(trsf.GetComponent<SphereCollider>());
-            GameObject.DestroyImmediate(trsf.GetComponent<GhostParticle>());
-        }
+    //     foreach (Transform trsf in selectedObjects)
+    //     {
+    //         GameObject.DestroyImmediate(trsf.GetComponent<Transducer>());
+    //         GameObject.DestroyImmediate(trsf.GetComponent<BoxCollider>());
+    //         GameObject.DestroyImmediate(trsf.GetComponent<SphereCollider>());
+    //         GameObject.DestroyImmediate(trsf.GetComponent<GhostParticle>());
+    //     }
 
-        Debug.DrawLine(ghost1.GetPostion(), ghost2.GetPostion(), Color.red, 10);
-        GameObject.DestroyImmediate(GameObject.Find("Sphere_1").GetComponent<GhostParticle>());
-        GameObject.DestroyImmediate(GameObject.Find("Sphere_2").GetComponent<GhostParticle>());
+    //     Debug.DrawLine(ghost1.GetPostion(), ghost2.GetPostion(), Color.red, 10);
+    //     GameObject.DestroyImmediate(GameObject.Find("Sphere_1").GetComponent<GhostParticle>());
+    //     GameObject.DestroyImmediate(GameObject.Find("Sphere_2").GetComponent<GhostParticle>());
 
-        GameObject.DestroyImmediate(GameObject.Find("Sphere_1").GetComponent<BoxCollider>());
-        GameObject.DestroyImmediate(GameObject.Find("Sphere_2").GetComponent<SphereCollider>());
+    //     GameObject.DestroyImmediate(GameObject.Find("Sphere_1").GetComponent<BoxCollider>());
+    //     GameObject.DestroyImmediate(GameObject.Find("Sphere_2").GetComponent<SphereCollider>());
 
-        GameObject.DestroyImmediate(GameObject.Find("Sphere_1").GetComponent<BoxCollider>());
-        GameObject.DestroyImmediate(GameObject.Find("Sphere_2").GetComponent<SphereCollider>());
+    //     GameObject.DestroyImmediate(GameObject.Find("Sphere_1").GetComponent<BoxCollider>());
+    //     GameObject.DestroyImmediate(GameObject.Find("Sphere_2").GetComponent<SphereCollider>());
 
-        GameObject.DestroyImmediate(GameObject.Find("Sphere_1").GetComponent<Transducer>());
-        GameObject.DestroyImmediate(GameObject.Find("Sphere_2").GetComponent<Transducer>());
-    }
+    //     GameObject.DestroyImmediate(GameObject.Find("Sphere_1").GetComponent<Transducer>());
+    //     GameObject.DestroyImmediate(GameObject.Find("Sphere_2").GetComponent<Transducer>());
+    // }
 }
 
 

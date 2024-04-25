@@ -17,8 +17,6 @@ using System.Runtime.InteropServices;
 public class FlowHandler : MonoBehaviour
 {
 
-    [DllImport("__Internal")]
-    private static extern void solver(double particlePosX, double particlePosY, double particlePosZ, double[] outputArg1);
 
     double[] phses = new double [1442];
     
@@ -171,8 +169,8 @@ public class FlowHandler : MonoBehaviour
                                 if (isSelected)
                                 {
                                 }
-                                this.GetComponent<StateInit>().UpdateLevState();
-                                // solver(0, 0, 0, phses);
+                                // this.GetComponent<StateInit>().UpdateLevState();
+                                this.GetComponent<Solver>().Solve();
                                 break;
                             case "xDown":
                                 if (isSelected) { SelectedLevParticle.MoveX(-1); }

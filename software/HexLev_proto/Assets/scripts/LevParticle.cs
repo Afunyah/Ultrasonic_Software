@@ -21,6 +21,8 @@ public class LevParticle : MonoBehaviour
     /// </summary>
     private Vector3 particlePos;
 
+    private Vector3 dummySolverPosition;
+
     /// <summary>
     /// Keeps track of whether the particle is selected or not 
     /// </summary>
@@ -119,6 +121,28 @@ public class LevParticle : MonoBehaviour
         this.transform.position += new Vector3(0, dir * 0.06F, 0);
     }
 
+
+
+    /// <summary>
+    /// Moves the particle in the z-direction.
+    /// </summary>
+    /// <param name="dir">Specifies the direction. -1 indicates backwards and 1 indicates forward.</param>
+    public float GetDistanceFromX(Vector3 coord)
+    {
+        return Vector3.Distance(coord, this.GetPosition());
+    }
+
+    public float GetZAngleFromX(Vector3 coord){
+        Vector3 vP = this.GetPosition() - coord;
+        return Vector3.Angle(vP, Vector3.up);
+    }
+
+    public Vector3 GetSolverPosition(float scale) { 
+        return this.transform.position/scale;
+    }
+
+
+
     /// <summary>
     /// Deletes the particle. This also removes the ghost particles.
     /// </summary>
@@ -130,6 +154,14 @@ public class LevParticle : MonoBehaviour
         }
         GameObject.Destroy(this.ghostParent);
         Destroy(gameObject);
+    }
+
+    public void SetDummySolverPosition(Vector3 pos){
+        this.dummySolverPosition = pos;
+    }
+
+    public Vector3 GetDummySolverPosition(){
+        return this.dummySolverPosition;
     }
 
 
@@ -202,7 +234,7 @@ public class Trajectory
     /// </summary>
     private readonly Vector3 StartPoint;
 
-        /// <summary>
+    /// <summary>
     /// 3D-coordinates specifying the end point of the trajectory.
     /// </summary>
     private readonly Vector3 EndPoint;
@@ -237,37 +269,37 @@ public class Trajectory
     }
 
 
-/// <summary>
-/// Gets the start point of the trajectory
-/// </summary>
-/// <returns>3D-Coordinates of the start point</returns>
+    /// <summary>
+    /// Gets the start point of the trajectory
+    /// </summary>
+    /// <returns>3D-Coordinates of the start point</returns>
     public Vector3 GetStartPoint()
     {
         return this.StartPoint;
     }
 
-/// <summary>
-/// Gets the end point of the trajectory
-/// </summary>
-/// <returns>3D-Coordinates of the end point</returns>
+    /// <summary>
+    /// Gets the end point of the trajectory
+    /// </summary>
+    /// <returns>3D-Coordinates of the end point</returns>
     public Vector3 GetEndPoint()
     {
         return this.EndPoint;
     }
 
     /// <summary>
-/// Gets the path of the trajectory.
-/// </summary>
-/// <returns>List containing 3D-Coordinates of all points along the trajectory</returns>
+    /// Gets the path of the trajectory.
+    /// </summary>
+    /// <returns>List containing 3D-Coordinates of all points along the trajectory</returns>
     public List<Vector3> GetPath()
     {
         return tPath;
     }
 
-/// <summary>
-/// Calculate the path using the resolution of the trajectory. Places points inbetween the start and end points.
-/// </summary>
-/// <returns>List of all the points along the trajectory</returns>
+    /// <summary>
+    /// Calculate the path using the resolution of the trajectory. Places points inbetween the start and end points.
+    /// </summary>
+    /// <returns>List of all the points along the trajectory</returns>
     public List<Vector3> CalculatePath()
     {
         List<Vector3> p = new List<Vector3> { };
@@ -281,24 +313,24 @@ public class Trajectory
         return p;
     }
 
-/// <summary>
-/// Adds a GhostParticle along the trajectory
-/// </summary>
-/// <param name="gst">GhostParticle to be added</param>
+    /// <summary>
+    /// Adds a GhostParticle along the trajectory
+    /// </summary>
+    /// <param name="gst">GhostParticle to be added</param>
     public void AddGhostParticle(GhostParticle gst)
     {
         this.GhostParticles.Add(gst);
     }
 
-/// <summary>
-/// Gets the list of GhostParticles for the trajectory.
-/// </summary>
-/// <returns>List of GhostParticles</returns>
+    /// <summary>
+    /// Gets the list of GhostParticles for the trajectory.
+    /// </summary>
+    /// <returns>List of GhostParticles</returns>
     public List<GhostParticle> GetGhostParticles()
     {
         return this.GhostParticles;
     }
-    
+
     /// <summary>
     /// From the nearby transducers on a given path, calculate near and far transducers to be used by the chosen phase and amplitude manipulation method.
     /// This takes into account two ghost particles in sequence, allowing for the future moves of the particle to be predicted
@@ -406,14 +438,14 @@ public class GhostTransducerPositionData
         Vector2 gst1_xy = gst1.GetXYPositionRounded();
         Vector2 gst2_xy = gst2.GetXYPositionRounded();
 
-        this.dist = (gst2.GetXYPosition() - trs.GetXYPosition()).magnitude; 
+        this.dist = (gst2.GetXYPosition() - trs.GetXYPosition()).magnitude;
         this.ang = Vector3.SignedAngle((gst1_xy - gst2_xy), (gst2_xy - trs_xy), Vector3.back);
     }
 
-/// <summary>
-/// Returns the 'next' distance.
-/// </summary>
-/// <returns>The distance beween the transducer and the next ghost particle</returns>
+    /// <summary>
+    /// Returns the 'next' distance.
+    /// </summary>
+    /// <returns>The distance beween the transducer and the next ghost particle</returns>
     public float GetDist()
     {
         return this.dist;
