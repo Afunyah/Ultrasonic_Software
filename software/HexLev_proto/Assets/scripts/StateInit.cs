@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using Vector3 = UnityEngine.Vector3;
 using UnityEngine.AI;
 using Accord.Math;
+using UnityEngine.Assertions;
 
 /// <summary>
 /// Initialises the program state: handles external interfacing and control algorithms
@@ -46,6 +47,14 @@ public class StateInit : MonoBehaviour
     /// </summary>
     public Transducer[] TopArray;
 
+
+    public List<Transducer> BottArray_tmp;
+
+    /// <summary>
+    /// Array of transducers for top plate
+    /// </summary>
+    public List<Transducer> TopArray_tmp;
+
     /// <summary>
     /// Z-axis value of the levitator centre.
     /// </summary>
@@ -67,37 +76,7 @@ public class StateInit : MonoBehaviour
     void Awake()
     {
         // StartSerial();
-        // // Change arduino port and baud rate to match hardware
-        // ArduinoSerial = new SerialPort("/dev/tty.usbmodem1101", 9600);
-        // BottArray = new List<Transducer> { };
-        // TopArray = new List<Transducer> { };
 
-        // while (!ArduinoSerial.IsOpen)
-        // {
-        //     ArduinoSerial.ReadTimeout = 3000;
-        //     ArduinoSerial.WriteTimeout = 1000;
-        //     ArduinoSerial.DtrEnable = true;
-        //     ArduinoSerial.RtsEnable = true;
-        //     ArduinoSerial.Handshake = Handshake.None;
-        //     ArduinoSerial.Open();
-        // }
-        
-        // offset_bottom_csv = Resources.Load<TextAsset>("bottomPlate_offset_rad");
-        // offset_top_csv = Resources.Load<TextAsset>("topPlate_flipped_offset_rad");
-
-        // offset_bottom_text = offset_bottom_csv.text.Split('\n');
-        // offset_top_text = offset_top_csv.text.Split('\n');
-
-        // int n = offset_bottom_text.Count();
-
-        // offset_bottom = new double[n]; 
-        // offset_top = new double[n];    
-
-        // for (int i = 0; i < n; i++)
-        // {
-        //     offset_bottom[i] = Double.Parse(offset_bottom_text[i]);
-        //     offset_top[i] = Double.Parse(offset_top_text[i]);
-        // }
     }
     void Start()
     {
@@ -186,9 +165,12 @@ public class StateInit : MonoBehaviour
                     ser.Close();
                 }
             }
-            catch (Exception ex)
-            {
-                // Debug.Log(ex);
+            // catch (Exception ex)
+            // {
+            //     // Debug.Log(ex);
+            // }
+            finally{
+                
             }
 
         }
@@ -223,6 +205,9 @@ public class StateInit : MonoBehaviour
         // TopArray = new List<Transducer>(721);
         BottArray = new Transducer[721];
         TopArray = new Transducer[721];
+
+        BottArray_tmp = new List<Transducer>();
+        TopArray_tmp = new List<Transducer>();
 
 
         Transform[] BArr;
@@ -266,12 +251,17 @@ public class StateInit : MonoBehaviour
             i++;
         }
 
+        for (int k = 0; k < 1; k++)
+        {
+            BottArray_tmp.Add(BottArray[k]);
+            TopArray_tmp.Add(TopArray[k]);
+            // Debug.Log(TopArray[k].GetSolverPostion());
+        }
 
         // foreach (Transducer item in BottArray)
         // {
         //     Debug.Log(item.GetUnityIndex() + " " + item.GetSolverIndex() + " " + item.GetFpgaIndex() + " " + item.GetInBankIndex());
         // }
-
 
     }
 

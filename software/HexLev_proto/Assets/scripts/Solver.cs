@@ -30,17 +30,19 @@ public class Solver : MonoBehaviour
     private double[] coords;
     void Awake()
     {
-    }
-
-    void Start()
-    {
         f = 40000;
         c = 343;
 
         lmbda = c / f;
-        tdist = 4 * lmbda;
+        // tdist = 4 * lmbda;
+        // tdist = 4 * lmbda;
+        tdist = (lmbda/2)*56;
         // tdist = (lmbda/2)*56;
-        tdist = (lmbda/2)*25;
+    }
+
+    void Start()
+    {
+        
     }
 
     void Update()
@@ -52,6 +54,9 @@ public class Solver : MonoBehaviour
         List<Transducer> TArray = this.gameObject.GetComponent<StateInit>().BottArray.ToList<Transducer>();
         TArray.AddRange(this.gameObject.GetComponent<StateInit>().TopArray.ToList<Transducer>());
 
+        // List<Transducer> TArray = this.gameObject.GetComponent<StateInit>().BottArray_tmp;
+        // TArray.AddRange(this.gameObject.GetComponent<StateInit>().TopArray_tmp);
+
         List<float> dists_from_point;
         dists_from_point = new List<float>();
 
@@ -59,8 +64,10 @@ public class Solver : MonoBehaviour
 
         for (int i = 0; i < TArray.Count; i++)
         {
-            dists_from_point.Add(Vector3.Distance(TArray[i].GetSolverPostion(), P_control_loc));
-
+            Vector3 trSolvPos = TArray[i].GetSolverPostion();
+            float d = Vector2.Distance(new Vector2(trSolvPos.x, trSolvPos.z), new Vector2(P_control_loc.x, P_control_loc.y));
+            dists_from_point.Add(d);
+            // Debug.Log(d);
         }
 
         float active_radius = 0.055f;
@@ -83,6 +90,7 @@ public class Solver : MonoBehaviour
             if (active_mask[i])
             {
                 Tarray_active.Add(TArray[i]);
+                // Debug.Log(TArray[i].GetPosition());
             }
         }
 
@@ -155,9 +163,12 @@ public class Solver : MonoBehaviour
 
         int[] bitmapArray = { 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-
         Complex[,] calcF_NOT = TransmissionMatrix(calculation_P, Tarray_active, GetSolverScale(TArray[0], TArray[1]));
 
+        // foreach (var item in calcF_NOT)
+        // {
+        //     Debug.Log(item);
+        // }
 
         List<List<Complex>> calcF;
         calcF = new List<List<Complex>>();
@@ -204,13 +215,26 @@ public class Solver : MonoBehaviour
         }
 
         BroydenFletcherGoldfarbShanno lbfgs = new BroydenFletcherGoldfarbShanno(numberOfVariables: phi.Count, function: f1, gradient: g1);
+        // ConjugateGradient lbfgs = new ConjugateGradient(numberOfVariables: phi.Count, function: f1, gradient: g1);
+
+        // lbfgs.FunctionTolerance = 1e1;
+        lbfgs.MaxLineSearch = 200;
         // BoundedBroydenFletcherGoldfarbShanno lbfgs = new BoundedBroydenFletcherGoldfarbShanno(numberOfVariables: phi.Count, function: f1, gradient: g1);
+        // lbfgs.FunctionTolerance = 1e-5;
+        // lbfgs.MaxIterations = 1000;
+        // lbfgs.Progress += (s, e) =>
+        // {
+        //     Debug.Log(lbfgs.Value);
+        // };
 
         bool success = lbfgs.Minimize(phi.ToArray<double>());
         double[] solution = lbfgs.Solution;
-        // Debug.Log(lbfgs.Value);
-        // Debug.Log("Solver solution: " + success);
-        Debug.Log(solution.Count());
+        Debug.Log("Solver solution: " + success + "\tValue: " + lbfgs.Value);
+        Debug.Log("Status: " + lbfgs.Status + "\tNsols: " + solution.Length);
+        // Debug.Log(lbfgs.Iterations);
+        // Debug.Log(lbfgs.Evaluations);
+        // Debug.Log(lbfgs.MaxIterations);
+        // Debug.Log(lbfgs.Epsilon);
         foreach (var value in solution)
         {
             // Debug.Log(value);
@@ -230,9 +254,11 @@ public class Solver : MonoBehaviour
 
     static public float GetSolverScale(Transducer one, Transducer two)
     {
+        // Debug.Log("(" + one.GetSolverPostion().x + ", " + one.GetSolverPostion().y + ", " + one.GetSolverPostion().z + ")" + " :: "+ "(" + two.GetSolverPostion().x + ", " + two.GetSolverPostion().y + ", " + two.GetSolverPostion().z + ")");
+        // Debug.Log("(" + one.GetPosition().x + ", " + one.GetPosition().y + ", " + one.GetPosition().z + ")" + " :: "+ "(" + two.GetPosition().x + ", " + two.GetPosition().y + ", " + two.GetPosition().z + ")");
         float sp = Vector3.Distance(one.GetSolverPostion(), two.GetSolverPostion());
         float tp = Vector3.Distance(one.GetPosition(), two.GetPosition());
-
+        // Debug.Log("(" + sp + ", " + tp + ")");
         return sp/tp;
 
     }
@@ -371,8 +397,8 @@ public class Solver : MonoBehaviour
 
     private Complex[,] TransmissionMatrix(List<DummyParticle> Parray, List<Transducer> Tarray, float ss)
     {
-        int f = 40000;
-        int c = 343;
+        double f = 40000;
+        double c = 343;
         double lambda = c / f;
         double k = 2 * Math.PI / lambda;
 
@@ -395,6 +421,7 @@ public class Solver : MonoBehaviour
 
 
                 float d = particle.GetDistanceFromX(tCoord_real);
+                // Debug.Log(ss);
                 d /= ss;
                 float theta = particle.GetZAngleFromX(tCoord_real);
 
@@ -410,6 +437,7 @@ public class Solver : MonoBehaviour
                 Complex Phi = new Complex(Math.Cos(k * d), Math.Sin(k * d));
 
                 F[l, n] = P * Phi;
+                // Debug.Log(lambda);
             }
         }
 
