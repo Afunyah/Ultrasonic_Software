@@ -16,7 +16,8 @@ public class Transducer : MonoBehaviour
     private Vector3 tSolverPostion;
 
     private Vector3 tNormals;
-    private int tIndex;
+    private int tUnityIndex;
+    private int tInd;
     private int tArr;
     private int tPhase;
     private int tAmplitude;
@@ -52,7 +53,7 @@ public class Transducer : MonoBehaviour
     /// <param name="bCenter_z"> Specifies the center of the transducer collider </param>
     public void Init(int arr, int ind, float bCenter_z, int bid)
     {
-        blenderID = bid;
+        tUnityIndex = bid;
         solverIndex = 0;
         fpgaIndex = 0;
         inBankIndex = 0;
@@ -68,7 +69,7 @@ public class Transducer : MonoBehaviour
         tAmplitude = 0;
         tPosition = this.transform.position;
         tArr = arr;
-        tIndex = ind;
+        tInd = ind;
         float bOff = tArr == 0 ? 1F : -1F;
         if (arr == 1 && ind == 1)
         {
@@ -216,6 +217,11 @@ public class Transducer : MonoBehaviour
     public int GetSolverIndex()
     {
         return this.solverIndex;
+    }
+
+    public int GetUnityIndex()
+    {
+        return this.tUnityIndex;
     }
 
     public void SetSolverPostion(Vector3 pos)

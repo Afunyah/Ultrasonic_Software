@@ -11,6 +11,8 @@ using UnityEditor;
 using System.Text.RegularExpressions;
 
 using Vector3 = UnityEngine.Vector3;
+using UnityEngine.AI;
+using Accord.Math;
 
 /// <summary>
 /// Initialises the program state: handles external interfacing and control algorithms
@@ -49,9 +51,22 @@ public class StateInit : MonoBehaviour
     /// </summary>
     private float HexCntr_z;
 
+    // private TextAsset offset_bottom_csv;
+    // private TextAsset offset_top_csv;
+
+    // private string[] offset_bottom_text;
+    // private string[] offset_top_text;
+    // private double[] offset_bottom;
+    // private double[] offset_top;
+
+    private double[] offsets;
+
+    private int[] unityIndexArray;
+    private int[] fpgaIndexArray;
+    private int[] inBankIndexArray;
     void Awake()
     {
-        StartSerial();
+        // StartSerial();
         // // Change arduino port and baud rate to match hardware
         // ArduinoSerial = new SerialPort("/dev/tty.usbmodem1101", 9600);
         // BottArray = new List<Transducer> { };
@@ -66,9 +81,32 @@ public class StateInit : MonoBehaviour
         //     ArduinoSerial.Handshake = Handshake.None;
         //     ArduinoSerial.Open();
         // }
+        
+        // offset_bottom_csv = Resources.Load<TextAsset>("bottomPlate_offset_rad");
+        // offset_top_csv = Resources.Load<TextAsset>("topPlate_flipped_offset_rad");
+
+        // offset_bottom_text = offset_bottom_csv.text.Split('\n');
+        // offset_top_text = offset_top_csv.text.Split('\n');
+
+        // int n = offset_bottom_text.Count();
+
+        // offset_bottom = new double[n]; 
+        // offset_top = new double[n];    
+
+        // for (int i = 0; i < n; i++)
+        // {
+        //     offset_bottom[i] = Double.Parse(offset_bottom_text[i]);
+        //     offset_top[i] = Double.Parse(offset_top_text[i]);
+        // }
     }
     void Start()
     {
+        fpgaIndexArray = Labeller.GetFpgaIndexArray();
+        inBankIndexArray = Labeller.GetInBankIndexArray();
+        unityIndexArray = Labeller.GetUnityIndexArray();
+
+        offsets = Labeller.GetOffsets();
+
         InitializeArrays();
     }
 
@@ -83,7 +121,9 @@ public class StateInit : MonoBehaviour
     {
 
         // FPGA_Serial.AddRange(new List<SerialPort>() { new SerialPort(),new SerialPort(),new SerialPort(),new SerialPort(),new SerialPort(),new SerialPort()});
+        bool fpgas_found = true;
         FPGA_Serial = new SerialPort[6];
+        int[] FPGA_ids = {-1,-1,-1,-1,-1,-1};
         string[] ports = SerialPort.GetPortNames();
 
         foreach (string port in ports)
@@ -121,7 +161,7 @@ public class StateInit : MonoBehaviour
                 //     ack = ser.ReadLine();
                 // }
 
-                Debug.Log(ack);
+                // Debug.Log(ack);
 
                 if (ack < 6)
                 {
@@ -139,6 +179,7 @@ public class StateInit : MonoBehaviour
                     // Debug.Log(GetPixel(ser, 0));
                     // Debug.Log("HERE");
                     // Debug.Log(FPGA_Serial.Count);
+                    FPGA_ids[ack] = ack;
                 }
                 else
                 {
@@ -147,11 +188,23 @@ public class StateInit : MonoBehaviour
             }
             catch (Exception ex)
             {
-                Debug.Log(ex);
+                // Debug.Log(ex);
             }
 
         }
 
+        for (int i = 0; i < FPGA_ids.Count(); i++)
+        {
+            if(FPGA_ids[i] != i){
+                fpgas_found = false;
+                Debug.Log("Not found, FPGA: " + i);
+            }
+        }
+
+    if (!fpgas_found){
+            Debug.Log("FPGAS HAVE NOT BEEN FOUND");
+            throw new Exception("FPGAS HAVE NOT BEEN FOUND");
+    }
 
     }
 
@@ -160,7 +213,7 @@ public class StateInit : MonoBehaviour
     /// </summary>
     public void InitializeArrays()
     {
-        Labeller labeller = this.gameObject.GetComponent<Labeller>();
+        // labeller = this.gameObject.GetComponent<Labeller>();
 
         hexCoords = Solver.GetHexCoords();
 
@@ -191,17 +244,17 @@ public class StateInit : MonoBehaviour
                 Transducer tr = child.AddComponent<Transducer>();
                 string obnm = child.gameObject.name;
                 int bid = Int32.Parse(Regex.Match(obnm, @"\d+").Value);
-                int s_ind = labeller.uCoordsList.IndexOf(bid);
+                int s_ind = unityIndexArray.IndexOf(bid);
+
                 tr.Init(i, j - 1, HexCntr_z, bid);
-                // Debug.Log(obnm);
+
                 tr.SetSolverIndex(s_ind + 1);
-                // Debug.Log(bid);
-                tr.SetFpgaIndex(labeller.fpgaIndexList[s_ind]);
-                tr.SetFpgaIndex(labeller.inBankIndexList[s_ind]);
+                tr.SetFpgaIndex(fpgaIndexArray[s_ind]);
+                tr.SetInBankIndex(inBankIndexArray[s_ind]);
                 
 
                 if (i == 0) { BottArray[s_ind] = tr; tr.SetSolverPostion(new Vector3((float)hexCoords[s_ind], 0, (float)hexCoords[s_ind+721]));}
-                if (i == 1) { TopArray[s_ind] = tr; tr.SetSolverPostion(new Vector3((float)hexCoords[s_ind], 0.36f, (float)hexCoords[s_ind+721]));}
+                if (i == 1) { TopArray[s_ind] = tr; tr.SetSolverPostion(new Vector3((float)hexCoords[s_ind], (float)Solver.GetTdist(), (float)hexCoords[s_ind+721]));}
                 j++;
 
                 // }
@@ -212,6 +265,12 @@ public class StateInit : MonoBehaviour
             }
             i++;
         }
+
+
+        // foreach (Transducer item in BottArray)
+        // {
+        //     Debug.Log(item.GetUnityIndex() + " " + item.GetSolverIndex() + " " + item.GetFpgaIndex() + " " + item.GetInBankIndex());
+        // }
 
 
     }
@@ -403,31 +462,31 @@ public class StateInit : MonoBehaviour
     //     return true;
     // }
 
-    public bool UpdateLevState()
-    {
-        List<LevParticle> particles;
-        particles = GameObject.FindObjectsByType<LevParticle>(FindObjectsSortMode.None).ToList();
+    // public bool UpdateLevState()
+    // {
+    //     List<LevParticle> particles;
+    //     particles = GameObject.FindObjectsByType<LevParticle>(FindObjectsSortMode.None).ToList();
 
-        LevParticle parti = particles[0];
+    //     LevParticle parti = particles[0];
 
 
-        // foreach (SerialPort item in FPGA_Serial)
-        // {
-        //     try
-        //     {
-        //         SetPixel(item, 0, 5, 1);
-        //         item.BaseStream.Flush();
-        //         Debug.Log(GetPixel(item, 0));
-        //     }
-        //     catch (System.Exception e)
-        //     {
+    //     // foreach (SerialPort item in FPGA_Serial)
+    //     // {
+    //     //     try
+    //     //     {
+    //     //         SetPixel(item, 0, 5, 1);
+    //     //         item.BaseStream.Flush();
+    //     //         Debug.Log(GetPixel(item, 0));
+    //     //     }
+    //     //     catch (System.Exception e)
+    //     //     {
 
-        //         Debug.Log(e);
-        //     }
-        // }
+    //     //         Debug.Log(e);
+    //     //     }
+    //     // }
 
-        return true;
-    }
+    //     return true;
+    // }
 
     // public bool UpdateLevState()
     // {
@@ -495,27 +554,62 @@ public class StateInit : MonoBehaviour
     //     return true;
     // }
 
+
+    public void UpdateLevState(){
+        var temptime = Time.realtimeSinceStartup;
+        (double[], List<bool>) sol = this.GetComponent<Solver>().Solve();
+        double[] phis = sol.Item1;
+        List<bool> activePhis = sol.Item2;
+        
+        for (int i = 0; i < 1442; i++)
+        {
+            phis[i] = phis[i] - offsets[i];
+
+            phis[i] = phis[i] % 2 * Math.PI;
+            phis[i] = phis[i] * 31/(2*Math.PI);
+            phis[i] = Math.Round(phis[i]); 
+        }
+
+        for (int i = 0; i < 721; i++)
+        {
+            int bott_ind = i;
+            int top_ind = i + 721;
+
+            // SetPixel(FPGA_Serial[fpgaIndexArray[bott_ind]], inBankIndexArray[bott_ind], 4, (int) phis[bott_ind]);
+            // SetPixel(FPGA_Serial[fpgaIndexArray[top_ind]], inBankIndexArray[top_ind], 4, (int) phis[top_ind]);
+        }
+
+        Debug.Log ("Time taken for solver and serial output : "+(Time.realtimeSinceStartup - temptime));
+
+        
+        // for (int i = 0; i < 241; i++)
+        // {
+        //     foreach (SerialPort fpga_ser in FPGA_Serial)
+        //     {
+        //         SetPixel(fpga_ser, i, 4, 2);
+        //     }
+        //     Debug.Log("Set "+i);
+        // }
+        // SetPixel(FPGA_Serial[0], 1, 4, 2);
+        // Debug.Log(GetPixel(FPGA_Serial[0], 1));
+    }
+
     private void SetPixel(SerialPort ser, int address, int duty, int phase)
     {
         string set_cmd = string.Format("CD{0:X4}{1:X2}{2:X2}", address, duty, phase);
         byte[] byteArray = StringToByteArray(set_cmd);
         ser.Write(byteArray, 0, 5);
-
-        // set_cmd = "CD{:04X}{:02X}{:02X}".format(address, duty, phase)
-        // ser.write(bytes.fromhex(set_cmd))
     }
 
-    public string GetPixel(SerialPort ser, int address)
+    private (int,int) GetPixel(SerialPort ser, int address)
     {
+        // Debug.Log("Attempting to get Pixel");
         string get_cmd = string.Format("EF{0:X4}", address);
         byte[] byteArray = StringToByteArray(get_cmd);
         ser.Write(byteArray, 0, 3);
         int ack0 = ser.ReadByte();
         int ack1 = ser.ReadByte();
-
-        // string val = ser.read(2);
-        // return val;
-        return string.Join(Convert.ToString(ack0), Convert.ToString(ack1));
+        return (ack0,ack1);
 
 
         // get_cmd = "EF{:04X}".format(address)

@@ -169,8 +169,8 @@ public class FlowHandler : MonoBehaviour
                                 if (isSelected)
                                 {
                                 }
-                                // this.GetComponent<StateInit>().UpdateLevState();
-                                this.GetComponent<Solver>().Solve();
+                                this.GetComponent<StateInit>().UpdateLevState();
+                                // this.GetComponent<Solver>().Solve();
                                 break;
                             case "xDown":
                                 if (isSelected) { SelectedLevParticle.MoveX(-1); }

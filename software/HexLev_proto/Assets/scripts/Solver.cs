@@ -19,7 +19,13 @@ using Accord.Math.Optimization;
 
 public class Solver : MonoBehaviour
 {
-    static public float solvScale = 0;
+    // static public float solvScale = 0;
+
+    private double f;
+    private double c;
+
+    private double lmbda;
+    static public double tdist;
 
     private double[] coords;
     void Awake()
@@ -28,28 +34,23 @@ public class Solver : MonoBehaviour
 
     void Start()
     {
-        coords = GetHexCoords();
+        f = 40000;
+        c = 343;
+
+        lmbda = c / f;
+        tdist = 4 * lmbda;
+        // tdist = (lmbda/2)*56;
+        tdist = (lmbda/2)*25;
     }
 
     void Update()
     {
     }
 
-    public void Solve()
+    public (double[],List<bool>) Solve()
     {
-
-        double f = 40000;
-        double c = 343;
-
-        double lmbda = c / f;
-        double tdist = 4 * lmbda;
-
-        // double[] hexCoords = GetHexCoords();
-
         List<Transducer> TArray = this.gameObject.GetComponent<StateInit>().BottArray.ToList<Transducer>();
         TArray.AddRange(this.gameObject.GetComponent<StateInit>().TopArray.ToList<Transducer>());
-
-
 
         List<float> dists_from_point;
         dists_from_point = new List<float>();
@@ -100,7 +101,7 @@ public class Solver : MonoBehaviour
 
         double wp = 1;
         double wx = 10;
-        double wy = 100;
+        double wy = 10;
         double wz = 1000;
 
         double[] K;
@@ -155,7 +156,7 @@ public class Solver : MonoBehaviour
         int[] bitmapArray = { 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 
-        Complex[,] calcF_NOT = TransmissionMatrix(calculation_P, Tarray_active);
+        Complex[,] calcF_NOT = TransmissionMatrix(calculation_P, Tarray_active, GetSolverScale(TArray[0], TArray[1]));
 
 
         List<List<Complex>> calcF;
@@ -202,83 +203,44 @@ public class Solver : MonoBehaviour
             return g;
         }
 
-
-
-
-
-        // Now, we need to write its gradient, which is just the
-        // vector of first partial derivatives del_f / del_x, as:
-        // 
-        //   g(x,y)  =  { del f / del x, del f / del y }
-        // 
-
-
-        // Finally, we can create the L-BFGS solver, passing the functions as arguments
         BroydenFletcherGoldfarbShanno lbfgs = new BroydenFletcherGoldfarbShanno(numberOfVariables: phi.Count, function: f1, gradient: g1);
+        // BoundedBroydenFletcherGoldfarbShanno lbfgs = new BoundedBroydenFletcherGoldfarbShanno(numberOfVariables: phi.Count, function: f1, gradient: g1);
 
-        // And then minimize the function:
         bool success = lbfgs.Minimize(phi.ToArray<double>());
-        double minValue = lbfgs.Value;
         double[] solution = lbfgs.Solution;
-        // Debug.Log(minValue);
-        foreach (double value in solution)
+        // Debug.Log(lbfgs.Value);
+        // Debug.Log("Solver solution: " + success);
+        Debug.Log(solution.Count());
+        foreach (var value in solution)
         {
-            Debug.Log(value);
+            // Debug.Log(value);
         }
+
+        double[] phi_total = new double[1442];
+        int active_ind = 0;
+        for (int i = 0; i < 1442; i++)
+        {
+            if(active_mask[i]){
+                phi_total[i] = solution[active_ind];
+                active_ind++;
+            }
+        }
+        return (phi_total, active_mask);
+    }
+
+    static public float GetSolverScale(Transducer one, Transducer two)
+    {
+        float sp = Vector3.Distance(one.GetSolverPostion(), two.GetSolverPostion());
+        float tp = Vector3.Distance(one.GetPosition(), two.GetPosition());
+
+        return sp/tp;
 
     }
 
-    // private double OPTObjectiveFunction(List<double> phi, List<List<Complex>> F, List<Double> delta, double[] K, double[] w)
-    // {
-    //     // double wp = w[0];
-    //     // double wx = w[1];
-    //     // double wy = w[2];
-    //     // double wz = w[3];
-
-    //     // SpatialDerivatives spatialDerivatives = new SpatialDerivatives(phi, F, delta);
-    //     // Gorkov gorkov = new Gorkov(spatialDerivatives, K);
-
-    //     // gorkov.ComputeLaplacian();
-
-    //     // double O = wp*gorkov.pAbs - wx*gorkov.Uxx - wy*gorkov.Uyy - wz*gorkov.Uzz;
-
-    //     // int N = phi.Count;
-    //     // double[] g = new double[N];
-
-    //     // for (int i = 0; i < N; i++)
-    //     // {
-    //     //     gorkov.ComputeGradientLaplacian(i);
-    //     //     g[i] = wp*gorkov.gpAbs - wx*gorkov.gUxx - wy*gorkov.gUyy - wz*gorkov.gUzz;
-    //     // }
-
-    //     // return O;
-    // }
-
-    // private double OPTObjectiveFunction(List<double> phi, List<List<Complex>> F, List<Double> delta, double[] K, double[] w)
-    // {
-    //     double wp = w[0];
-    //     double wx = w[1];
-    //     double wy = w[2];
-    //     double wz = w[3];
-
-    //     SpatialDerivatives spatialDerivatives = new SpatialDerivatives(phi, F, delta);
-    //     Gorkov gorkov = new Gorkov(spatialDerivatives, K);
-
-    //     gorkov.ComputeLaplacian();
-
-    //     double O = wp*gorkov.pAbs - wx*gorkov.Uxx - wy*gorkov.Uyy - wz*gorkov.Uzz;
-
-    //     int N = phi.Count;
-    //     double[] g = new double[N];
-
-    //     for (int i = 0; i < N; i++)
-    //     {
-    //         gorkov.ComputeGradientLaplacian(i);
-    //         g[i] = wp*gorkov.gpAbs - wx*gorkov.gUxx - wy*gorkov.gUyy - wz*gorkov.gUzz;
-    //     }
-
-    //     return O;
-    // }
+    static public double GetTdist()
+    {
+        return tdist;
+    }
 
     static public double[] GetHexCoords()
     {
@@ -355,7 +317,7 @@ public class Solver : MonoBehaviour
                 }
             }
 
-            
+
             if (s_ind > e_ind)
             {
                 j = 1;
@@ -390,7 +352,7 @@ public class Solver : MonoBehaviour
                 for (colIdx = 0; colIdx < ring_cords_size_idx_0; colIdx++)
                 {
                     coords[((j + colIdx) + 721 * rowIdx) - 1] = ring_cords_data[colIdx +
-                      ring_cords_size_idx_0 * rowIdx];
+                      ring_cords_size_idx_0 * rowIdx]/ 100000.0;
                 }
             }
 
@@ -406,11 +368,8 @@ public class Solver : MonoBehaviour
         return coords;
     }
 
-    // static public void SetScale(float scale){
-    //     solvScale = scale;
-    // }
 
-    private Complex[,] TransmissionMatrix(List<DummyParticle> Parray, List<Transducer> Tarray)
+    private Complex[,] TransmissionMatrix(List<DummyParticle> Parray, List<Transducer> Tarray, float ss)
     {
         int f = 40000;
         int c = 343;
@@ -436,7 +395,7 @@ public class Solver : MonoBehaviour
 
 
                 float d = particle.GetDistanceFromX(tCoord_real);
-                d /= solvScale;
+                d /= ss;
                 float theta = particle.GetZAngleFromX(tCoord_real);
 
                 double r = transducer.GetRadius();
@@ -457,135 +416,6 @@ public class Solver : MonoBehaviour
         return F;
     }
 
-
-    // public List<List<Complex>> SpatialDerivatives(List<double> phi, List<List<Complex>> F, List<Double> delta)
-    // {
-    //     List<Complex> tau = new List<Complex>();
-    //     foreach (double elem in phi)
-    //     {
-    //         tau.Add(new Complex(Math.Cos(elem), Math.Sin(elem)));
-    //     }
-
-    //     int N = phi.Count;
-
-    //     List<List<List<List<Complex>>>> PMatrix = new List<List<List<List<Complex>>>>(N); // Nx4x4x4
-
-    //     List<Complex> Fcol = new List<Complex>(64); // 64
-
-    //     for (int i = 0; i < N; i++)
-    //     {
-    //         Fcol = F[i];
-
-    //         for (int ii = 0; ii < Fcol.Count; ii++)
-    //         {
-    //             Fcol[i] = Complex.Multiply(Fcol[i], tau[i]);
-    //         }
-
-    //         for (int j = 0; j < 4; j++)
-    //         {
-    //             for (int k = 0; k < 4; k++)
-    //             {
-    //                 for (int l = 0; l < 4; l++)
-    //                 {
-    //                     PMatrix[i][j][k][l] = Fcol[4 * l + k];
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    //     int x0 = 2;
-    //     int y0 = 2;
-    //     int z0 = 2;
-
-    //     // List<Complex> p = new List<Complex>(N);
-    //     // List<Complex> px = new List<Complex>(N);
-    //     // List<Complex> py = new List<Complex>(N);
-    //     // List<Complex> pz = new List<Complex>(N);
-    //     // List<Complex> pxx = new List<Complex>(N);
-    //     // List<Complex> pxy = new List<Complex>(N);
-    //     // List<Complex> pxz = new List<Complex>(N);
-    //     // List<Complex> pyy = new List<Complex>(N);
-    //     // List<Complex> pyz = new List<Complex>(N);
-    //     // List<Complex> pzz = new List<Complex>(N);
-    //     // List<Complex> pxxx = new List<Complex>(N);
-    //     // List<Complex> pxyy = new List<Complex>(N);
-    //     // List<Complex> pxzz = new List<Complex>(N);
-    //     // List<Complex> pyxx = new List<Complex>(N);
-    //     // List<Complex> pyyy = new List<Complex>(N);
-    //     // List<Complex> pyzz = new List<Complex>(N);
-    //     // List<Complex> pzxx = new List<Complex>(N);
-    //     // List<Complex> pzyy = new List<Complex>(N);
-    //     // List<Complex> pzzz = new List<Complex>(N);
-
-
-
-    //     for (int i = 0; i < N; i++)
-    //     {
-    //         p[i] = PMatrix[i][z0][y0][z0];
-    //         px[i] = (PMatrix[i][z0][y0][x0 + 1] - PMatrix[i][z0][y0][x0]) / delta[1];
-    //         py[i] = (PMatrix[i][z0][y0 + 1][x0] - PMatrix[i][z0][y0][x0]) / delta[2];
-    //         pz[i] = (PMatrix[i][z0 + 1][y0][x0] - PMatrix[i][z0][y0][x0]) / delta[3];
-    //         pxx[i] = (PMatrix[i][z0][y0][x0 + 1] - 2 * PMatrix[i][z0][y0][x0] + 2 * PMatrix[i][z0][y0][x0 - 1]) / Math.Pow(delta[1], 2);
-    //         pyy[i] = (PMatrix[i][z0][y0 + 1][x0] - 2 * PMatrix[i][z0][y0][x0] + 2 * PMatrix[i][z0][y0 - 1][x0]) / Math.Pow(delta[2], 2);
-    //         pzz[i] = (PMatrix[i][z0 + 1][y0][x0] - 2 * PMatrix[i][z0][y0][x0] + 2 * PMatrix[i][z0 - 1][y0][x0]) / Math.Pow(delta[3], 2);
-    //         pxy[i] = (PMatrix[i][z0][y0 + 1][x0 + 1] - PMatrix[i][z0][y0 - 1][x0 + 1] - PMatrix[i][z0][y0 + 1][x0 - 1] + PMatrix[i][z0][y0 - 1][x0 - 1]) / (4 * delta[1] * delta[2]);
-    //         pxz[i] = (PMatrix[i][z0 + 1][y0][x0 + 1] - PMatrix[i][z0 - 1][y0][x0 + 1] - PMatrix[i][z0 + 1][y0][x0 - 1] + PMatrix[i][z0 - 1][y0][x0 - 1]) / (4 * delta[1] * delta[3]);
-    //         pyz[i] = (PMatrix[i][z0 + 1][y0 + 1][x0] - PMatrix[i][z0 + 1][y0 - 1][x0] - PMatrix[i][z0 - 1][y0 + 1][x0] + PMatrix[i][z0 - 1][y0 - 1][x0]) / (4 * delta[2] * delta[3]);
-    //         pxxx[i] = (PMatrix[i][z0][y0][x0 + 2] - 3 * PMatrix[i][z0][y0][x0 + 1] + 3 * PMatrix[i][z0][y0][x0] - PMatrix[i][z0][y0][x0 - 1]) / Math.Pow(delta[1], 3);
-    //         pyyy[i] = (PMatrix[i][z0][y0 + 2][x0] - 3 * PMatrix[i][z0][y0 + 1][x0] + 3 * PMatrix[i][z0][y0][x0] - PMatrix[i][z0][y0 - 1][x0]) / Math.Pow(delta[2], 3);
-    //         pzzz[i] = (PMatrix[i][z0 + 2][y0][x0] - 3 * PMatrix[i][z0 + 1][y0][x0] + 3 * PMatrix[i][z0][y0][x0] - PMatrix[i][z0 - 1][y0][x0]) / Math.Pow(delta[3], 3);
-    //         pxyy[i] = (PMatrix[i][z0][y0 + 1][x0 + 1] - 2 * PMatrix[i][z0][y0][x0 + 1] + PMatrix[i][z0][y0 - 1][x0 + 1] - PMatrix[i][z0][y0 + 1][x0 - 1] + 2 * PMatrix[i][z0][y0][x0 - 1] - PMatrix[i][z0][y0 - 1][x0 - 1]) / Math.Pow(2 * delta[1] * delta[2], 2);
-    //         pxzz[i] = (PMatrix[i][z0][y0][x0 + 1] - 2 * PMatrix[i][z0][y0][x0] + PMatrix[i][z0][y0][x0 - 1] - PMatrix[i][z0][y0][x0 + 1] + 2 * PMatrix[i][z0][y0][x0] - PMatrix[i][z0][y0][x0 - 1]) / Math.Pow(2 * delta[1] * delta[3], 2);
-    //         pyxx[i] = (PMatrix[i][z0][y0 + 1][x0 + 1] - 2 * PMatrix[i][z0][y0 + 1][x0] + PMatrix[i][z0][y0 + 1][x0 - 1] - PMatrix[i][z0][y0 - 1][x0 + 1] + 2 * PMatrix[i][z0][y0 - 1][x0] - PMatrix[i][z0][y0 - 1][x0 - 1]) / Math.Pow(2 * delta[2] * delta[1], 2);
-    //         pyzz[i] = (PMatrix[i][z0][y0 + 1][x0] - 2 * PMatrix[i][z0][y0][x0] + PMatrix[i][z0][y0 - 1][x0] - PMatrix[i][z0][y0 + 1][x0] + 2 * PMatrix[i][z0][y0][x0] - PMatrix[i][z0][y0 - 1][x0]) / Math.Pow(2 * delta[2] * delta[3], 2);
-    //         pzxx[i] = (PMatrix[i][z0 + 1][y0][x0 + 1] - 2 * PMatrix[i][z0 + 1][y0][x0] + PMatrix[i][z0 + 1][y0][x0 - 1] - PMatrix[i][z0 - 1][y0][x0 + 1] + 2 * PMatrix[i][z0 - 1][y0][x0] - PMatrix[i][z0 - 1][y0][x0 - 1]) / Math.Pow(2 * delta[3] * delta[1], 2);
-    //         pzyy[i] = (PMatrix[i][z0 + 1][y0 + 1][x0] - 2 * PMatrix[i][z0 + 1][y0][x0] + PMatrix[i][z0 + 1][y0 - 1][x0] - PMatrix[i][z0 - 1][y0 + 1][x0] + 2 * PMatrix[i][z0 - 1][y0][x0] - PMatrix[i][z0 - 1][y0 - 1][x0]) / Math.Pow(2 * delta[3] * delta[2], 2);
-
-    //     }
-
-
-    //     // Complex P = new Complex(0, 0);
-    //     // Complex Px = new Complex(0, 0);
-    //     // Complex Py = new Complex(0, 0);
-    //     // Complex Pz = new Complex(0, 0);
-    //     // Complex Pxx = new Complex(0, 0);
-    //     // Complex Pxy = new Complex(0, 0);
-    //     // Complex Pxz = new Complex(0, 0);
-    //     // Complex Pyy = new Complex(0, 0);
-    //     // Complex Pyz = new Complex(0, 0);
-    //     // Complex Pzz = new Complex(0, 0);
-    //     // Complex Pxxx = new Complex(0, 0);
-    //     // Complex Pxyy = new Complex(0, 0);
-    //     // Complex Pxzz = new Complex(0, 0);
-    //     // Complex Pyxx = new Complex(0, 0);
-    //     // Complex Pyyy = new Complex(0, 0);
-    //     // Complex Pyzz = new Complex(0, 0);
-    //     // Complex Pzxx = new Complex(0, 0);
-    //     // Complex Pzyy = new Complex(0, 0);
-    //     // Complex Pzzz = new Complex(0, 0);
-
-    //     P = ComplexSum(p);
-    //     Px = ComplexSum(px);
-    //     Py = ComplexSum(py);
-    //     Pz = ComplexSum(pz);
-    //     Pxx = ComplexSum(pxx);
-    //     Pxy = ComplexSum(pxy);
-    //     Pxz = ComplexSum(pxz);
-    //     Pyy = ComplexSum(pyy);
-    //     Pyz = ComplexSum(pyz);
-    //     Pzz = ComplexSum(pzz);
-    //     Pxxx = ComplexSum(pxxx);
-    //     Pxyy = ComplexSum(pxyy);
-    //     Pxzz = ComplexSum(pxzz);
-    //     Pyxx = ComplexSum(pyxx);
-    //     Pyyy = ComplexSum(pyyy);
-    //     Pyzz = ComplexSum(pyzz);
-    //     Pzxx = ComplexSum(pzxx);
-    //     Pzyy = ComplexSum(pzyy);
-    //     Pzzz = ComplexSum(pzzz);
-
-    //     return
-    // }
 
     static List<List<double>> CombVec(List<List<double>> arrays)
     {
@@ -638,25 +468,7 @@ public class SpatialDerivatives
     public Complex[] pzyy;
     public Complex[] pzzz;
 
-    // public List<Complex> p;
-    // public List<Complex> px;
-    // public List<Complex> py;
-    // public List<Complex> pz;
-    // public List<Complex> pxx;
-    // public List<Complex> pxy;
-    // public List<Complex> pxz;
-    // public List<Complex> pyy;
-    // public List<Complex> pyz;
-    // public List<Complex> pzz;
-    // public List<Complex> pxxx;
-    // public List<Complex> pxyy;
-    // public List<Complex> pxzz;
-    // public List<Complex> pyxx;
-    // public List<Complex> pyyy;
-    // public List<Complex> pyzz;
-    // public List<Complex> pzxx;
-    // public List<Complex> pzyy;
-    // public List<Complex> pzzz;
+
     public Complex P;
     public Complex Px;
     public Complex Py;
@@ -680,26 +492,6 @@ public class SpatialDerivatives
     public SpatialDerivatives(List<double> phi, List<List<Complex>> F)
     {
         this.N = phi.Count;
-
-        // this.p = new List<Complex>(N);
-        // this.px = new List<Complex>(N);
-        // this.py = new List<Complex>(N);
-        // this.pz = new List<Complex>(N);
-        // this.pxx = new List<Complex>(N);
-        // this.pxy = new List<Complex>(N);
-        // this.pxz = new List<Complex>(N);
-        // this.pyy = new List<Complex>(N);
-        // this.pyz = new List<Complex>(N);
-        // this.pzz = new List<Complex>(N);
-        // this.pxxx = new List<Complex>(N);
-        // this.pxyy = new List<Complex>(N);
-        // this.pxzz = new List<Complex>(N);
-        // this.pyxx = new List<Complex>(N);
-        // this.pyyy = new List<Complex>(N);
-        // this.pyzz = new List<Complex>(N);
-        // this.pzxx = new List<Complex>(N);
-        // this.pzyy = new List<Complex>(N);
-        // this.pzzz = new List<Complex>(N);
 
         this.p = new Complex[N];
         this.px = new Complex[N];
@@ -770,7 +562,8 @@ public class SpatialDerivatives
             Fcol = new List<Complex>(); // 64*
             // Fcol.AddRange(F[i]);
 
-            for(int c = 0; c < 64; c++){
+            for (int c = 0; c < 64; c++)
+            {
                 Fcol.Add(F[c][i]);
 
             }
@@ -803,26 +596,6 @@ public class SpatialDerivatives
 
         for (int i = 0; i < N; i++)
         {
-            // p[i] = PMatrix[i][z0][y0][x0];
-            // px[i] = (PMatrix[i][z0][y0][x0 + 1] - PMatrix[i][z0][y0][x0]) / delta[1];
-            // py[i] = (PMatrix[i][z0][y0 + 1][x0] - PMatrix[i][z0][y0][x0]) / delta[2];
-            // pz[i] = (PMatrix[i][z0 + 1][y0][x0] - PMatrix[i][z0][y0][x0]) / delta[3];
-            // pxx[i] = (PMatrix[i][z0][y0][x0 + 1] - 2 * PMatrix[i][z0][y0][x0] + 2 * PMatrix[i][z0][y0][x0 - 1]) / Math.Pow(delta[1], 2);
-            // pyy[i] = (PMatrix[i][z0][y0 + 1][x0] - 2 * PMatrix[i][z0][y0][x0] + 2 * PMatrix[i][z0][y0 - 1][x0]) / Math.Pow(delta[2], 2);
-            // pzz[i] = (PMatrix[i][z0 + 1][y0][x0] - 2 * PMatrix[i][z0][y0][x0] + 2 * PMatrix[i][z0 - 1][y0][x0]) / Math.Pow(delta[3], 2);
-            // pxy[i] = (PMatrix[i][z0][y0 + 1][x0 + 1] - PMatrix[i][z0][y0 - 1][x0 + 1] - PMatrix[i][z0][y0 + 1][x0 - 1] + PMatrix[i][z0][y0 - 1][x0 - 1]) / (4 * delta[1] * delta[2]);
-            // pxz[i] = (PMatrix[i][z0 + 1][y0][x0 + 1] - PMatrix[i][z0 - 1][y0][x0 + 1] - PMatrix[i][z0 + 1][y0][x0 - 1] + PMatrix[i][z0 - 1][y0][x0 - 1]) / (4 * delta[1] * delta[3]);
-            // pyz[i] = (PMatrix[i][z0 + 1][y0 + 1][x0] - PMatrix[i][z0 + 1][y0 - 1][x0] - PMatrix[i][z0 - 1][y0 + 1][x0] + PMatrix[i][z0 - 1][y0 - 1][x0]) / (4 * delta[2] * delta[3]);
-            // pxxx[i] = (PMatrix[i][z0][y0][x0 + 2] - 3 * PMatrix[i][z0][y0][x0 + 1] + 3 * PMatrix[i][z0][y0][x0] - PMatrix[i][z0][y0][x0 - 1]) / Math.Pow(delta[1], 3);
-            // pyyy[i] = (PMatrix[i][z0][y0 + 2][x0] - 3 * PMatrix[i][z0][y0 + 1][x0] + 3 * PMatrix[i][z0][y0][x0] - PMatrix[i][z0][y0 - 1][x0]) / Math.Pow(delta[2], 3);
-            // pzzz[i] = (PMatrix[i][z0 + 2][y0][x0] - 3 * PMatrix[i][z0 + 1][y0][x0] + 3 * PMatrix[i][z0][y0][x0] - PMatrix[i][z0 - 1][y0][x0]) / Math.Pow(delta[3], 3);
-            // pxyy[i] = (PMatrix[i][z0][y0 + 1][x0 + 1] - 2 * PMatrix[i][z0][y0][x0 + 1] + PMatrix[i][z0][y0 - 1][x0 + 1] - PMatrix[i][z0][y0 + 1][x0 - 1] + 2 * PMatrix[i][z0][y0][x0 - 1] - PMatrix[i][z0][y0 - 1][x0 - 1]) / Math.Pow(2 * delta[1] * delta[2], 2);
-            // pxzz[i] = (PMatrix[i][z0][y0][x0 + 1] - 2 * PMatrix[i][z0][y0][x0] + PMatrix[i][z0][y0][x0 - 1] - PMatrix[i][z0][y0][x0 + 1] + 2 * PMatrix[i][z0][y0][x0] - PMatrix[i][z0][y0][x0 - 1]) / Math.Pow(2 * delta[1] * delta[3], 2);
-            // pyxx[i] = (PMatrix[i][z0][y0 + 1][x0 + 1] - 2 * PMatrix[i][z0][y0 + 1][x0] + PMatrix[i][z0][y0 + 1][x0 - 1] - PMatrix[i][z0][y0 - 1][x0 + 1] + 2 * PMatrix[i][z0][y0 - 1][x0] - PMatrix[i][z0][y0 - 1][x0 - 1]) / Math.Pow(2 * delta[2] * delta[1], 2);
-            // pyzz[i] = (PMatrix[i][z0][y0 + 1][x0] - 2 * PMatrix[i][z0][y0][x0] + PMatrix[i][z0][y0 - 1][x0] - PMatrix[i][z0][y0 + 1][x0] + 2 * PMatrix[i][z0][y0][x0] - PMatrix[i][z0][y0 - 1][x0]) / Math.Pow(2 * delta[2] * delta[3], 2);
-            // pzxx[i] = (PMatrix[i][z0 + 1][y0][x0 + 1] - 2 * PMatrix[i][z0 + 1][y0][x0] + PMatrix[i][z0 + 1][y0][x0 - 1] - PMatrix[i][z0 - 1][y0][x0 + 1] + 2 * PMatrix[i][z0 - 1][y0][x0] - PMatrix[i][z0 - 1][y0][x0 - 1]) / Math.Pow(2 * delta[3] * delta[1], 2);
-            // pzyy[i] = (PMatrix[i][z0 + 1][y0 + 1][x0] - 2 * PMatrix[i][z0 + 1][y0][x0] + PMatrix[i][z0 + 1][y0 - 1][x0] - PMatrix[i][z0 - 1][y0 + 1][x0] + 2 * PMatrix[i][z0 - 1][y0][x0] - PMatrix[i][z0 - 1][y0 - 1][x0]) / Math.Pow(2 * delta[3] * delta[2], 2);
-
             p[i] = PMatrix[i, z0, y0, x0];
             px[i] = (PMatrix[i, z0, y0, x0 + 1] - PMatrix[i, z0, y0, x0]) / delta[0];
             py[i] = (PMatrix[i, z0, y0 + 1, x0] - PMatrix[i, z0, y0, x0]) / delta[1];
