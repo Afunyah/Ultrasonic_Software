@@ -15,6 +15,7 @@ using NLoptNet;
 using Accord.Math;
 using Accord;
 using Accord.Math.Optimization;
+using UnityEngine.AI;
 
 
 public class Solver : MonoBehaviour
@@ -36,20 +37,20 @@ public class Solver : MonoBehaviour
         lmbda = c / f;
         // tdist = 4 * lmbda;
         // tdist = 4 * lmbda;
-        tdist = (lmbda/2)*56;
-        // tdist = (lmbda/2)*56;
+        // tdist = (lmbda / 2) * 56;
+        tdist = 0.163f;
     }
 
     void Start()
     {
-        
+
     }
 
     void Update()
     {
     }
 
-    public (double[],List<bool>) Solve()
+    public (double[], List<bool>) Solve()
     {
         List<Transducer> TArray = this.gameObject.GetComponent<StateInit>().BottArray.ToList<Transducer>();
         TArray.AddRange(this.gameObject.GetComponent<StateInit>().TopArray.ToList<Transducer>());
@@ -65,12 +66,15 @@ public class Solver : MonoBehaviour
         for (int i = 0; i < TArray.Count; i++)
         {
             Vector3 trSolvPos = TArray[i].GetSolverPostion();
-            float d = Vector2.Distance(new Vector2(trSolvPos.x, trSolvPos.z), new Vector2(P_control_loc.x, P_control_loc.y));
+            // float d = Vector2.Distance(new Vector2(trSolvPos.x, trSolvPos.y), new Vector2(P_control_loc.x, P_control_loc.y)); // y z swapped
+            float d = Vector2.Distance(new Vector2(trSolvPos.x, trSolvPos.y), new Vector2(P_control_loc.x, P_control_loc.y));
             dists_from_point.Add(d);
-            // Debug.Log(d);
+            // Debug.Log(trSolvPos.ToString("F4"));
         }
 
-        float active_radius = 0.055f;
+        // float active_radius = 0.055f;
+        // float active_radius = 1f;
+        float active_radius = 0.1f;
 
         List<bool> active_mask;
         active_mask = new List<bool>();
@@ -87,11 +91,19 @@ public class Solver : MonoBehaviour
 
         for (int i = 0; i < active_mask.Count; i++)
         {
+
             if (active_mask[i])
             {
                 Tarray_active.Add(TArray[i]);
-                // Debug.Log(TArray[i].GetPosition());
+                // Debug.Log(TArray[i].GetSolverPostion().z);
             }
+            // if (active_mask[i])
+            // {
+            //     Debug.Log(1);
+            // }else{
+            //     Debug.Log(0);
+            // }
+
         }
 
         int N_active = Tarray_active.Count;
@@ -104,13 +116,21 @@ public class Solver : MonoBehaviour
 
 
         double wfreq = f * 2 * Math.PI;
-        double K1 = 0.25 * V * (1 / (Math.Pow(C0, 2) * r0) - 1 / (Math.Pow(Cp, 2) * rp));
+        double K1 = 0.25 * V * ((1 / (Math.Pow(C0, 2) * r0)) - (1 / (Math.Pow(Cp, 2) * rp)));
         double K2 = 0.75 * V * (r0 - rp) / (Math.Pow(wfreq, 2) * r0 * (r0 + 2 * rp));
 
+        // double wp = 1;
+        // double wx = 10;
+        // double wy = 10;
+        // double wz = 1000;
+        // double wp = 0.1;
+        // double wx = 0.1;
+        // double wy = 0.1;
+        // double wz = 0.1;
         double wp = 1;
-        double wx = 10;
-        double wy = 10;
-        double wz = 1000;
+        double wx = 1;
+        double wy = 1;
+        double wz = 1;
 
         double[] K;
         K = new double[2];
@@ -125,8 +145,13 @@ public class Solver : MonoBehaviour
 
         for (int i = 0; i < N_active; i++)
         {
-            float randnum = Random.Range(0.0f, 1.0f);
-            phi.Add(randnum * 2 * Math.PI);
+            // float randnum = Random.Range(0.0f, 1.0f);
+            // phi.Add(randnum * 2 * Math.PI);
+            // phi.Add(2 * Math.PI);
+            double cb0 = Tarray_active[i].GetPhaseOffset();
+            cb0 = cb0 < 0 ? 0 : cb0;
+            phi.Add(cb0);
+            // Debug.Log(phi[i]);
         }
 
 
@@ -149,8 +174,15 @@ public class Solver : MonoBehaviour
         }
 
         List<List<double>> calculation_points = new List<List<double>>();
-        calculation_points = CombVec(new List<List<double>>() { x, y, z });
+        calculation_points = CombVec3(new List<List<double>>() { x, y, z });
+
+        // foreach (var i in calculation_points)
+        // {
+        //     Debug.Log(i[0].ToString("F4") + " " + i[1].ToString("F4") + " " + i[2].ToString("F4"));
+        // }
+
         int L = calculation_points.Count();
+
 
         List<DummyParticle> calculation_P;
         calculation_P = new List<DummyParticle>();
@@ -165,9 +197,22 @@ public class Solver : MonoBehaviour
 
         Complex[,] calcF_NOT = TransmissionMatrix(calculation_P, Tarray_active, GetSolverScale(TArray[0], TArray[1]));
 
-        // foreach (var item in calcF_NOT)
+        for (int i = 0; i < calcF_NOT.GetLength(0); i++)
+        {
+            for (int j = 0; j < calcF_NOT.GetLength(1); j++)
+            {
+                // Debug.Log(calcF_NOT[i, j]);
+            }
+        }
+
+        // foreach (var i in calcF_NOT)
         // {
-        //     Debug.Log(item);
+        //     String srng = "";
+
+        //     srng += (i.ToString());
+        //     srng += " ";
+
+        //     Debug.Log(srng);
         // }
 
         List<List<Complex>> calcF;
@@ -182,6 +227,35 @@ public class Solver : MonoBehaviour
             calcF.Add(tmp);
         }
 
+        // foreach (var i in calcF)
+        // {
+        //     String srng = "";
+        //     foreach (var item in i)
+        //     {
+        //         // srng += (item.Imaginary.ToString("F4"));
+        //         Debug.Log(item.Real.ToString("F4"));
+        //         // srng += " ";
+        //     }
+        //     // Debug.Log(srng);
+        // }
+
+
+        // SpatialDerivatives spatialDerivatives_debug = new SpatialDerivatives(phi.ToList<double>(), calcF);
+        // Gorkov gorkov_debug = new Gorkov(spatialDerivatives_debug, K);
+        // gorkov_debug.ComputeLaplacian();
+        // double O_debug = wp * gorkov_debug.pAbs - wx * gorkov_debug.Uxx - wy * gorkov_debug.Uyy - wz * gorkov_debug.Uzz;
+        // // Debug.Log(O_debug);
+
+        // int N_debug = phi.Count;
+        // double[] g_debug = new double[N_debug];
+
+        // for (int i = 0; i < N_debug; i++)
+        // {
+        //     gorkov_debug.ComputeGradientLaplacian(i);
+        //     g_debug[i] = wp * gorkov_debug.gpAbs - wx * gorkov_debug.gUxx - wy * gorkov_debug.gUyy - wz * gorkov_debug.gUzz;
+        //     Debug.Log(g_debug[i].ToString("F4"));
+        // }
+
         Func<double[], double> f1 = (x) =>
         {
             SpatialDerivatives spatialDerivatives = new SpatialDerivatives(x.ToList<double>(), calcF);
@@ -192,6 +266,8 @@ public class Solver : MonoBehaviour
             double O = wp * gorkov.pAbs - wx * gorkov.Uxx - wy * gorkov.Uyy - wz * gorkov.Uzz;
             return O;
         };
+
+
 
         double[] g1(double[] x)
         {
@@ -214,20 +290,22 @@ public class Solver : MonoBehaviour
             return g;
         }
 
-        BroydenFletcherGoldfarbShanno lbfgs = new BroydenFletcherGoldfarbShanno(numberOfVariables: phi.Count, function: f1, gradient: g1);
-        // ConjugateGradient lbfgs = new ConjugateGradient(numberOfVariables: phi.Count, function: f1, gradient: g1);
+        // BroydenFletcherGoldfarbShanno lbfgs = new BroydenFletcherGoldfarbShanno(numberOfVariables: phi.Count, function: f1, gradient: g1);
+        ConjugateGradient lbfgs = new ConjugateGradient(numberOfVariables: phi.Count, function: f1, gradient: g1);
 
         // lbfgs.FunctionTolerance = 1e1;
-        lbfgs.MaxLineSearch = 200;
+        // lbfgs.MaxLineSearch = 1000;
         // BoundedBroydenFletcherGoldfarbShanno lbfgs = new BoundedBroydenFletcherGoldfarbShanno(numberOfVariables: phi.Count, function: f1, gradient: g1);
-        // lbfgs.FunctionTolerance = 1e-5;
+        // lbfgs.FunctionTolerance = 1e-10;
+        // lbfgs.GradientTolerance = 0.1;
         // lbfgs.MaxIterations = 1000;
         // lbfgs.Progress += (s, e) =>
         // {
-        //     Debug.Log(lbfgs.Value);
+        //     Debug.Log(lbfgs.Value.ToString("F10"));
         // };
 
-        bool success = lbfgs.Minimize(phi.ToArray<double>());
+        bool success = false;
+        success = lbfgs.Minimize(phi.ToArray<double>());
         double[] solution = lbfgs.Solution;
         Debug.Log("Solver solution: " + success + "\tValue: " + lbfgs.Value);
         Debug.Log("Status: " + lbfgs.Status + "\tNsols: " + solution.Length);
@@ -244,7 +322,8 @@ public class Solver : MonoBehaviour
         int active_ind = 0;
         for (int i = 0; i < 1442; i++)
         {
-            if(active_mask[i]){
+            if (active_mask[i])
+            {
                 phi_total[i] = solution[active_ind];
                 active_ind++;
             }
@@ -259,7 +338,7 @@ public class Solver : MonoBehaviour
         float sp = Vector3.Distance(one.GetSolverPostion(), two.GetSolverPostion());
         float tp = Vector3.Distance(one.GetPosition(), two.GetPosition());
         // Debug.Log("(" + sp + ", " + tp + ")");
-        return sp/tp;
+        return sp / tp;
 
     }
 
@@ -272,7 +351,7 @@ public class Solver : MonoBehaviour
     {
         double T_diam = 9.8e-3;
         double spacing = 1e-3;
-        double u = (T_diam + spacing) / 2;
+        double u = (T_diam + spacing) / 2.0;
 
         //     double[] x = { -0.0054f, -0.0108f, -0.0054f, 0.0054f, 0.0108f,
         // 0.0054, 0.0093530743608719377f, 0.0f, -0.0093530743608719377f,
@@ -308,7 +387,7 @@ public class Solver : MonoBehaviour
                 {
                     for (k = 0; k <= i; k++)
                     {
-                        ring_cords_data[((rowIdx + k) + ring_cords_size_idx_0 * colIdx) + 1] = x[b_i + 6 * j];
+                        ring_cords_data[((rowIdx + k) + ring_cords_size_idx_0 * colIdx) + 1] = u * x[b_i + 6 * j];
                     }
 
                     rowIdx = (rowIdx + i) + 1;
@@ -378,7 +457,7 @@ public class Solver : MonoBehaviour
                 for (colIdx = 0; colIdx < ring_cords_size_idx_0; colIdx++)
                 {
                     coords[((j + colIdx) + 721 * rowIdx) - 1] = ring_cords_data[colIdx +
-                      ring_cords_size_idx_0 * rowIdx]/ 100000.0;
+                      ring_cords_size_idx_0 * rowIdx];
                 }
             }
 
@@ -418,15 +497,26 @@ public class Solver : MonoBehaviour
                 Transducer transducer = Tarray[n];
                 Vector3 tCoord_real = transducer.GetPosition();
                 Vector3 tCoord = transducer.GetSolverPostion();
+                int tz = transducer.GetPlate() == 0 ? 1 : -1;
+                Vector3 tNorm = new Vector3(0, 0, tz);
 
 
-                float d = particle.GetDistanceFromX(tCoord_real);
-                // Debug.Log(ss);
-                d /= ss;
-                float theta = particle.GetZAngleFromX(tCoord_real);
+                // float d = particle.GetDistanceFromX(tCoord_real);
+                // d /= ss;
+                // float theta = particle.GetZAngleFromX(tCoord_real);
+
+                // Debug.Log(tCoord.z);
+                float d = particle.GetDistanceFromX(tCoord);
+                // Debug.Log(d.ToString("F4"));
+
+                double theta = particle.GetZAngleFromX(tCoord, tNorm);
+                // Debug.Log(theta.ToString("F4"));
 
                 double r = transducer.GetRadius();
                 double Pref = transducer.GetRefPressure();
+
+                // Debug.Log(Pref.ToString("F4"));
+
 
                 double P = MathNet.Numerics.SpecialFunctions.BesselJ(0, k * r * Math.Sin(theta)) * Pref / d;
                 if (double.IsNaN(P))
@@ -435,9 +525,10 @@ public class Solver : MonoBehaviour
                 }
 
                 Complex Phi = new Complex(Math.Cos(k * d), Math.Sin(k * d));
+                // Debug.Log(Phi.Imaginary.ToString("F4"));
 
                 F[l, n] = P * Phi;
-                // Debug.Log(lambda);
+                // Debug.Log(P.ToString("F4"));
             }
         }
 
@@ -449,7 +540,9 @@ public class Solver : MonoBehaviour
     {
         List<List<double>> result = new List<List<double>>();
         List<double> currentCombination = new List<double>();
-        GenerateCombinations(arrays, 0, currentCombination, result);
+
+        GenerateCombinations(arrays, 0, currentCombination, result); // counts up
+        // GenerateCombinations2(arrays, 3, currentCombination, result); // counts down
         return result;
     }
 
@@ -469,6 +562,77 @@ public class Solver : MonoBehaviour
         }
     }
 
+
+    static void GenerateCombinations2(List<List<double>> arrays, int currentIndex, List<double> currentCombination, List<List<double>> result)
+    {
+        if (currentIndex == 0)
+        {
+            result.Add(new List<double>(currentCombination));
+            return;
+        }
+
+        try
+        {
+            foreach (double num in arrays[currentIndex - 1])
+            {
+                // Debug.Log(currentCombination.Count);
+                currentCombination.Add(num);
+                GenerateCombinations2(arrays, currentIndex - 1, currentCombination, result);
+                currentCombination.RemoveAt(currentCombination.Count - 1);
+
+
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.Log(ex);
+
+            Debug.Log(currentCombination.Count);
+            Debug.Log(currentIndex);
+        }
+    }
+
+    static List<List<double>> CombVec3(List<List<double>> arrays)
+    {
+        List<List<double>> result = new List<List<double>>(64);
+        List<double> currentCombination = new List<double>(3);
+
+        GenerateCombinations3(arrays, result); // counts up
+        // GenerateCombinations2(arrays, 3, currentCombination, result); // counts down
+        return result;
+    }
+
+    static void GenerateCombinations3(List<List<double>> arrays, List<List<double>> result)
+    {
+        for (int i = 0; i < 64; i++)
+        {
+            result.Add(new List<double>(3));
+            result[i].Add(arrays[0][i % 4]);
+        }
+
+        for (float i = 0; i < 16; i++)
+        {
+            float j = 0;
+            while (j < 4)
+            {
+                try { result[(int)((4 * i) + j)].Add(arrays[1][(int)Mathf.Floor(i % 4)]); }
+                catch (DivideByZeroException) { result[(int)((4 * i) + j)].Add(arrays[1][0]); }
+                j++;
+            }
+        }
+
+        for (float i = 0; i < 4; i++)
+        {
+            float j = 0;
+            while (j < 16)
+            {
+                try { result[(int)((16 * i) + j)].Add(arrays[2][(int)Mathf.Floor(i % 4)]); }
+                catch (DivideByZeroException) { result[(int)((16 * i) + j)].Add(arrays[2][0]); }
+                j++;
+            }
+        }
+
+    }
 
 }
 
@@ -577,12 +741,15 @@ public class SpatialDerivatives
         foreach (double elem in phi)
         {
             tau.Add(new Complex(Math.Cos(elem), Math.Sin(elem)));
+            // Debug.Log(new Complex(Math.Cos(elem), Math.Sin(elem)).ToString("F4"));
         }
 
         // List<List<List<List<Complex>>>> PMatrix = new List<List<List<List<Complex>>>>(N); // Nx4x4x4
         Complex[,,,] PMatrix = new Complex[N, 4, 4, 4];
 
         List<Complex> Fcol = new List<Complex>(); // 64
+
+        int debug_count = 1;
 
         // 64 or N here?
         for (int i = 0; i < N; i++)
@@ -593,7 +760,8 @@ public class SpatialDerivatives
             for (int c = 0; c < 64; c++)
             {
                 Fcol.Add(F[c][i]);
-
+                // Debug.Log(debug_count + " : " + F[c][i].ToString("F4"));
+                // debug_count++;
             }
 
 
@@ -601,6 +769,8 @@ public class SpatialDerivatives
             for (int ii = 0; ii < Fcol.Count; ii++)
             {
                 Fcol[ii] = Complex.Multiply(Fcol[ii], tau[i]);
+                // Debug.Log(debug_count + " : " + Fcol[ii].ToString("F4"));
+                // debug_count++;
             }
 
             for (int j = 0; j < 4; j++)
@@ -609,7 +779,11 @@ public class SpatialDerivatives
                 {
                     for (int l = 0; l < 4; l++)
                     {
-                        PMatrix[i, j, k, l] = Fcol[4 * l + k];
+                        // PMatrix[i, j, k, l] = Fcol[4 * l + k];
+                        PMatrix[i, j, k, l] = Fcol[(16 * j) + (4 * k) + l];
+                        // Debug.Log(debug_count + " : " + PMatrix[i, j, k, l].ToString("F4"));
+                        // debug_count++;
+                        // Debug.Log(PMatrix[i, j, k, l].Imaginary.ToString("F4"));
                     }
                 }
             }
@@ -625,25 +799,62 @@ public class SpatialDerivatives
         for (int i = 0; i < N; i++)
         {
             p[i] = PMatrix[i, z0, y0, x0];
-            px[i] = (PMatrix[i, z0, y0, x0 + 1] - PMatrix[i, z0, y0, x0]) / delta[0];
-            py[i] = (PMatrix[i, z0, y0 + 1, x0] - PMatrix[i, z0, y0, x0]) / delta[1];
-            pz[i] = (PMatrix[i, z0 + 1, y0, x0] - PMatrix[i, z0, y0, x0]) / delta[2];
-            pxx[i] = (PMatrix[i, z0, y0, x0 + 1] - 2 * PMatrix[i, z0, y0, x0] + 2 * PMatrix[i, z0, y0, x0 - 1]) / Math.Pow(delta[0], 2);
-            pyy[i] = (PMatrix[i, z0, y0 + 1, x0] - 2 * PMatrix[i, z0, y0, x0] + 2 * PMatrix[i, z0, y0 - 1, x0]) / Math.Pow(delta[1], 2);
-            pzz[i] = (PMatrix[i, z0 + 1, y0, x0] - 2 * PMatrix[i, z0, y0, x0] + 2 * PMatrix[i, z0 - 1, y0, x0]) / Math.Pow(delta[2], 2);
-            pxy[i] = (PMatrix[i, z0, y0 + 1, x0 + 1] - PMatrix[i, z0, y0 - 1, x0 + 1] - PMatrix[i, z0, y0 + 1, x0 - 1] + PMatrix[i, z0, y0 - 1, x0 - 1]) / (4 * delta[0] * delta[1]);
-            pxz[i] = (PMatrix[i, z0 + 1, y0, x0 + 1] - PMatrix[i, z0 - 1, y0, x0 + 1] - PMatrix[i, z0 + 1, y0, x0 - 1] + PMatrix[i, z0 - 1, y0, x0 - 1]) / (4 * delta[0] * delta[2]);
-            pyz[i] = (PMatrix[i, z0 + 1, y0 + 1, x0] - PMatrix[i, z0 + 1, y0 - 1, x0] - PMatrix[i, z0 - 1, y0 + 1, x0] + PMatrix[i, z0 - 1, y0 - 1, x0]) / (4 * delta[1] * delta[2]);
-            pxxx[i] = (PMatrix[i, z0, y0, x0 + 2] - 3 * PMatrix[i, z0, y0, x0 + 1] + 3 * PMatrix[i, z0, y0, x0] - PMatrix[i, z0, y0, x0 - 1]) / Math.Pow(delta[0], 3);
-            pyyy[i] = (PMatrix[i, z0, y0 + 2, x0] - 3 * PMatrix[i, z0, y0 + 1, x0] + 3 * PMatrix[i, z0, y0, x0] - PMatrix[i, z0, y0 - 1, x0]) / Math.Pow(delta[1], 3);
-            pzzz[i] = (PMatrix[i, z0 + 2, y0, x0] - 3 * PMatrix[i, z0 + 1, y0, x0] + 3 * PMatrix[i, z0, y0, x0] - PMatrix[i, z0 - 1, y0, x0]) / Math.Pow(delta[2], 3);
-            pxyy[i] = (PMatrix[i, z0, y0 + 1, x0 + 1] - 2 * PMatrix[i, z0, y0, x0 + 1] + PMatrix[i, z0, y0 - 1, x0 + 1] - PMatrix[i, z0, y0 + 1, x0 - 1] + 2 * PMatrix[i, z0, y0, x0 - 1] - PMatrix[i, z0, y0 - 1, x0 - 1]) / Math.Pow(2 * delta[0] * delta[1], 2);
-            pxzz[i] = (PMatrix[i, z0, y0, x0 + 1] - 2 * PMatrix[i, z0, y0, x0] + PMatrix[i, z0, y0, x0 - 1] - PMatrix[i, z0, y0, x0 + 1] + 2 * PMatrix[i, z0, y0, x0] - PMatrix[i, z0, y0, x0 - 1]) / Math.Pow(2 * delta[0] * delta[2], 2);
-            pyxx[i] = (PMatrix[i, z0, y0 + 1, x0 + 1] - 2 * PMatrix[i, z0, y0 + 1, x0] + PMatrix[i, z0, y0 + 1, x0 - 1] - PMatrix[i, z0, y0 - 1, x0 + 1] + 2 * PMatrix[i, z0, y0 - 1, x0] - PMatrix[i, z0, y0 - 1, x0 - 1]) / Math.Pow(2 * delta[1] * delta[0], 2);
-            pyzz[i] = (PMatrix[i, z0, y0 + 1, x0] - 2 * PMatrix[i, z0, y0, x0] + PMatrix[i, z0, y0 - 1, x0] - PMatrix[i, z0, y0 + 1, x0] + 2 * PMatrix[i, z0, y0, x0] - PMatrix[i, z0, y0 - 1, x0]) / Math.Pow(2 * delta[1] * delta[2], 2);
-            pzxx[i] = (PMatrix[i, z0 + 1, y0, x0 + 1] - 2 * PMatrix[i, z0 + 1, y0, x0] + PMatrix[i, z0 + 1, y0, x0 - 1] - PMatrix[i, z0 - 1, y0, x0 + 1] + 2 * PMatrix[i, z0 - 1, y0, x0] - PMatrix[i, z0 - 1, y0, x0 - 1]) / Math.Pow(2 * delta[2] * delta[0], 2);
-            pzyy[i] = (PMatrix[i, z0 + 1, y0 + 1, x0] - 2 * PMatrix[i, z0 + 1, y0, x0] + PMatrix[i, z0 + 1, y0 - 1, x0] - PMatrix[i, z0 - 1, y0 + 1, x0] + 2 * PMatrix[i, z0 - 1, y0, x0] - PMatrix[i, z0 - 1, y0 - 1, x0]) / Math.Pow(2 * delta[2] * delta[1], 2);
+
+            px[i] = PMatrix[i, z0, y0, x0 + 1] - PMatrix[i, z0, y0, x0];
+            py[i] = PMatrix[i, z0, y0 + 1, x0] - PMatrix[i, z0, y0, x0];
+            pz[i] = PMatrix[i, z0 + 1, y0, x0] - PMatrix[i, z0, y0, x0];
+            pxx[i] = PMatrix[i, z0, y0, x0 + 1] - 2 * PMatrix[i, z0, y0, x0] + 2 * PMatrix[i, z0, y0, x0 - 1];
+            pyy[i] = PMatrix[i, z0, y0 + 1, x0] - 2 * PMatrix[i, z0, y0, x0] + 2 * PMatrix[i, z0, y0 - 1, x0];
+            pzz[i] = PMatrix[i, z0 + 1, y0, x0] - 2 * PMatrix[i, z0, y0, x0] + 2 * PMatrix[i, z0 - 1, y0, x0];
+            pxy[i] = PMatrix[i, z0, y0 + 1, x0 + 1] - PMatrix[i, z0, y0 - 1, x0 + 1] - PMatrix[i, z0, y0 + 1, x0 - 1] + PMatrix[i, z0, y0 - 1, x0 - 1];
+            pxz[i] = PMatrix[i, z0 + 1, y0, x0 + 1] - PMatrix[i, z0 - 1, y0, x0 + 1] - PMatrix[i, z0 + 1, y0, x0 - 1] + PMatrix[i, z0 - 1, y0, x0 - 1];
+            pyz[i] = PMatrix[i, z0 + 1, y0 + 1, x0] - PMatrix[i, z0 + 1, y0 - 1, x0] - PMatrix[i, z0 - 1, y0 + 1, x0] + PMatrix[i, z0 - 1, y0 - 1, x0];
+            pxxx[i] = PMatrix[i, z0, y0, x0 + 2] - 3 * PMatrix[i, z0, y0, x0 + 1] + 3 * PMatrix[i, z0, y0, x0] - PMatrix[i, z0, y0, x0 - 1];
+            pyyy[i] = PMatrix[i, z0, y0 + 2, x0] - 3 * PMatrix[i, z0, y0 + 1, x0] + 3 * PMatrix[i, z0, y0, x0] - PMatrix[i, z0, y0 - 1, x0];
+            pzzz[i] = PMatrix[i, z0 + 2, y0, x0] - 3 * PMatrix[i, z0 + 1, y0, x0] + 3 * PMatrix[i, z0, y0, x0] - PMatrix[i, z0 - 1, y0, x0];
+            // Complex dbg = new Complex();
+            // dbg = (PMatrix[i, z0 + 2, y0, x0] - 3 * PMatrix[i, z0 + 1, y0, x0] + 3 * PMatrix[i, z0, y0, x0] - PMatrix[i, z0 - 1, y0, x0]);
+            // Debug.Log(dbg.Real.ToString("F8"));
+            pxyy[i] = PMatrix[i, z0, y0 + 1, x0 + 1] - 2 * PMatrix[i, z0, y0, x0 + 1] + PMatrix[i, z0, y0 - 1, x0 + 1] - PMatrix[i, z0, y0 + 1, x0 - 1] + 2 * PMatrix[i, z0, y0, x0 - 1] - PMatrix[i, z0, y0 - 1, x0 - 1];
+            pxzz[i] = PMatrix[i, z0, y0, x0 + 1] - 2 * PMatrix[i, z0, y0, x0] + PMatrix[i, z0, y0, x0 - 1] - PMatrix[i, z0, y0, x0 + 1] + 2 * PMatrix[i, z0, y0, x0] - PMatrix[i, z0, y0, x0 - 1];
+            pyxx[i] = PMatrix[i, z0, y0 + 1, x0 + 1] - 2 * PMatrix[i, z0, y0 + 1, x0] + PMatrix[i, z0, y0 + 1, x0 - 1] - PMatrix[i, z0, y0 - 1, x0 + 1] + 2 * PMatrix[i, z0, y0 - 1, x0] - PMatrix[i, z0, y0 - 1, x0 - 1];
+            pyzz[i] = PMatrix[i, z0, y0 + 1, x0] - 2 * PMatrix[i, z0, y0, x0] + PMatrix[i, z0, y0 - 1, x0] - PMatrix[i, z0, y0 + 1, x0] + 2 * PMatrix[i, z0, y0, x0] - PMatrix[i, z0, y0 - 1, x0];
+            pzxx[i] = PMatrix[i, z0 + 1, y0, x0 + 1] - 2 * PMatrix[i, z0 + 1, y0, x0] + PMatrix[i, z0 + 1, y0, x0 - 1] - PMatrix[i, z0 - 1, y0, x0 + 1] + 2 * PMatrix[i, z0 - 1, y0, x0] - PMatrix[i, z0 - 1, y0, x0 - 1];
+            pzyy[i] = PMatrix[i, z0 + 1, y0 + 1, x0] - 2 * PMatrix[i, z0 + 1, y0, x0] + PMatrix[i, z0 + 1, y0 - 1, x0] - PMatrix[i, z0 - 1, y0 + 1, x0] + 2 * PMatrix[i, z0 - 1, y0, x0] - PMatrix[i, z0 - 1, y0 - 1, x0];
+            // Complex dbg = new Complex();
+            // dbg = (PMatrix[i, z0 + 1, y0 + 1, x0] - 2 * PMatrix[i, z0 + 1, y0, x0] + PMatrix[i, z0 + 1, y0 - 1, x0] - PMatrix[i, z0 - 1, y0 + 1, x0] + 2 * PMatrix[i, z0 - 1, y0, x0] - PMatrix[i, z0 - 1, y0 - 1, x0]);
+            // Debug.Log(dbg.Real.ToString("F8"));
         }
+
+        // for (int i = 0; i < N; i++)
+        // {
+        //     p[i] = PMatrix[i, z0, y0, x0];
+
+        //     px[i] = (PMatrix[i, z0, y0, x0 + 1] - PMatrix[i, z0, y0, x0]) / delta[0];
+        //     py[i] = (PMatrix[i, z0, y0 + 1, x0] - PMatrix[i, z0, y0, x0]) / delta[1];
+        //     pz[i] = (PMatrix[i, z0 + 1, y0, x0] - PMatrix[i, z0, y0, x0]) / delta[2];
+        //     pxx[i] = (PMatrix[i, z0, y0, x0 + 1] - 2 * PMatrix[i, z0, y0, x0] + 2 * PMatrix[i, z0, y0, x0 - 1]) / Math.Pow(delta[0], 2);
+        //     pyy[i] = (PMatrix[i, z0, y0 + 1, x0] - 2 * PMatrix[i, z0, y0, x0] + 2 * PMatrix[i, z0, y0 - 1, x0]) / Math.Pow(delta[1], 2);
+        //     pzz[i] = (PMatrix[i, z0 + 1, y0, x0] - 2 * PMatrix[i, z0, y0, x0] + 2 * PMatrix[i, z0 - 1, y0, x0]) / Math.Pow(delta[2], 2);
+        //     pxy[i] = (PMatrix[i, z0, y0 + 1, x0 + 1] - PMatrix[i, z0, y0 - 1, x0 + 1] - PMatrix[i, z0, y0 + 1, x0 - 1] + PMatrix[i, z0, y0 - 1, x0 - 1]) / (4 * delta[0] * delta[1]);
+        //     pxz[i] = (PMatrix[i, z0 + 1, y0, x0 + 1] - PMatrix[i, z0 - 1, y0, x0 + 1] - PMatrix[i, z0 + 1, y0, x0 - 1] + PMatrix[i, z0 - 1, y0, x0 - 1]) / (4 * delta[0] * delta[2]);
+        //     pyz[i] = (PMatrix[i, z0 + 1, y0 + 1, x0] - PMatrix[i, z0 + 1, y0 - 1, x0] - PMatrix[i, z0 - 1, y0 + 1, x0] + PMatrix[i, z0 - 1, y0 - 1, x0]) / (4 * delta[1] * delta[2]);
+        //     pxxx[i] = (PMatrix[i, z0, y0, x0 + 2] - 3 * PMatrix[i, z0, y0, x0 + 1] + 3 * PMatrix[i, z0, y0, x0] - PMatrix[i, z0, y0, x0 - 1]) / Math.Pow(delta[0], 3);
+        //     pyyy[i] = (PMatrix[i, z0, y0 + 2, x0] - 3 * PMatrix[i, z0, y0 + 1, x0] + 3 * PMatrix[i, z0, y0, x0] - PMatrix[i, z0, y0 - 1, x0]) / Math.Pow(delta[1], 3);
+        //     pzzz[i] = (PMatrix[i, z0 + 2, y0, x0] - 3 * PMatrix[i, z0 + 1, y0, x0] + 3 * PMatrix[i, z0, y0, x0] - PMatrix[i, z0 - 1, y0, x0]) / Math.Pow(delta[2], 3);
+        //     // Complex dbg = new Complex();
+        //     // dbg = (PMatrix[i, z0 + 2, y0, x0] - 3 * PMatrix[i, z0 + 1, y0, x0] + 3 * PMatrix[i, z0, y0, x0] - PMatrix[i, z0 - 1, y0, x0]);
+        //     // Debug.Log(dbg.Real.ToString("F8"));
+        //     pxyy[i] = (PMatrix[i, z0, y0 + 1, x0 + 1] - 2 * PMatrix[i, z0, y0, x0 + 1] + PMatrix[i, z0, y0 - 1, x0 + 1] - PMatrix[i, z0, y0 + 1, x0 - 1] + 2 * PMatrix[i, z0, y0, x0 - 1] - PMatrix[i, z0, y0 - 1, x0 - 1]) / (2 * delta[0] * Math.Pow(delta[1], 2));
+        //     pxzz[i] = (PMatrix[i, z0, y0, x0 + 1] - 2 * PMatrix[i, z0, y0, x0] + PMatrix[i, z0, y0, x0 - 1] - PMatrix[i, z0, y0, x0 + 1] + 2 * PMatrix[i, z0, y0, x0] - PMatrix[i, z0, y0, x0 - 1]) / (2 * delta[0] * Math.Pow(delta[2], 2));
+        //     pyxx[i] = (PMatrix[i, z0, y0 + 1, x0 + 1] - 2 * PMatrix[i, z0, y0 + 1, x0] + PMatrix[i, z0, y0 + 1, x0 - 1] - PMatrix[i, z0, y0 - 1, x0 + 1] + 2 * PMatrix[i, z0, y0 - 1, x0] - PMatrix[i, z0, y0 - 1, x0 - 1]) / (2 * delta[1] * Math.Pow(delta[0], 2));
+        //     pyzz[i] = (PMatrix[i, z0, y0 + 1, x0] - 2 * PMatrix[i, z0, y0, x0] + PMatrix[i, z0, y0 - 1, x0] - PMatrix[i, z0, y0 + 1, x0] + 2 * PMatrix[i, z0, y0, x0] - PMatrix[i, z0, y0 - 1, x0]) / (2 * delta[1] * Math.Pow(delta[2], 2));
+        //     pzxx[i] = (PMatrix[i, z0 + 1, y0, x0 + 1] - 2 * PMatrix[i, z0 + 1, y0, x0] + PMatrix[i, z0 + 1, y0, x0 - 1] - PMatrix[i, z0 - 1, y0, x0 + 1] + 2 * PMatrix[i, z0 - 1, y0, x0] - PMatrix[i, z0 - 1, y0, x0 - 1]) / (2 * delta[2] * Math.Pow(delta[0], 2));
+        //     pzyy[i] = (PMatrix[i, z0 + 1, y0 + 1, x0] - 2 * PMatrix[i, z0 + 1, y0, x0] + PMatrix[i, z0 + 1, y0 - 1, x0] - PMatrix[i, z0 - 1, y0 + 1, x0] + 2 * PMatrix[i, z0 - 1, y0, x0] - PMatrix[i, z0 - 1, y0 - 1, x0]) / (2 * delta[2] * Math.Pow(delta[1], 2));
+        //     // Complex dbg = new Complex();
+        //     // dbg = (PMatrix[i, z0 + 1, y0 + 1, x0] - 2 * PMatrix[i, z0 + 1, y0, x0] + PMatrix[i, z0 + 1, y0 - 1, x0] - PMatrix[i, z0 - 1, y0 + 1, x0] + 2 * PMatrix[i, z0 - 1, y0, x0] - PMatrix[i, z0 - 1, y0 - 1, x0]);
+        //     // Debug.Log(dbg.Real.ToString("F8"));
+        // }
 
 
         P = ComplexSum(p);
@@ -665,6 +876,80 @@ public class SpatialDerivatives
         Pzxx = ComplexSum(pzxx);
         Pzyy = ComplexSum(pzyy);
         Pzzz = ComplexSum(pzzz);
+
+        double c1 = 1e-2;
+        double c2 = 1e-4;
+        // double c3 = 4e-4;
+        double c3 = 1e-6;
+        // double c5 = 2e-6;
+
+        Px = Px / delta[0];
+        Py = Py / delta[1];
+        Pz = Pz / delta[2];
+
+        Pxx = Pxx / Math.Pow(delta[0], 2);
+        Pyy = Pyy / Math.Pow(delta[1], 2);
+        Pzz = Pzz / Math.Pow(delta[2], 2);
+
+        Pxy = Pxy / (4 * delta[0] * delta[1]);
+        Pxz = Pxz / (4 * delta[0] * delta[2]);
+        Pyz = Pyz / (4 * delta[1] * delta[2]);
+
+        Pxxx = Pxxx / Math.Pow(delta[0], 3);
+        Pyyy = Pyyy / Math.Pow(delta[1], 3);
+        Pzzz = Pzzz / Math.Pow(delta[2], 3);
+
+        Pxyy = Pxyy / (2 * delta[0] * Math.Pow(delta[1], 2));
+        Pxzz = Pxzz / (2 * delta[0] * Math.Pow(delta[2], 2));
+        Pyxx = Pyxx / (2 * delta[1] * Math.Pow(delta[0], 2));
+        Pyzz = Pyzz / (2 * delta[1] * Math.Pow(delta[2], 2));
+        Pzxx = Pzxx / (2 * delta[2] * Math.Pow(delta[0], 2));
+        Pzyy = Pzyy / (2 * delta[2] * Math.Pow(delta[1], 2));
+
+        //
+
+        // Px = Px * c1 / delta[0];
+        // Py = Py * c1 / delta[1];
+        // Pz = Pz * c1 / delta[2];
+
+        // Pxx = Pxx * c2 / Math.Pow(delta[0], 2);
+        // Pyy = Pyy * c2 / Math.Pow(delta[1], 2);
+        // Pzz = Pzz * c2 / Math.Pow(delta[2], 2);
+
+        // Pxy = Pxy * c2 / (4 * delta[0] * delta[1]);
+        // Pxz = Pxz * c2 / (4 * delta[0] * delta[2]);
+        // Pyz = Pyz * c2 / (4 * delta[1] * delta[2]);
+
+        // Pxxx = Pxxx * c3 / Math.Pow(delta[0], 3);
+        // Pyyy = Pyyy * c3 / Math.Pow(delta[1], 3);
+        // Pzzz = Pzzz * c3 / Math.Pow(delta[2], 3);
+
+        // Pxyy = Pxyy * c3 / (2 * delta[0] * Math.Pow(delta[1], 2));
+        // Pxzz = Pxzz * c3 / (2 * delta[0] * Math.Pow(delta[2], 2));
+        // Pyxx = Pyxx * c3 / (2 * delta[1] * Math.Pow(delta[0], 2)); 
+        // Pyzz = Pyzz * c3 / (2 * delta[1] * Math.Pow(delta[2], 2));
+        // Pzxx = Pzxx * c3 / (2 * delta[2] * Math.Pow(delta[0], 2));
+        // Pzyy = Pzyy * c3 / (2 * delta[2] * Math.Pow(delta[1], 2));
+
+        // Debug.Log(P.Real.ToString("F8"));
+        // Debug.Log(Px.Real.ToString("F8"));
+        // Debug.Log(Py.Real.ToString("F8"));
+        // Debug.Log(Pz.Real.ToString("F8"));
+        // Debug.Log(Pxx.Real.ToString("F8"));
+        // Debug.Log(Pxy.Real.ToString("F8"));
+        // Debug.Log(Pxz.Real.ToString("F8"));
+        // Debug.Log(Pyy.Real.ToString("F8"));
+        // Debug.Log(Pyz.Real.ToString("F8"));
+        // Debug.Log(Pzz.Real.ToString("F8"));
+        // Debug.Log(Pxxx.Real.ToString("F8"));
+        // Debug.Log(Pxyy.Real.ToString("F8"));
+        // Debug.Log(Pxzz.Real.ToString("F8"));
+        // Debug.Log(Pyxx.Real.ToString("F8"));
+        // Debug.Log(Pyyy.Real.ToString("F8"));
+        // Debug.Log(Pyzz.Real.ToString("F8"));
+        // Debug.Log(Pzxx.Real.ToString("F8"));
+        // Debug.Log(Pzyy.Real.ToString("F8"));
+        // Debug.Log(Pzzz.Real.ToString("F8"));
     }
 
 
@@ -698,6 +983,11 @@ public class Gorkov
     private readonly SpatialDerivatives sd;
     private readonly double[] K;
 
+
+    private readonly double c1;
+    private readonly double c2;
+    private readonly double c3;
+
     public Gorkov(SpatialDerivatives sd0, double[] K0)
     {
         this.sd = sd0;
@@ -713,58 +1003,182 @@ public class Gorkov
 
         this.gpAbs = 0;
         this.pAbs = 0;
+
+        // this.c1 = 1e-2;
+        // this.c2 = 1e-4;
+        // this.c3 = 1e-6;
+        this.c1 = 1e-0;
+        this.c2 = 1e-0;
+        this.c3 = 1e-0;
     }
 
     public void ComputeLaplacian()
     {
+        // double c1 = 1e-2;
+        // double c2 = 1e-4;
+        // // double c3 = 4e-4;
+        // double c3 = 1e-6;
+        // // double c5 = 2e-6;
+
         double K1 = K[0];
         double K2 = K[1];
+        // Debug.Log(K1);
+        // Debug.Log(K2);
+
 
         pAbs = DotOp(sd.P, sd.P);
 
-        double Uxx_1 = 2 * K1 * (DotOp(sd.Px, sd.Px) + DotOp(sd.P, sd.Pxx));
-        double Uxx_2x = K2 * (DotOp(sd.Pxx, sd.Pxx) + DotOp(sd.Px, sd.Pxxx));
-        double Uxx_2y = K2 * (DotOp(sd.Pxy, sd.Pxy) + DotOp(sd.Px, sd.Pyxx));
-        double Uxx_2z = K2 * (DotOp(sd.Pxz, sd.Pxz) + DotOp(sd.Px, sd.Pzxx));
+        double Uxx_1 = 2 * K1 * (c1 * c1 * DotOp(sd.Px, sd.Px) + c1 * c2 * DotOp(sd.P, sd.Pxx));
+        double Uxx_2x = K2 * (c2 * c2 * DotOp(sd.Pxx, sd.Pxx) + c1 * c3 * DotOp(sd.Px, sd.Pxxx));
+        double Uxx_2y = K2 * (c2 * c2 * DotOp(sd.Pxy, sd.Pxy) + c1 * c3 * DotOp(sd.Px, sd.Pyxx));
+        double Uxx_2z = K2 * (c2 * c2 * DotOp(sd.Pxz, sd.Pxz) + c1 * c3 * DotOp(sd.Px, sd.Pzxx));
         Uxx = Uxx_1 - Uxx_2x - Uxx_2y - Uxx_2z;
 
-        double Uyy_1 = 2 * K1 * (DotOp(sd.Py, sd.Py) + DotOp(sd.P, sd.Pyy));
-        double Uyy_2x = K2 * (DotOp(sd.Pxy, sd.Pxy) + DotOp(sd.Py, sd.Pxyy));
-        double Uyy_2y = K2 * (DotOp(sd.Pyy, sd.Pyy) + DotOp(sd.Py, sd.Pyyy));
-        double Uyy_2z = K2 * (DotOp(sd.Pyz, sd.Pyz) + DotOp(sd.Py, sd.Pzyy));
+        double Uyy_1 = 2 * K1 * (c1 * c1 * DotOp(sd.Py, sd.Py) + c1 * c2 * DotOp(sd.P, sd.Pyy));
+        double Uyy_2x = K2 * (c2 * c2 * DotOp(sd.Pxy, sd.Pxy) + c1 * c3 * DotOp(sd.Py, sd.Pxyy));
+        double Uyy_2y = K2 * (c2 * c2 * DotOp(sd.Pyy, sd.Pyy) + c1 * c3 * DotOp(sd.Py, sd.Pyyy));
+        double Uyy_2z = K2 * (c2 * c2 * DotOp(sd.Pyz, sd.Pyz) + c1 * c3 * DotOp(sd.Py, sd.Pzyy));
         Uyy = Uyy_1 - Uyy_2x - Uyy_2y - Uyy_2z;
 
-        double Uzz_1 = 2 * K1 * (DotOp(sd.Pz, sd.Pz) + DotOp(sd.P, sd.Pzz));
-        double Uzz_2x = K2 * (DotOp(sd.Pxz, sd.Pxz) + DotOp(sd.Pz, sd.Pxzz));
-        double Uzz_2y = K2 * (DotOp(sd.Pyz, sd.Pyz) + DotOp(sd.Pz, sd.Pyzz));
-        double Uzz_2z = K2 * (DotOp(sd.Pzz, sd.Pzz) + DotOp(sd.Pz, sd.Pzzz));
+        double Uzz_1 = 2 * K1 * (c1 * c1 * DotOp(sd.Pz, sd.Pz) + c1 * c2 * DotOp(sd.P, sd.Pzz));
+        double Uzz_2x = K2 * (c2 * c2 * DotOp(sd.Pxz, sd.Pxz) + c1 * c3 * DotOp(sd.Pz, sd.Pxzz));
+        double Uzz_2y = K2 * (c2 * c2 * DotOp(sd.Pyz, sd.Pyz) + c1 * c3 * DotOp(sd.Pz, sd.Pyzz));
+        double Uzz_2z = K2 * (c2 * c2 * DotOp(sd.Pzz, sd.Pzz) + c1 * c3 * DotOp(sd.Pz, sd.Pzzz));
         Uzz = Uzz_1 - Uzz_2x - Uzz_2y - Uzz_2z;
+
+        //
+
+        // double Uxx_1 = 2 * K1 * (DotOp(sd.Px, sd.Px) + DotOp(sd.P, sd.Pxx));
+        // double Uxx_2x = K2 * (DotOp(sd.Pxx, sd.Pxx) + DotOp(sd.Px, sd.Pxxx));
+        // double Uxx_2y = K2 * (DotOp(sd.Pxy, sd.Pxy) + DotOp(sd.Px, sd.Pyxx));
+        // double Uxx_2z = K2 * (DotOp(sd.Pxz, sd.Pxz) + DotOp(sd.Px, sd.Pzxx));
+        // Uxx = Uxx_1 - Uxx_2x - Uxx_2y - Uxx_2z;
+
+
+        // double Uyy_1 = 2 * K1 * (DotOp(sd.Py, sd.Py) + DotOp(sd.P, sd.Pyy));
+        // double Uyy_2x = K2 * (DotOp(sd.Pxy, sd.Pxy) + DotOp(sd.Py, sd.Pxyy));
+        // double Uyy_2y = K2 * (DotOp(sd.Pyy, sd.Pyy) + DotOp(sd.Py, sd.Pyyy));
+        // double Uyy_2z = K2 * (DotOp(sd.Pyz, sd.Pyz) + DotOp(sd.Py, sd.Pzyy));
+        // Uyy = Uyy_1 - Uyy_2x - Uyy_2y - Uyy_2z;
+
+
+        // double Uzz_1 = 2 * K1 * (DotOp(sd.Pz, sd.Pz) + DotOp(sd.P, sd.Pzz));
+        // double Uzz_2x = K2 * (DotOp(sd.Pxz, sd.Pxz) + DotOp(sd.Pz, sd.Pxzz));
+        // double Uzz_2y = K2 * (DotOp(sd.Pyz, sd.Pyz) + DotOp(sd.Pz, sd.Pyzz));
+        // double Uzz_2z = K2 * (DotOp(sd.Pzz, sd.Pzz) + DotOp(sd.Pz, sd.Pzzz));
+        // Uzz = Uzz_1 - Uzz_2x - Uzz_2y - Uzz_2z;
+
+        // Debug.Log(Uxx_1.ToString("F4"));
+        // Debug.Log(Uxx_2x.ToString("F4"));
+        // Debug.Log(Uxx_2y.ToString("F4"));
+        // Debug.Log(Uxx_2z.ToString("F4"));
+        // Debug.Log(Uxx.ToString("F4"));
+
+        // Debug.Log(Uyy_1.ToString("F4"));
+        // Debug.Log(Uyy_2x.ToString("F4"));
+        // Debug.Log(Uyy_2y.ToString("F4"));
+        // Debug.Log(Uyy_2z.ToString("F4"));
+        // Debug.Log(Uyy.ToString("F4"));
+
+        // Debug.Log(Uzz_1.ToString("F4"));
+        // Debug.Log(Uzz_2x.ToString("F4"));
+        // Debug.Log(Uzz_2y.ToString("F4"));
+        // Debug.Log(Uzz_2z.ToString("F4"));
+        // Debug.Log(Uzz.ToString("F4"));
     }
 
     public void ComputeGradientLaplacian(int i)
     {
+
+        // double c1 = 1e-2;
+        // double c2 = 1e-4;
+        // // double c3 = 4e-4;
+        // double c3 = 1e-6;
+        // double c5 = 2e-6;
+
+
         double K1 = K[0];
         double K2 = K[1];
 
         gpAbs = D_DotOp(sd.P, sd.P, sd.p[i], sd.p[i]);
 
-        double gUxx_1 = 2 * K1 * (D_DotOp(sd.Px, sd.Px, sd.px[i], sd.px[i]) + D_DotOp(sd.P, sd.Pxx, sd.p[i], sd.pxx[i]));
-        double gUxx_2x = K2 * (D_DotOp(sd.Pxx, sd.Pxx, sd.pxx[i], sd.pxx[i]) + D_DotOp(sd.Px, sd.Pxxx, sd.px[i], sd.pxxx[i]));
-        double gUxx_2y = K2 * (D_DotOp(sd.Pxy, sd.Pxy, sd.pxy[i], sd.pxy[i]) + D_DotOp(sd.Px, sd.Pyxx, sd.px[i], sd.pyxx[i]));
-        double gUxx_2z = K2 * (D_DotOp(sd.Pxz, sd.Pxz, sd.pxz[i], sd.pxz[i]) + D_DotOp(sd.Px, sd.Pzxx, sd.pz[i], sd.pzxx[i]));
+        //
+
+        // double gUxx_1 = 2 * K1 * (  D_DotOp_14(sd.Px, sd.px[i])   + D_DotOp_23(sd.Px, sd.px[i])   + D_DotOp_14(sd.P, sd.pxx[i])   + D_DotOp_23(sd.Pxx, sd.p[i])     );
+        // double gUxx_2x = K2 *    (  D_DotOp_14(sd.Pxx, sd.pxx[i]) + D_DotOp_23(sd.Pxx, sd.pxx[i]) + D_DotOp_14(sd.Px, sd.pxxx[i]) + D_DotOp_23(sd.Pxxx, sd.px[i])   );
+        // double gUxx_2y = K2 *    (  D_DotOp_14(sd.Pxy, sd.pxy[i]) + D_DotOp_23(sd.Pxy, sd.pxy[i]) + D_DotOp_14(sd.Px, sd.pyxx[i]) + D_DotOp_23(sd.Pyxx, sd.px[i])   );
+        // double gUxx_2z = K2 *    (  D_DotOp_14(sd.Pxz, sd.pxz[i]) + D_DotOp_23(sd.Pxz, sd.pxz[i]) + D_DotOp_14(sd.Px, sd.pzxx[i]) + D_DotOp_23(sd.Pzxx, sd.pz[i])   );
+        // gUxx = gUxx_1 - gUxx_2x - gUxx_2y - gUxx_2z;
+
+        // double gUyy_1 = 2 * K1 * (  D_DotOp_14(sd.Py, sd.py[i])   + D_DotOp_23(sd.Py, sd.py[i])   + D_DotOp_14(sd.P, sd.pyy[i])   + D_DotOp_23(sd.Pyy, sd.p[i])     );
+        // double gUyy_2x = K2 *    (  D_DotOp_14(sd.Pxy, sd.pxy[i]) + D_DotOp_23(sd.Pxy, sd.pxy[i]) + D_DotOp_14(sd.Py, sd.pxyy[i]) + D_DotOp_23(sd.Pxyy, sd.py[i])   );
+        // double gUyy_2y = K2 *    (  D_DotOp_14(sd.Pyy, sd.pyy[i]) + D_DotOp_23(sd.Pyy, sd.pyy[i]) + D_DotOp_14(sd.Py, sd.pyyy[i]) + D_DotOp_23(sd.Pyyy, sd.py[i])   );
+        // double gUyy_2z = K2 *    (  D_DotOp_14(sd.Pyz, sd.pyz[i]) + D_DotOp_23(sd.Pyz, sd.pyz[i]) + D_DotOp_14(sd.Py, sd.pzyy[i]) + D_DotOp_23(sd.Pzyy, sd.py[i])   );
+        // gUyy = gUyy_1 - gUyy_2x - gUyy_2y - gUyy_2z;
+
+        // double gUzz_1 = 2 * K1 * (  D_DotOp_14(sd.Pz, sd.pz[i])   + D_DotOp_23(sd.Pz, sd.pz[i])   + D_DotOp_14(sd.P, sd.pzz[i])   + D_DotOp_23(sd.Pzz, sd.p[i])     );
+        // double gUzz_2x = K2 *    (  D_DotOp_14(sd.Pxz, sd.pxz[i]) + D_DotOp_23(sd.Pxz, sd.pxz[i]) + D_DotOp_14(sd.Pz, sd.pxzz[i]) + D_DotOp_23(sd.Pxzz, sd.pz[i])   );
+        // double gUzz_2y = K2 *    (  D_DotOp_14(sd.Pyz, sd.pyz[i]) + D_DotOp_23(sd.Pyz, sd.pyz[i]) + D_DotOp_14(sd.Pz, sd.pyzz[i]) + D_DotOp_23(sd.Pyzz, sd.pz[i])   );
+        // double gUzz_2z = K2 *    (  D_DotOp_14(sd.Pzz, sd.pzz[i]) + D_DotOp_23(sd.Pzz, sd.pzz[i]) + D_DotOp_14(sd.Pz, sd.pzzz[i]) + D_DotOp_23(sd.Pzzz, sd.pz[i])   );
+        // gUzz = gUzz_1 - gUzz_2x - gUzz_2y - gUzz_2z;
+
+        //
+
+        double gUxx_1 = 2 * K1 * (c1 * D_DotOp_14(sd.Px, sd.px[i]) + c1 * D_DotOp_23(sd.Px, sd.px[i]) + c1 * D_DotOp_14(sd.P, sd.pxx[i]) + c2 * D_DotOp_23(sd.Pxx, sd.p[i]));
+        double gUxx_2x = K2 * (c2 * D_DotOp_14(sd.Pxx, sd.pxx[i]) + c2 * D_DotOp_23(sd.Pxx, sd.pxx[i]) + c1 * D_DotOp_14(sd.Px, sd.pxxx[i]) + c3 * D_DotOp_23(sd.Pxxx, sd.px[i]));
+        double gUxx_2y = K2 * (c2 * D_DotOp_14(sd.Pxy, sd.pxy[i]) + c2 * D_DotOp_23(sd.Pxy, sd.pxy[i]) + c1 * D_DotOp_14(sd.Px, sd.pyxx[i]) + c3 * D_DotOp_23(sd.Pyxx, sd.px[i]));
+        double gUxx_2z = K2 * (c2 * D_DotOp_14(sd.Pxz, sd.pxz[i]) + c2 * D_DotOp_23(sd.Pxz, sd.pxz[i]) + c1 * D_DotOp_14(sd.Px, sd.pzxx[i]) + c3 * D_DotOp_23(sd.Pzxx, sd.pz[i]));
         gUxx = gUxx_1 - gUxx_2x - gUxx_2y - gUxx_2z;
 
-        double gUyy_1 = 2 * K1 * (D_DotOp(sd.Py, sd.Py, sd.py[i], sd.py[i]) + D_DotOp(sd.P, sd.Pyy, sd.p[i], sd.pyy[i]));
-        double gUyy_2x = K2 * (D_DotOp(sd.Pxy, sd.Pxy, sd.pxy[i], sd.pxy[i]) + D_DotOp(sd.Py, sd.Pxyy, sd.py[i], sd.pxyy[i]));
-        double gUyy_2y = K2 * (D_DotOp(sd.Pyy, sd.Pyy, sd.pyy[i], sd.pyy[i]) + D_DotOp(sd.Py, sd.Pyyy, sd.py[i], sd.pyyy[i]));
-        double gUyy_2z = K2 * (D_DotOp(sd.Pyz, sd.Pyz, sd.pyz[i], sd.pyz[i]) + D_DotOp(sd.Py, sd.Pzyy, sd.py[i], sd.pzyy[i]));
+        double gUyy_1 = 2 * K1 * (c1 * D_DotOp_14(sd.Py, sd.py[i]) + c1 * D_DotOp_23(sd.Py, sd.py[i]) + c1 * D_DotOp_14(sd.P, sd.pyy[i]) + c2 * D_DotOp_23(sd.Pyy, sd.p[i]));
+        double gUyy_2x = K2 * (c2 * D_DotOp_14(sd.Pxy, sd.pxy[i]) + c2 * D_DotOp_23(sd.Pxy, sd.pxy[i]) + c1 * D_DotOp_14(sd.Py, sd.pxyy[i]) + c3 * D_DotOp_23(sd.Pxyy, sd.py[i]));
+        double gUyy_2y = K2 * (c2 * D_DotOp_14(sd.Pyy, sd.pyy[i]) + c2 * D_DotOp_23(sd.Pyy, sd.pyy[i]) + c1 * D_DotOp_14(sd.Py, sd.pyyy[i]) + c3 * D_DotOp_23(sd.Pyyy, sd.py[i]));
+        double gUyy_2z = K2 * (c2 * D_DotOp_14(sd.Pyz, sd.pyz[i]) + c2 * D_DotOp_23(sd.Pyz, sd.pyz[i]) + c1 * D_DotOp_14(sd.Py, sd.pzyy[i]) + c3 * D_DotOp_23(sd.Pzyy, sd.py[i]));
         gUyy = gUyy_1 - gUyy_2x - gUyy_2y - gUyy_2z;
 
-        double gUzz_1 = 2 * K1 * (D_DotOp(sd.Pz, sd.Pz, sd.pz[i], sd.pz[i]) + D_DotOp(sd.P, sd.Pzz, sd.p[i], sd.pzz[i]));
-        double gUzz_2x = K2 * (D_DotOp(sd.Pxz, sd.Pxz, sd.pxz[i], sd.pxz[i]) + D_DotOp(sd.Pz, sd.Pxzz, sd.pz[i], sd.pxzz[i]));
-        double gUzz_2y = K2 * (D_DotOp(sd.Pyz, sd.Pyz, sd.pyz[i], sd.pyz[i]) + D_DotOp(sd.Pz, sd.Pyzz, sd.pz[i], sd.pyzz[i]));
-        double gUzz_2z = K2 * (D_DotOp(sd.Pzz, sd.Pzz, sd.pzz[i], sd.pzz[i]) + D_DotOp(sd.Pz, sd.Pzzz, sd.pz[i], sd.pzzz[i]));
+        double gUzz_1 = 2 * K1 * (c1 * D_DotOp_14(sd.Pz, sd.pz[i]) + c1 * D_DotOp_23(sd.Pz, sd.pz[i]) + c1 * D_DotOp_14(sd.P, sd.pzz[i]) + c1 * D_DotOp_23(sd.Pzz, sd.p[i]));
+        double gUzz_2x = K2 * (c2 * D_DotOp_14(sd.Pxz, sd.pxz[i]) + c2 * D_DotOp_23(sd.Pxz, sd.pxz[i]) + c1 * D_DotOp_14(sd.Pz, sd.pxzz[i]) + c3 * D_DotOp_23(sd.Pxzz, sd.pz[i]));
+        double gUzz_2y = K2 * (c2 * D_DotOp_14(sd.Pyz, sd.pyz[i]) + c2 * D_DotOp_23(sd.Pyz, sd.pyz[i]) + c1 * D_DotOp_14(sd.Pz, sd.pyzz[i]) + c3 * D_DotOp_23(sd.Pyzz, sd.pz[i]));
+        double gUzz_2z = K2 * (c2 * D_DotOp_14(sd.Pzz, sd.pzz[i]) + c2 * D_DotOp_23(sd.Pzz, sd.pzz[i]) + c1 * D_DotOp_14(sd.Pz, sd.pzzz[i]) + c3 * D_DotOp_23(sd.Pzzz, sd.pz[i]));
         gUzz = gUzz_1 - gUzz_2x - gUzz_2y - gUzz_2z;
+
+        //
+
+        // double gUxx_1 = 2 * K1 * (D_DotOp(sd.Px, sd.Px, sd.px[i], sd.px[i]) + D_DotOp(sd.P, sd.Pxx, sd.p[i], sd.pxx[i]));
+        // double gUxx_2x = K2 * (D_DotOp(sd.Pxx, sd.Pxx, sd.pxx[i], sd.pxx[i]) + D_DotOp(sd.Px, sd.Pxxx, sd.px[i], sd.pxxx[i]));
+        // double gUxx_2y = K2 * (D_DotOp(sd.Pxy, sd.Pxy, sd.pxy[i], sd.pxy[i]) + D_DotOp(sd.Px, sd.Pyxx, sd.px[i], sd.pyxx[i]));
+        // double gUxx_2z = K2 * (D_DotOp(sd.Pxz, sd.Pxz, sd.pxz[i], sd.pxz[i]) + D_DotOp(sd.Px, sd.Pzxx, sd.pz[i], sd.pzxx[i]));
+        // gUxx = gUxx_1 - gUxx_2x - gUxx_2y - gUxx_2z;
+
+        // double gUyy_1 = 2 * K1 * (D_DotOp(sd.Py, sd.Py, sd.py[i], sd.py[i]) + D_DotOp(sd.P, sd.Pyy, sd.p[i], sd.pyy[i]));
+        // double gUyy_2x = K2 * (D_DotOp(sd.Pxy, sd.Pxy, sd.pxy[i], sd.pxy[i]) + D_DotOp(sd.Py, sd.Pxyy, sd.py[i], sd.pxyy[i]));
+        // double gUyy_2y = K2 * (D_DotOp(sd.Pyy, sd.Pyy, sd.pyy[i], sd.pyy[i]) + D_DotOp(sd.Py, sd.Pyyy, sd.py[i], sd.pyyy[i]));
+        // double gUyy_2z = K2 * (D_DotOp(sd.Pyz, sd.Pyz, sd.pyz[i], sd.pyz[i]) + D_DotOp(sd.Py, sd.Pzyy, sd.py[i], sd.pzyy[i]));
+        // gUyy = gUyy_1 - gUyy_2x - gUyy_2y - gUyy_2z;
+
+        // double gUzz_1 = 2 * K1 * (D_DotOp(sd.Pz, sd.Pz, sd.pz[i], sd.pz[i]) + D_DotOp(sd.P, sd.Pzz, sd.p[i], sd.pzz[i]));
+        // double gUzz_2x = K2 * (D_DotOp(sd.Pxz, sd.Pxz, sd.pxz[i], sd.pxz[i]) + D_DotOp(sd.Pz, sd.Pxzz, sd.pz[i], sd.pxzz[i]));
+        // double gUzz_2y = K2 * (D_DotOp(sd.Pyz, sd.Pyz, sd.pyz[i], sd.pyz[i]) + D_DotOp(sd.Pz, sd.Pyzz, sd.pz[i], sd.pyzz[i]));
+        // double gUzz_2z = K2 * (D_DotOp(sd.Pzz, sd.Pzz, sd.pzz[i], sd.pzz[i]) + D_DotOp(sd.Pz, sd.Pzzz, sd.pz[i], sd.pzzz[i]));
+        // gUzz = gUzz_1 - gUzz_2x - gUzz_2y - gUzz_2z;
+
+        // Debug.Log(gUxx_1.ToString("F4"));
+        // Debug.Log(gUxx_2x.ToString("F4"));
+        // Debug.Log(gUxx_2y.ToString("F4"));
+        // Debug.Log(gUxx_2z.ToString("F4"));
+        // Debug.Log(gUxx.ToString("F4"));
+
+        // Debug.Log(gUyy_1.ToString("F4"));
+        // Debug.Log(gUyy_2x.ToString("F4"));
+        // Debug.Log(gUyy_2y.ToString("F4"));
+        // Debug.Log(gUyy_2z.ToString("F4"));
+        // Debug.Log(gUyy.ToString("F4"));
+
+        // Debug.Log(gUzz_1.ToString("F4"));
+        // Debug.Log(gUzz_2x.ToString("F4"));
+        // Debug.Log(gUzz_2y.ToString("F4"));
+        // Debug.Log(gUzz_2z.ToString("F4"));
+        // Debug.Log(gUzz.ToString("F4"));
     }
 
 
@@ -777,6 +1191,18 @@ public class Gorkov
     {
         return P1.Imaginary * P4.Real + P3.Real * P2.Imaginary
              - P1.Real * P4.Imaginary - P3.Imaginary * P2.Real;
+    }
+
+    private double D_DotOp_14(Complex P1, Complex P4)
+    {
+        return P1.Imaginary * P4.Real
+             - P1.Real * P4.Imaginary;
+    }
+
+    private double D_DotOp_23(Complex P2, Complex P3)
+    {
+        return P3.Real * P2.Imaginary
+             - P3.Imaginary * P2.Real;
     }
 
 
@@ -797,10 +1223,17 @@ public class DummyParticle
         return Vector3.Distance(coord, this.dummyPosition);
     }
 
-    public float GetZAngleFromX(Vector3 coord)
+    // public float GetZAngleFromX(Vector3 coord)
+    // {
+    //     Vector3 vP = this.dummyPosition - coord;
+    //     return Vector3.Angle(vP, Vector3.up)* Mathf.Deg2Rad;
+    // }
+
+    public double GetZAngleFromX(Vector3 pX, Vector3 vX)
     {
-        Vector3 vP = this.dummyPosition - coord;
-        return Vector3.Angle(vP, Vector3.up);
+        Vector3 vP = this.dummyPosition - pX;
+        // Debug.Log(vP);
+        return Math.Acos(Vector3.Dot(vX, vP) / (Vector3.Magnitude(vX) * Vector3.Magnitude(vP)));
     }
 }
 

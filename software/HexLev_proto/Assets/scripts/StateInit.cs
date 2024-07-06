@@ -15,6 +15,7 @@ using UnityEngine.AI;
 using Accord.Math;
 using UnityEngine.Assertions;
 
+
 /// <summary>
 /// Initialises the program state: handles external interfacing and control algorithms
 /// </summary>
@@ -27,6 +28,8 @@ public class StateInit : MonoBehaviour
     /// </summary>
     // private List<SerialPort> FPGA_Serial;
     private SerialPort[] FPGA_Serial;
+
+    public bool SERIALON;
 
     /// <summary>
     /// Array of transducers for bottom plate
@@ -73,16 +76,22 @@ public class StateInit : MonoBehaviour
     private int[] unityIndexArray;
     private int[] fpgaIndexArray;
     private int[] inBankIndexArray;
+    private int[] xyTestIndexArray;
+
     void Awake()
     {
-        // StartSerial();
-
+        SERIALON = false;
+        if (SERIALON)
+        {
+            StartSerial();
+        }
     }
     void Start()
     {
         fpgaIndexArray = Labeller.GetFpgaIndexArray();
         inBankIndexArray = Labeller.GetInBankIndexArray();
         unityIndexArray = Labeller.GetUnityIndexArray();
+        xyTestIndexArray = Labeller.GetXYTestIndexArray();
 
         offsets = Labeller.GetOffsets();
 
@@ -96,13 +105,14 @@ public class StateInit : MonoBehaviour
     }
 
 
-    private void StartSerial()
+    public void StartSerial()
     {
+        SERIALON = true;
 
         // FPGA_Serial.AddRange(new List<SerialPort>() { new SerialPort(),new SerialPort(),new SerialPort(),new SerialPort(),new SerialPort(),new SerialPort()});
         bool fpgas_found = true;
         FPGA_Serial = new SerialPort[6];
-        int[] FPGA_ids = {-1,-1,-1,-1,-1,-1};
+        int[] FPGA_ids = { -1, -1, -1, -1, -1, -1 };
         string[] ports = SerialPort.GetPortNames();
 
         foreach (string port in ports)
@@ -120,7 +130,7 @@ public class StateInit : MonoBehaviour
 
                 while (!ser.IsOpen)
                 {
-                    ser.ReadTimeout = 3000;
+                    ser.ReadTimeout = 1500;
                     ser.WriteTimeout = 1500;
                     ser.DtrEnable = true;
                     ser.RtsEnable = true;
@@ -165,28 +175,32 @@ public class StateInit : MonoBehaviour
                     ser.Close();
                 }
             }
-            // catch (Exception ex)
-            // {
-            //     // Debug.Log(ex);
-            // }
-            finally{
-                
+            catch (Exception ex)
+            {
+                // Debug.Log(ex);
             }
 
         }
 
         for (int i = 0; i < FPGA_ids.Count(); i++)
         {
-            if(FPGA_ids[i] != i){
+            if (FPGA_ids[i] != i)
+            {
                 fpgas_found = false;
                 Debug.Log("Not found, FPGA: " + i);
             }
         }
 
-    if (!fpgas_found){
+        if (!fpgas_found)
+        {
             Debug.Log("FPGAS HAVE NOT BEEN FOUND");
+            SERIALON = false;
             throw new Exception("FPGAS HAVE NOT BEEN FOUND");
-    }
+        }
+        else
+        {
+            Debug.Log("FPGAS AVAILABLE; SERIAL STARTED SUCCESSFULLY");
+        }
 
     }
 
@@ -228,18 +242,44 @@ public class StateInit : MonoBehaviour
                 if (j == 0) { j++; continue; }
                 Transducer tr = child.AddComponent<Transducer>();
                 string obnm = child.gameObject.name;
-                int bid = Int32.Parse(Regex.Match(obnm, @"\d+").Value);
-                int s_ind = unityIndexArray.IndexOf(bid);
+                int unityId = Int32.Parse(Regex.Match(obnm, @"\d+").Value);
+                int solver_ind_singular = unityIndexArray.IndexOf(unityId);
+                int solver_ind = 0;
 
-                tr.Init(i, j - 1, HexCntr_z, bid);
 
-                tr.SetSolverIndex(s_ind + 1);
-                tr.SetFpgaIndex(fpgaIndexArray[s_ind]);
-                tr.SetInBankIndex(inBankIndexArray[s_ind]);
-                
+                tr.Init(i, j - 1, HexCntr_z, unityId);
 
-                if (i == 0) { BottArray[s_ind] = tr; tr.SetSolverPostion(new Vector3((float)hexCoords[s_ind], 0, (float)hexCoords[s_ind+721]));}
-                if (i == 1) { TopArray[s_ind] = tr; tr.SetSolverPostion(new Vector3((float)hexCoords[s_ind], (float)Solver.GetTdist(), (float)hexCoords[s_ind+721]));}
+
+                if (i == 0)
+                {
+                    //bottom plate
+                    solver_ind = solver_ind_singular;
+                    // Debug.Log(hexCoords[solver_ind_singular]);
+                    // tr.SetSolverPostion(new Vector3((float)hexCoords[solver_ind_singular], 0, (float)hexCoords[solver_ind_singular + 721])); // y z swapped
+                    tr.SetSolverPostion(new Vector3((float)hexCoords[solver_ind_singular], (float)hexCoords[solver_ind_singular + 721], 0));
+                }
+
+                if (i == 1)
+                {
+                    //top plate
+                    solver_ind = solver_ind_singular + 721;
+                    // tr.SetSolverPostion(new Vector3((float)hexCoords[solver_ind_singular], (float)Solver.GetTdist(), (float)hexCoords[solver_ind_singular + 721])); // y z swapped
+                    tr.SetSolverPostion(new Vector3((float)hexCoords[solver_ind_singular], (float)hexCoords[solver_ind_singular + 721], (float)Solver.GetTdist()));
+                }
+
+                tr.SetSolverIndex(solver_ind + 1);
+                tr.SetFpgaIndex(fpgaIndexArray[solver_ind]);
+                tr.SetInBankIndex(inBankIndexArray[solver_ind]);
+
+                int xytest_ind = xyTestIndexArray.IndexOf(tr.GetSolverIndex());
+                tr.SetXYTestIndex(xytest_ind);
+
+                double phase_offset = offsets[tr.GetXYTestIndex()];
+                tr.SetPhaseOffset(phase_offset);
+
+
+                if (i == 0) { BottArray[solver_ind_singular] = tr; }
+                if (i == 1) { TopArray[solver_ind_singular] = tr; }
                 j++;
 
                 // }
@@ -262,6 +302,11 @@ public class StateInit : MonoBehaviour
         // {
         //     Debug.Log(item.GetUnityIndex() + " " + item.GetSolverIndex() + " " + item.GetFpgaIndex() + " " + item.GetInBankIndex());
         // }
+
+        for (int k = 0; k < fpgaIndexArray.Length; k++)
+        {
+            // Debug.Log(k+1 + " : " + fpgaIndexArray[k] + " : " + inBankIndexArray[k]);
+        }
 
     }
 
@@ -545,33 +590,141 @@ public class StateInit : MonoBehaviour
     // }
 
 
-    public void UpdateLevState(){
+    // IEnumerator SPIXEL(){
+    //         SetPixel
+    //         yield return new WaitForSeconds(4);
+    // }
+
+    public void D1TestFunc(int val, int on)
+    {
+        Debug.Log("<color=green>D1 Set</color>" + " : " + val);
+
+        if (SERIALON)
+        {
+            // for (int i = 0; i < 3; i++)
+            // {
+            //     for (int j = 0; j < 241; j++)
+            //     {
+            //         Debug.Log(SetPixel(FPGA_Serial[i], j, 4, 0));
+            //     }
+            // }
+
+            // for (int j = 0; j < 241; j++)
+            // {
+            //     Debug.Log(SetPixel(FPGA_Serial[5], j, 4, 0));
+            // }
+        }
+
+        int v = val - 1;
+
+        if (SERIALON)
+        {
+            if (v > -1)
+            {
+                if (on == 1)
+                {
+                    SetPixel(FPGA_Serial[fpgaIndexArray[v]], inBankIndexArray[v], 4, 0);
+                    Debug.Log("Turning ON: " + "Solver (" + val + ")" + "  FPGA (" + fpgaIndexArray[v] + ", " + inBankIndexArray[v] + ")");
+                }
+                else
+                {
+                    SetPixel(FPGA_Serial[fpgaIndexArray[v]], inBankIndexArray[v], 0, 0);
+                    Debug.Log("Turning OFF: " + "Solver (" + val + ")" + "  FPGA (" + fpgaIndexArray[v] + ", " + inBankIndexArray[v] + ")");
+                }
+            }
+        }
+    }
+
+    public void D2TestFunc(int val, int on)
+    {
+        Debug.Log("<color=green>D2 Set</color>" + " : " + val);
+
+        int v = val - 1;
+
+        if (SERIALON)
+        {
+            if (v > -1)
+            {
+                if (on == 1)
+                {
+                    SetPixel(FPGA_Serial[fpgaIndexArray[v]], inBankIndexArray[v], 4, 0);
+                    Debug.Log("Turning ON: " + "Solver (" + val + ")" + "  FPGA (" + fpgaIndexArray[v] + ", " + inBankIndexArray[v] + ")");
+                }
+                else
+                {
+                    SetPixel(FPGA_Serial[fpgaIndexArray[v]], inBankIndexArray[v], 0, 0);
+                    Debug.Log("Turning OFF: " + "Solver (" + val + ")" + "  FPGA (" + fpgaIndexArray[v] + ", " + inBankIndexArray[v] + ")");
+                }
+            }
+        }
+    }
+
+
+    public void D3TestFunc(int val_1, int val_2, int on)
+    {
+        Debug.Log("<color=green>D3 Set</color>" + " : (" + val_1 + ", " + val_2 + ")");
+
+        int fpga = val_1;
+        int bank = val_2;
+
+        if (SERIALON)
+        {
+            if (on == 1)
+            {
+                (int, int) resp = SetPixel(FPGA_Serial[fpga], bank, 4, 0);
+                Debug.Log("Turning ON: " + "FPGA (" + fpga + ", " + bank + ")\tResponse: " + resp);
+            }
+            else
+            {
+                (int, int) resp = SetPixel(FPGA_Serial[fpga], bank, 0, 0);
+                Debug.Log("Turning OFF: " + "FPGA (" + fpga + ", " + bank + ")\tResponse: " + resp);
+            }
+        }
+    }
+
+
+    public void UpdateLevState()
+    {
         var temptime = Time.realtimeSinceStartup;
         (double[], List<bool>) sol = this.GetComponent<Solver>().Solve();
         double[] phis = sol.Item1;
         List<bool> activePhis = sol.Item2;
-        
+        int[] onOff = new int[activePhis.Count];
+
         for (int i = 0; i < 1442; i++)
         {
-            phis[i] = phis[i] - offsets[i];
+            Debug.Log(phis[i]);
+            // phis[i] = phis[i] - offsets[i];
+            phis[i] = phis[i] % (2 * Math.PI);
+            phis[i] = phis[i] * 31 / (2 * Math.PI);
+            phis[i] = Math.Round(phis[i]);
+            phis[i] = phis[i] >= 0 ? phis[i] : 32 + phis[i];
+            Debug.Log(phis[i]);
 
-            phis[i] = phis[i] % 2 * Math.PI;
-            phis[i] = phis[i] * 31/(2*Math.PI);
-            phis[i] = Math.Round(phis[i]); 
+            onOff[i] = activePhis[i] ? 1 : 0;
+
+            // Debug.Log(activePhis[i]);
         }
+
+
 
         for (int i = 0; i < 721; i++)
         {
             int bott_ind = i;
             int top_ind = i + 721;
 
-            // SetPixel(FPGA_Serial[fpgaIndexArray[bott_ind]], inBankIndexArray[bott_ind], 4, (int) phis[bott_ind]);
-            // SetPixel(FPGA_Serial[fpgaIndexArray[top_ind]], inBankIndexArray[top_ind], 4, (int) phis[top_ind]);
+            // Debug.Log(4*onOff[bott_ind]);
+
+            if (SERIALON)
+            {
+                SetPixel(FPGA_Serial[fpgaIndexArray[bott_ind]], inBankIndexArray[bott_ind], 4 * onOff[bott_ind], (int)phis[bott_ind]);
+                SetPixel(FPGA_Serial[fpgaIndexArray[top_ind]], inBankIndexArray[top_ind], 4 * onOff[top_ind], (int)phis[top_ind]);
+            }
         }
 
-        Debug.Log ("Time taken for solver and serial output : "+(Time.realtimeSinceStartup - temptime));
+        Debug.Log("Time taken for solver and serial output : " + (Time.realtimeSinceStartup - temptime));
 
-        
+
         // for (int i = 0; i < 241; i++)
         // {
         //     foreach (SerialPort fpga_ser in FPGA_Serial)
@@ -584,14 +737,15 @@ public class StateInit : MonoBehaviour
         // Debug.Log(GetPixel(FPGA_Serial[0], 1));
     }
 
-    private void SetPixel(SerialPort ser, int address, int duty, int phase)
+    private (int, int) SetPixel(SerialPort ser, int address, int duty, int phase)
     {
         string set_cmd = string.Format("CD{0:X4}{1:X2}{2:X2}", address, duty, phase);
         byte[] byteArray = StringToByteArray(set_cmd);
         ser.Write(byteArray, 0, 5);
+        return GetPixel(ser, address);
     }
 
-    private (int,int) GetPixel(SerialPort ser, int address)
+    private (int, int) GetPixel(SerialPort ser, int address)
     {
         // Debug.Log("Attempting to get Pixel");
         string get_cmd = string.Format("EF{0:X4}", address);
@@ -599,7 +753,7 @@ public class StateInit : MonoBehaviour
         ser.Write(byteArray, 0, 3);
         int ack0 = ser.ReadByte();
         int ack1 = ser.ReadByte();
-        return (ack0,ack1);
+        return (ack0, ack1);
 
 
         // get_cmd = "EF{:04X}".format(address)

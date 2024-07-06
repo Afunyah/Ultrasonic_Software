@@ -9,6 +9,7 @@ using System.Numerics;
 using Vector3 = UnityEngine.Vector3;
 using Vector2 = UnityEngine.Vector2;
 using System.Runtime.InteropServices;
+using TMPro;
 
 /// <summary>
 /// Manages the workflow of the program.
@@ -18,8 +19,8 @@ public class FlowHandler : MonoBehaviour
 {
 
 
-    double[] phses = new double [1442];
-    
+    double[] phses = new double[1442];
+
     /// <summary>
     /// Camera reference to main HexCam. Provided within the Unity editor.
     /// </summary>
@@ -44,7 +45,7 @@ public class FlowHandler : MonoBehaviour
     /// Stores mouse pointer information.
     /// </summary>
     private PointerEventData m_PointerEventData;
-    
+
     /// <summary>
     /// References the currently selected particle as a Gameobject.
     /// </summary>
@@ -95,8 +96,33 @@ public class FlowHandler : MonoBehaviour
     /// </summary>
     private bool isCreatingTraj;
 
+    public TMP_InputField DebugInputField1;
+    public TMP_InputField DebugInputField2;
+    public TMP_InputField DebugInputField3_1;
+    public TMP_InputField DebugInputField3_2;
+    private int d1_value;
+    private int d2_value;
+
+    private int d3_1_value;
+    private int d3_2_value;
+
+
+    void Awake()
+    {
+        d1_value = 0;
+        d2_value = 0;
+
+        d3_1_value = 0;
+        d3_2_value = 0;
+
+    }
     void Start()
     {
+        DebugInputField1.onEndEdit.AddListener(DebugInputField1_func);
+        DebugInputField2.onEndEdit.AddListener(DebugInputField2_func);
+        DebugInputField3_1.onEndEdit.AddListener(DebugInputField3_1_func);
+        DebugInputField3_2.onEndEdit.AddListener(DebugInputField3_2_func);
+
         isSelected = false;
         isCreatingTraj = false;
         trLayer = 1 << 6; // Set Transducer Layer
@@ -169,8 +195,32 @@ public class FlowHandler : MonoBehaviour
                                 if (isSelected)
                                 {
                                 }
+                                // this.GetComponent<StateInit>().TestFunc(tval);
                                 this.GetComponent<StateInit>().UpdateLevState();
                                 // this.GetComponent<Solver>().Solve();
+                                break;
+                            case "D1on":
+                                this.GetComponent<StateInit>().D1TestFunc(d1_value, 1);
+                                break;
+                            case "D1off":
+                                this.GetComponent<StateInit>().D1TestFunc(d1_value, 0);
+                                break;
+                            case "D2on":
+                                this.GetComponent<StateInit>().D2TestFunc(d2_value, 1);
+                                break;
+                            case "D2off":
+                                this.GetComponent<StateInit>().D2TestFunc(d2_value, 0);
+                                break;
+                            case "D3on":
+                                this.GetComponent<StateInit>().D3TestFunc(d3_1_value, d3_2_value, 1);
+                                break;
+                            case "D3off":
+                                this.GetComponent<StateInit>().D3TestFunc(d3_1_value, d3_2_value, 0);
+                                break;
+                            case "StartSerial":
+                                if(!this.GetComponent<StateInit>().SERIALON){
+                                    this.GetComponent<StateInit>().StartSerial();
+                                }
                                 break;
                             case "xDown":
                                 if (isSelected) { SelectedLevParticle.MoveX(-1); }
@@ -229,4 +279,65 @@ public class FlowHandler : MonoBehaviour
         }
 
     }
+
+    public void DebugInputField1_func(string text)
+    {
+        try
+        {
+            int val;
+            val = Int32.Parse(text);
+            // if((val < 0) || (val > 32)){
+            //     throw new Exception("Out of range");
+            // }
+
+            d1_value = val;
+        }
+        catch (Exception ex) { Debug.Log(ex); }
+    }
+
+    public void DebugInputField2_func(string text)
+    {   
+        try
+        {
+            int val;
+            val = Int32.Parse(text);
+            // if((val < 0) || (val > 32)){
+            //     throw new Exception("Out of range");
+            // }
+
+            d2_value = val;
+        }
+        catch (Exception ex) { Debug.Log(ex); }
+    }
+
+    public void DebugInputField3_1_func(string text)
+    {   
+        try
+        {
+            int val;
+            val = Int32.Parse(text);
+            // if((val < 0) || (val > 32)){
+            //     throw new Exception("Out of range");
+            // }
+
+            d3_1_value = val;
+        }
+        catch (Exception ex) { Debug.Log(ex); }
+    }
+
+    public void DebugInputField3_2_func(string text)
+    {   
+        try
+        {
+            int val;
+            val = Int32.Parse(text);
+            // if((val < 0) || (val > 32)){
+            //     throw new Exception("Out of range");
+            // }
+
+            d3_2_value = val;
+        }
+        catch (Exception ex) { Debug.Log(ex); }
+    }
+
 }

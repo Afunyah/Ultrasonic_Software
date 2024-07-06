@@ -18,14 +18,19 @@ private double[] hexCoords;
     private TextAsset solver_fpga_csv;
     private TextAsset solver_unity_csv;
 
+    private TextAsset solver_xytest_csv;
+
     private string[] solver_fpga_coords;
     private string[] solver_unity_coords;
+
+    private string[] solver_xytest_coords;
 
     private TextAsset offsets_csv;
 
     private string[] offsets_text;
 
     static private double[] offsets;
+    static private int[] xyTestIndexArray;
 
     static private int[] solverIndexArray;
     static private int[] fpgaIndexArray;
@@ -43,6 +48,7 @@ private double[] hexCoords;
         fpgaIndexArray = new int[n];
         inBankIndexArray = new int[n];
         unityIndexArray = new int[n];
+        xyTestIndexArray = new int[n];
 
         offsets = new double[n]; 
         
@@ -51,12 +57,14 @@ private double[] hexCoords;
 
         solver_fpga_csv = Resources.Load<TextAsset>("solver_fpga_coords");
         solver_unity_csv = Resources.Load<TextAsset>("solver_unity_coords");
+        solver_xytest_csv = Resources.Load<TextAsset>("solver_xytest_index");
 
         offsets_csv = Resources.Load<TextAsset>("offsets_bott_top_rad");
 
         // Splitting the dataset in the end of line
         solver_fpga_coords = solver_fpga_csv.text.Split('\n');
         solver_unity_coords = solver_unity_csv.text.Split('\n');
+        solver_xytest_coords = solver_xytest_csv.text.Split('\n');
 
         offsets_text = offsets_csv.text.Split('\n');
 
@@ -69,6 +77,8 @@ private double[] hexCoords;
             inBankIndexArray[i] = Int32.Parse(fpga_row[2]);
 
             unityIndexArray[i] = Int32.Parse(solver_unity_coords[i]);
+
+            xyTestIndexArray[i] = Int32.Parse(solver_xytest_coords[i]);
 
             offsets[i] = Double.Parse(offsets_text[i]);
         }
@@ -93,11 +103,14 @@ private double[] hexCoords;
         return unityIndexArray;
     }
 
+    static public int[] GetXYTestIndexArray(){
+        return xyTestIndexArray;
+    }
+
     static public double[] GetOffsets(){
         return offsets;
     }
 
-  
 
 
     void Update()

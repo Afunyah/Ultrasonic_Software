@@ -20,6 +20,7 @@ public class Transducer : MonoBehaviour
     private int tInd;
     private int tArr;
     private int tPhase;
+    private double tPhaseOffset;
     private int tAmplitude;
 
     private double tRadius;
@@ -30,6 +31,8 @@ public class Transducer : MonoBehaviour
     private int fpgaIndex;
 
     private int inBankIndex;
+
+    private int tXYTestIndex;
 
     private bool used;
 
@@ -58,11 +61,13 @@ public class Transducer : MonoBehaviour
         fpgaIndex = 0;
         inBankIndex = 0;
         tSolverPostion = Vector3.zero;
+        tXYTestIndex = 0;
+        tPhaseOffset = 0;
         tNormals = Vector3.zero;
         plate = arr;
 
         tRadius = 4.9e-3;
-        tRefPressure = 300e-3 * 20e-6 * Math.Pow(10, 105 / 20);
+        tRefPressure = 300e-3 * 20e-6 * Math.Pow(10f, 105f / 20f);
 
         used = false;
         tPhase = 0;
@@ -169,6 +174,16 @@ public class Transducer : MonoBehaviour
         this.tPhase = p;
     }
 
+    public void SetPhaseOffset(double p)
+    {
+        this.tPhaseOffset = p;
+    }
+
+    public double GetPhaseOffset()
+    {
+        return tPhaseOffset;
+    }
+
     /// <summary>
     /// Sets the amplitude of the transducer
     /// </summary>
@@ -232,6 +247,16 @@ public class Transducer : MonoBehaviour
     public Vector3 GetSolverPostion()
     {
         return this.tSolverPostion;
+    }
+
+    public int GetXYTestIndex()
+    {
+        return this.tXYTestIndex;
+    }
+
+    public void SetXYTestIndex(int v)
+    {
+        tXYTestIndex = v;
     }
 
     public void SetNormals(Vector3 nrmls)
