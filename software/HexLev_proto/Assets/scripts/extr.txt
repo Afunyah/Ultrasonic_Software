@@ -1,0 +1,60 @@
+        double offset = 0;
+        double phase = 0;
+        double TWOPI = 2 * Math.PI;
+
+        for (int i = 0; i < 1442; i++)
+        {
+            phase = phis[i];
+            offset = offsets[i];
+            /* Solver phase */
+            // phase = (phase+(TWOPI)) % (TWOPI);
+            phase = ((phase % TWOPI) + TWOPI) % TWOPI;
+            // phase = phase % (TWOPI);
+
+            phase = phase * 31 / TWOPI;
+            phase = Math.Round(phase);
+
+            /* Offset */
+            offset = ((offset % TWOPI) + TWOPI) % TWOPI;
+            // offset = (offset + TWOPI) % TWOPI;
+            offset = offset * 31 / TWOPI;
+            offset = Math.Round(offset);
+
+            phase -= 0;
+            phase = phase >= 0 ? phase : 32 + phase;
+            // Debug.Log(phase);
+
+            onOff[i] = activePhis[i] ? 1 : 0;
+        }
+
+
+
+                // double offset = 0;
+        // double phase = 0;
+        // double TWOPI = 2 * Math.PI;
+
+        // for (int i = 0; i < 1442; i++)
+        // {
+        //     phase = phis[i];
+        //     offset = offsets[i];
+
+        //     /* Solver phase */
+        //     // phase = (phase+(TWOPI)) % (TWOPI);
+        //     phase = ((phase % TWOPI) + TWOPI) % TWOPI;
+        //     // phase = phase % (TWOPI);
+
+        //     phase = phase * 31 / TWOPI;
+        //     phase = Math.Round(phase);
+
+        //     /* Offset */
+        //     offset = ((offset % TWOPI) + TWOPI) % TWOPI;
+        //     // offset = (offset + TWOPI) % TWOPI;
+        //     offset = offset * 31 / TWOPI;
+        //     offset = Math.Round(offset);
+
+        //     phase -= offset;
+        //     phase = phase >= 0 ? phase : 32 + phase;
+        //     // Debug.Log(phase);
+
+        //     onOff[i] = activePhis[i] ? 1 : 0;
+        // }

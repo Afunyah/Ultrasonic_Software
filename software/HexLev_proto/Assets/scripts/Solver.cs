@@ -38,7 +38,9 @@ public class Solver : MonoBehaviour
         // tdist = 4 * lmbda;
         // tdist = 4 * lmbda;
         // tdist = (lmbda / 2) * 56;
-        tdist = 0.163f;
+        // tdist = 0.163f;
+        tdist = 0.244f;
+        // tdist = 0.324f;
     }
 
     void Start()
@@ -61,7 +63,9 @@ public class Solver : MonoBehaviour
         List<float> dists_from_point;
         dists_from_point = new List<float>();
 
-        Vector3 P_control_loc = new Vector3(0, 0, (float)tdist / 2);
+        Vector3 P_control_loc = new Vector3(0, 0, 0.12f);
+        // Vector3 P_control_loc = new Vector3(0.1f, 0, (float)tdist / 2f);
+        // Debug.Log((float)tdist/2);
 
         for (int i = 0; i < TArray.Count; i++)
         {
@@ -73,8 +77,7 @@ public class Solver : MonoBehaviour
         }
 
         // float active_radius = 0.055f;
-        // float active_radius = 1f;
-        float active_radius = 0.1f;
+        float active_radius = 0.25f;
 
         List<bool> active_mask;
         active_mask = new List<bool>();
@@ -119,18 +122,18 @@ public class Solver : MonoBehaviour
         double K1 = 0.25 * V * ((1 / (Math.Pow(C0, 2) * r0)) - (1 / (Math.Pow(Cp, 2) * rp)));
         double K2 = 0.75 * V * (r0 - rp) / (Math.Pow(wfreq, 2) * r0 * (r0 + 2 * rp));
 
-        // double wp = 1;
-        // double wx = 10;
-        // double wy = 10;
-        // double wz = 1000;
+        double wp = 1;
+        double wx = 10;
+        double wy = 10;
+        double wz = 600;
         // double wp = 0.1;
         // double wx = 0.1;
         // double wy = 0.1;
         // double wz = 0.1;
-        double wp = 1;
-        double wx = 1;
-        double wy = 1;
-        double wz = 1;
+        // double wp = 1f;
+        // double wx = 1f;
+        // double wy = 1f;
+        // double wz = 0.1f;
 
         double[] K;
         K = new double[2];
@@ -145,12 +148,15 @@ public class Solver : MonoBehaviour
 
         for (int i = 0; i < N_active; i++)
         {
-            // float randnum = Random.Range(0.0f, 1.0f);
-            // phi.Add(randnum * 2 * Math.PI);
+            float randnum = Random.Range(0.0f, 1.0f);
+            phi.Add(randnum * 2f * Math.PI);
+
             // phi.Add(2 * Math.PI);
-            double cb0 = Tarray_active[i].GetPhaseOffset();
-            cb0 = cb0 < 0 ? 0 : cb0;
-            phi.Add(cb0);
+
+            // double cb0 = Tarray_active[i].GetPhaseOffset();
+            // cb0 = cb0 < 0 ? 0 : cb0;
+            // phi.Add(cb0);
+
             // Debug.Log(phi[i]);
         }
 
@@ -307,14 +313,26 @@ public class Solver : MonoBehaviour
         bool success = false;
         success = lbfgs.Minimize(phi.ToArray<double>());
         double[] solution = lbfgs.Solution;
-        Debug.Log("Solver solution: " + success + "\tValue: " + lbfgs.Value);
-        Debug.Log("Status: " + lbfgs.Status + "\tNsols: " + solution.Length);
+        if (success)
+        {
+            Debug.Log("Solver solution: <color=green>" + success + "</color>\tValue: " + lbfgs.Value);
+            Debug.Log("Status: <color=green>" + lbfgs.Status + "</color>\tNsols: " + solution.Length);
+        }
+        else
+        {
+            Debug.Log("Solver solution: <color=red>" + success + "</color>\tValue: " + lbfgs.Value);
+            Debug.Log("Status: <color=red>" + lbfgs.Status + "</color>\tNsols: " + solution.Length);
+        }
         // Debug.Log(lbfgs.Iterations);
         // Debug.Log(lbfgs.Evaluations);
         // Debug.Log(lbfgs.MaxIterations);
         // Debug.Log(lbfgs.Epsilon);
         foreach (var value in solution)
         {
+            // if (value > 2 * Math.PI)
+            // {
+            // Debug.Log(value);
+            // }
             // Debug.Log(value);
         }
 
@@ -349,7 +367,9 @@ public class Solver : MonoBehaviour
 
     static public double[] GetHexCoords()
     {
-        double T_diam = 9.8e-3;
+        // double T_diam = 9.8e-3;
+        double T_diam = 10e-3;
+
         double spacing = 1e-3;
         double u = (T_diam + spacing) / 2.0;
 
@@ -403,7 +423,7 @@ public class Solver : MonoBehaviour
                 }
             }
 
-            i_data[0] = ((double)i + 1.0f) * 2.0f * 0.0054f;
+            i_data[0] = ((double)i + 1.0f) * 2.0f * u;
             for (j = 0; j < 2; j++)
             {
                 for (rowIdx = 0; rowIdx < ring_cords_size_idx_0; rowIdx++)

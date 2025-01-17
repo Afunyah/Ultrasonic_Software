@@ -11,9 +11,11 @@ using UnityEditor;
 using System.Text.RegularExpressions;
 
 using Vector3 = UnityEngine.Vector3;
+using Vector2 = UnityEngine.Vector2;
 using UnityEngine.AI;
 using Accord.Math;
 using UnityEngine.Assertions;
+using MathNet.Numerics.Random;
 
 
 /// <summary>
@@ -73,18 +75,32 @@ public class StateInit : MonoBehaviour
 
     private double[] offsets;
 
-    private int[] unityIndexArray;
+    public int[] unityIndexArray;
     private int[] fpgaIndexArray;
     private int[] inBankIndexArray;
-    private int[] xyTestIndexArray;
+    public int[] xyTestIndexArray;
+
+    private Vector3 solvrMaxVector;
+    private Vector3 solvrMinVector;
+    private Vector3 solvrCenterVector;
+    private Vector3 solvrSizeVector;
+
+
+    bool BRD_DEBUG;
+    private int BOTT_BRD;
+    private int TOP_BRD;
+
+    String T_POS;
 
     void Awake()
     {
         SERIALON = false;
+        BRD_DEBUG = false;
         if (SERIALON)
         {
             StartSerial();
         }
+
     }
     void Start()
     {
@@ -94,6 +110,15 @@ public class StateInit : MonoBehaviour
         xyTestIndexArray = Labeller.GetXYTestIndexArray();
 
         offsets = Labeller.GetOffsets();
+
+        solvrMaxVector = Vector3.zero;
+        solvrMinVector = Vector3.zero;
+        solvrCenterVector = Vector3.zero;
+        solvrSizeVector = Vector3.zero;
+
+        BOTT_BRD = 0;
+        TOP_BRD = 3;
+        T_POS = BOTT_BRD.ToString() + TOP_BRD.ToString();
 
         InitializeArrays();
     }
@@ -257,6 +282,7 @@ public class StateInit : MonoBehaviour
                     // Debug.Log(hexCoords[solver_ind_singular]);
                     // tr.SetSolverPostion(new Vector3((float)hexCoords[solver_ind_singular], 0, (float)hexCoords[solver_ind_singular + 721])); // y z swapped
                     tr.SetSolverPostion(new Vector3((float)hexCoords[solver_ind_singular], (float)hexCoords[solver_ind_singular + 721], 0));
+                    tr.SetNormals(new Vector3(0, 0, 1));
                 }
 
                 if (i == 1)
@@ -265,6 +291,7 @@ public class StateInit : MonoBehaviour
                     solver_ind = solver_ind_singular + 721;
                     // tr.SetSolverPostion(new Vector3((float)hexCoords[solver_ind_singular], (float)Solver.GetTdist(), (float)hexCoords[solver_ind_singular + 721])); // y z swapped
                     tr.SetSolverPostion(new Vector3((float)hexCoords[solver_ind_singular], (float)hexCoords[solver_ind_singular + 721], (float)Solver.GetTdist()));
+                    tr.SetNormals(new Vector3(0, 0, -1));
                 }
 
                 tr.SetSolverIndex(solver_ind + 1);
@@ -277,6 +304,14 @@ public class StateInit : MonoBehaviour
                 double phase_offset = offsets[tr.GetXYTestIndex()];
                 tr.SetPhaseOffset(phase_offset);
 
+                solvrMinVector = Vector3.Min(tr.GetSolverPostion(), solvrMinVector);
+                solvrMaxVector = Vector3.Max(tr.GetSolverPostion(), solvrMaxVector);
+
+                // if (fpgaIndexArray[solver_ind] == 5 || fpgaIndexArray[solver_ind] == 0)
+                // {
+                //     solvrMinVector = Vector3.Min(tr.GetSolverPostion(), solvrMinVector);
+                //     solvrMaxVector = Vector3.Max(tr.GetSolverPostion(), solvrMaxVector);
+                // }
 
                 if (i == 0) { BottArray[solver_ind_singular] = tr; }
                 if (i == 1) { TopArray[solver_ind_singular] = tr; }
@@ -291,12 +326,86 @@ public class StateInit : MonoBehaviour
             i++;
         }
 
-        for (int k = 0; k < 1; k++)
+        // solvrSizeVector = solvrMaxVector - solvrMinVector;
+        // // solvrCenterVector = solvrMinVector + 0.5f * Vector3.Normalize(new Vector3(solvrSizeVector.x,solvrSizeVector.y));
+        // solvrCenterVector = solvrMinVector + 0.5f * solvrSizeVector;
+
+
+        if (BRD_DEBUG)
         {
-            BottArray_tmp.Add(BottArray[k]);
-            TopArray_tmp.Add(TopArray[k]);
-            // Debug.Log(TopArray[k].GetSolverPostion());
+            solvrSizeVector = new Vector3(0.32f, 0.143f, 0.244f);
         }
+        else
+        {
+            solvrSizeVector = new Vector3(0.32f, 0.28f, 0.244f);
+        }
+        // solvrSizeVector = new Vector3(0.249f, 0.286f, 0.244f);
+
+
+        // solvrCenterVector = new Vector3(0f, -0.071f, 0.122f); // Top A Bott A
+        // solvrCenterVector = new Vector3(0f, -0.071f, 0.122f); // Top B Bott B
+
+        // solvrCenterVector = new Vector3(-0.062f,-0.036f, 0.122f); // Top C Bott A*
+        // solvrCenterVector = new Vector3(-0.062f, 0.036f, 0.122f); // Top C Bott B
+
+        // solvrCenterVector = new Vector3(0.062f, -0.036f, 0.122f); // Bott C Top A
+        // solvrCenterVector = new Vector3(0.062f, 0.036f, 0.122f); // Bott C Top B
+
+        solvrCenterVector = new Vector3(0f, 0f, 0.122f);
+        // FindCenter();
+
+        // switch (T_POS)
+        // {
+        //     case "03":
+        //         solvrCenterVector = new Vector3(0f, -0.071f, 0.122f); // 03
+        //         break;
+        //     case "14":
+        //         solvrCenterVector = new Vector3(0f, 0.071f, 0.122f); // 14
+        //         break;
+        //     case "05":
+        //         solvrCenterVector = new Vector3(-0.062f, -0.036f, 0.122f); // 05
+        //         break;
+        //     case "15":
+        //         solvrCenterVector = new Vector3(-0.062f, 0.036f, 0.122f); // 15
+        //         break;
+        //     case "23":
+        //         solvrCenterVector = new Vector3(0.062f, -0.036f, 0.122f); // 23
+        //         break;
+        //     case "24":
+        //         solvrCenterVector = new Vector3(0.062f, 0.036f, 0.122f); // 24
+        //         break;
+        //     default:
+        //         solvrCenterVector = new Vector3(0f, 0f, 0f);
+        //         break;
+        // }
+
+        // solvrCenterVector = new Vector3(0f, -0.071f, 0.122f); // 03
+        // solvrCenterVector = new Vector3(0f, 0.071f, 0.122f); // 14
+
+        // solvrCenterVector = new Vector3(-0.062f,-0.036f, 0.122f); // 05
+        // solvrCenterVector = new Vector3(-0.062f, 0.036f, 0.122f); // 15
+
+        // solvrCenterVector = new Vector3(0.062f, -0.036f, 0.122f); // 23
+        // solvrCenterVector = new Vector3(0.062f, 0.036f, 0.122f); // 24
+
+        // solvrSizeVector = 
+
+        // Debug.Log(BottArray[691].GetSolverPostion().ToString("F4"));
+        // Debug.Log(TopArray[1412-721].GetSolverPostion().ToString("F4"));
+        // Debug.Log(BottArray[4].GetSolverPostion().ToString("F4"));
+        // Debug.Log(solvrMinVector.ToString("F4"));
+        // Debug.Log(solvrMaxVector.ToString("F4"));
+        // Debug.Log(solvrSizeVector.ToString("F4"));
+        // Debug.Log(solvrCenterVector.ToString("F4"));
+
+
+
+        // for (int k = 0; k < 1; k++)
+        // {
+        //     BottArray_tmp.Add(BottArray[k]);
+        //     TopArray_tmp.Add(TopArray[k]);
+        //     // Debug.Log(TopArray[k].GetSolverPostion());
+        // }
 
         // foreach (Transducer item in BottArray)
         // {
@@ -310,7 +419,44 @@ public class StateInit : MonoBehaviour
 
     }
 
+    private void FindCenter()
+    {
 
+
+        if (BRD_DEBUG)
+        {
+            T_POS = BOTT_BRD.ToString() + TOP_BRD.ToString();
+        }
+        else
+        {
+            T_POS = "";
+        }
+        // Debug.Log(T_POS);
+        switch (T_POS)
+        {
+            case "03":
+                solvrCenterVector = new Vector3(0f, -0.071f, 0.122f); // 03
+                break;
+            case "14":
+                solvrCenterVector = new Vector3(0f, 0.071f, 0.122f); // 14
+                break;
+            case "05":
+                solvrCenterVector = new Vector3(-0.062f, -0.036f, 0.122f); // 05
+                break;
+            case "15":
+                solvrCenterVector = new Vector3(-0.062f, 0.036f, 0.122f); // 15
+                break;
+            case "23":
+                solvrCenterVector = new Vector3(0.062f, -0.036f, 0.122f); // 23
+                break;
+            case "24":
+                solvrCenterVector = new Vector3(0.062f, 0.036f, 0.122f); // 24
+                break;
+            default:
+                solvrCenterVector = new Vector3(0f, 0f, 0.122f);
+                break;
+        }
+    }
 
 
     /// <summary>
@@ -599,38 +745,36 @@ public class StateInit : MonoBehaviour
     {
         Debug.Log("<color=green>D1 Set</color>" + " : " + val);
 
+        // int v = val - 1;
+
+        // if (SERIALON)
+        // {
+        //     if (v > -1)
+        //     {
+        //         if (on == 1)
+        //         {
+        //             (int, int) resp = SetPixel(FPGA_Serial[fpgaIndexArray[v]], inBankIndexArray[v], 4, 0);
+        //             Debug.Log("Turning ON: " + "Solver (" + val + ")" + "  FPGA (" + fpgaIndexArray[v] + ", " + inBankIndexArray[v] + ")\tResponse: " + resp);
+        //         }
+        //         else
+        //         {
+        //             (int, int) resp = SetPixel(FPGA_Serial[fpgaIndexArray[v]], inBankIndexArray[v], 0, 0);
+        //             Debug.Log("Turning OFF: " + "Solver (" + val + ")" + "  FPGA (" + fpgaIndexArray[v] + ", " + inBankIndexArray[v] + ")\tResponse: " + resp);
+        //         }
+        //     }
+        // }
+
+        int someFpga = 0;
         if (SERIALON)
         {
-            // for (int i = 0; i < 3; i++)
+            // for (int i = 0; i < 240; i++)
             // {
-            //     for (int j = 0; j < 241; j++)
-            //     {
-            //         Debug.Log(SetPixel(FPGA_Serial[i], j, 4, 0));
-            //     }
+            //     SetPixel(FPGA_Serial[0], i, 4, 0);
             // }
 
-            // for (int j = 0; j < 241; j++)
-            // {
-            //     Debug.Log(SetPixel(FPGA_Serial[5], j, 4, 0));
-            // }
-        }
-
-        int v = val - 1;
-
-        if (SERIALON)
-        {
-            if (v > -1)
+            for (int i = 0; i < 240; i++)
             {
-                if (on == 1)
-                {
-                    SetPixel(FPGA_Serial[fpgaIndexArray[v]], inBankIndexArray[v], 4, 0);
-                    Debug.Log("Turning ON: " + "Solver (" + val + ")" + "  FPGA (" + fpgaIndexArray[v] + ", " + inBankIndexArray[v] + ")");
-                }
-                else
-                {
-                    SetPixel(FPGA_Serial[fpgaIndexArray[v]], inBankIndexArray[v], 0, 0);
-                    Debug.Log("Turning OFF: " + "Solver (" + val + ")" + "  FPGA (" + fpgaIndexArray[v] + ", " + inBankIndexArray[v] + ")");
-                }
+                SetPixel(FPGA_Serial[3], i, 4, 0);
             }
         }
     }
@@ -647,94 +791,381 @@ public class StateInit : MonoBehaviour
             {
                 if (on == 1)
                 {
-                    SetPixel(FPGA_Serial[fpgaIndexArray[v]], inBankIndexArray[v], 4, 0);
-                    Debug.Log("Turning ON: " + "Solver (" + val + ")" + "  FPGA (" + fpgaIndexArray[v] + ", " + inBankIndexArray[v] + ")");
+                    (int, int) resp = SetPixel(FPGA_Serial[fpgaIndexArray[v]], inBankIndexArray[v], 4, 0);
+                    Debug.Log("Turning ON: " + "Solver (" + val + ")" + "  FPGA (" + fpgaIndexArray[v] + ", " + inBankIndexArray[v] + ")\tResponse: " + resp);
                 }
                 else
                 {
-                    SetPixel(FPGA_Serial[fpgaIndexArray[v]], inBankIndexArray[v], 0, 0);
-                    Debug.Log("Turning OFF: " + "Solver (" + val + ")" + "  FPGA (" + fpgaIndexArray[v] + ", " + inBankIndexArray[v] + ")");
+                    (int, int) resp = SetPixel(FPGA_Serial[fpgaIndexArray[v]], inBankIndexArray[v], 0, 0);
+                    Debug.Log("Turning OFF: " + "Solver (" + val + ")" + "  FPGA (" + fpgaIndexArray[v] + ", " + inBankIndexArray[v] + ")\tResponse: " + resp);
                 }
             }
         }
     }
 
 
+    // public void D3TestFunc(int val_1, int val_2, int on)
+    // {
+    //     Debug.Log("<color=green>D3 Set</color>" + " : (" + val_1 + ", " + val_2 + ")");
+
+    //     int fpga = val_1;
+    //     int bank = val_2;
+
+    //     if (SERIALON)
+    //     {
+    //         if (on == 1)
+    //         {
+    //             (int, int) resp = SetPixel(FPGA_Serial[fpga], bank, 4, 0);
+    //             Debug.Log("Turning ON: " + "FPGA (" + fpga + ", " + bank + ")\tResponse: " + resp);
+    //         }
+    //         else
+    //         {
+    //             (int, int) resp = SetPixel(FPGA_Serial[fpga], bank, 0, 0);
+    //             Debug.Log("Turning OFF: " + "FPGA (" + fpga + ", " + bank + ")\tResponse: " + resp);
+    //         }
+    //     }
+    // }
+
     public void D3TestFunc(int val_1, int val_2, int on)
     {
         Debug.Log("<color=green>D3 Set</color>" + " : (" + val_1 + ", " + val_2 + ")");
 
-        int fpga = val_1;
-        int bank = val_2;
+        BOTT_BRD = val_1;
+        TOP_BRD = val_2;
+
+        FindCenter();
 
         if (SERIALON)
         {
             if (on == 1)
             {
-                (int, int) resp = SetPixel(FPGA_Serial[fpga], bank, 4, 0);
-                Debug.Log("Turning ON: " + "FPGA (" + fpga + ", " + bank + ")\tResponse: " + resp);
+                Debug.Log("Turning ON: " + BOTT_BRD + ", " + TOP_BRD);
+                UpdateLevState();
             }
             else
             {
-                (int, int) resp = SetPixel(FPGA_Serial[fpga], bank, 0, 0);
-                Debug.Log("Turning OFF: " + "FPGA (" + fpga + ", " + bank + ")\tResponse: " + resp);
+                Debug.Log("Turning OFF ALL");
+
+                for (int i = 0; i < 721; i++)
+                {
+                    int bott_ind = i;
+                    int top_ind = i + 721;
+
+                    var retrytime1 = Time.realtimeSinceStartup;
+                    (int, int) resp1 = SetPixel(FPGA_Serial[fpgaIndexArray[bott_ind]], inBankIndexArray[bott_ind], 0, 0);
+
+                    while (resp1 != (0, 0))
+                    {
+                        while (Time.realtimeSinceStartup - retrytime1 < 1) { }
+                        resp1 = SetPixel(FPGA_Serial[fpgaIndexArray[bott_ind]], inBankIndexArray[bott_ind], 0, 0);
+                    }
+
+
+                    var retrytime2 = Time.realtimeSinceStartup;
+                    (int, int) resp2 = SetPixel(FPGA_Serial[fpgaIndexArray[top_ind]], inBankIndexArray[top_ind], 0, 0);
+
+                    while (resp2 != (0, 0))
+                    {
+                        while (Time.realtimeSinceStartup - retrytime2 < 1) { }
+                        resp2 = SetPixel(FPGA_Serial[fpgaIndexArray[top_ind]], inBankIndexArray[top_ind], 0, 0);
+                    }
+                }
             }
         }
+
     }
 
 
     public void UpdateLevState()
     {
         var temptime = Time.realtimeSinceStartup;
-        (double[], List<bool>) sol = this.GetComponent<Solver>().Solve();
-        double[] phis = sol.Item1;
-        List<bool> activePhis = sol.Item2;
-        int[] onOff = new int[activePhis.Count];
 
-        for (int i = 0; i < 1442; i++)
+        int phase_div = 32;
+        double[] phis;
+        int[] onOff;
+
+
+
+        int opt = 3;
+
+        if (opt == 1)
         {
-            Debug.Log(phis[i]);
-            // phis[i] = phis[i] - offsets[i];
-            phis[i] = phis[i] % (2 * Math.PI);
-            phis[i] = phis[i] * 31 / (2 * Math.PI);
-            phis[i] = Math.Round(phis[i]);
-            phis[i] = phis[i] >= 0 ? phis[i] : 32 + phis[i];
-            Debug.Log(phis[i]);
+            (double[], List<bool>) solvr = this.GetComponent<Solver>().Solve();
 
-            onOff[i] = activePhis[i] ? 1 : 0;
+            phis = solvr.Item1;
+            List<bool> activePhis = solvr.Item2;
+            onOff = new int[activePhis.Count];
 
-            // Debug.Log(activePhis[i]);
+
+            for (int i = 0; i < 1442; i++)
+            {
+                // // Debug.Log(phis[i]);
+                // // phis[i] = (phis[i]+(2 * Math.PI)) % (2 * Math.PI);
+                // // phis[i] = ((phis[i] % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
+                // // // phis[i] = phis[i] % (2 * Math.PI);
+
+                // // phis[i] = phis[i] - (((offsets[i] % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI));
+                // // // phis[i] = phis[i] - ((offsets[i] + (2 * Math.PI)) % (2 * Math.PI));
+
+                // // // phis[i] = phis[i] % (2 * Math.PI);
+
+                // // phis[i] = phis[i] * phase_div / (2 * Math.PI);
+                // ;
+
+                phis[i] = Math.Round((((phis[i] / Math.PI) % 2.0f) + ((-offsets[i]) / Math.PI)) * 16) % 32;
+
+                // phis[i] = Math.Round(phis[i]);
+                phis[i] = phis[i] >= 0 ? phis[i] : phase_div + phis[i];
+                // Debug.Log(phis[i]);
+
+                onOff[i] = activePhis[i] ? 1 : 0;
+            }
+        }
+        else if (opt == 2)
+        {
+            List<Transducer> TArray = BottArray.ToList<Transducer>();
+            TArray.AddRange(TopArray.ToList<Transducer>());
+
+            Vector3 P_control_loc = new Vector3(0, 0.12f, 0.1f);
+
+            Vector3[] emittorPosArray = new Vector3[TArray.Count];
+            Vector3[] emittorNormArray = new Vector3[TArray.Count];
+            Vector3[] pointArray = { P_control_loc };
+
+            for (int i = 0; i < TArray.Count; i++)
+            {
+                Transducer tr = TArray[i];
+                Vector3 trSolvPos = tr.GetSolverPostion();
+                Vector3 trSolvNorms = tr.GetNormals();
+                // Debug.Log(P_control_loc.ToString());
+
+                emittorPosArray[i] = new Vector3(trSolvPos.x, trSolvPos.z, trSolvPos.y);
+                emittorNormArray[i] = new Vector3(trSolvNorms.x, trSolvNorms.z, trSolvNorms.y);
+            }
+
+
+            Focus focus = this.GetComponent<Focus>();
+            focus.IBP_initEmitters();
+            phis = focus.FocusArrayAtPoints(emittorPosArray, emittorNormArray, pointArray);
+            onOff = new int[1442];
+
+            for (int i = 0; i < 1442; i++)
+            {
+                // Debug.Log(phis[i]);
+                phis[i] = Math.Round(phis[i] / (2 * Math.PI) * phase_div);
+
+                // phis[i] = phis[i] * phase_div / (2 * Math.PI);
+                // phis[i] = Math.Round(phis[i]);
+                // phis[i] = phis[i] >= 0 ? phis[i] : phase_div + phis[i];
+                // Debug.Log(phis[i]);
+
+                onOff[i] = 1;
+            }
+
+            // for (int i = 0; i < 1442; i++)
+            // {
+            //     // Debug.Log(phis[i]);
+            //     // phis[i] = (phis[i]+(2 * Math.PI)) % (2 * Math.PI);
+            //     phis[i] = ((phis[i] % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
+            //     // phis[i] = phis[i] % (2 * Math.PI);
+
+            //     phis[i] = phis[i] - (((offsets[i] % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI));
+            //     // phis[i] = phis[i] - ((offsets[i] + (2 * Math.PI)) % (2 * Math.PI));
+
+            //     // phis[i] = phis[i] % (2 * Math.PI);
+
+            //     phis[i] = phis[i] * phase_div / (2 * Math.PI);
+            //     phis[i] = Math.Round(phis[i]);
+            //     phis[i] = phis[i] >= 0 ? phis[i] : phase_div + phis[i];
+            //     // Debug.Log(phis[i]);
+
+            //     onOff[i] = 1;
+            // }
+        }
+        else if (opt == 3)
+        {
+            List<Transducer> TArray = BottArray.ToList<Transducer>();
+            TArray.AddRange(TopArray.ToList<Transducer>());
+
+            // Vector3 P_control_loc = new Vector3(0f, 0f, 0.12f); // normal xyz
+
+            // Vector3 P_control_loc = new Vector3(0f, -0.085f, 0.12f); // normal xyz FOR A
+            // Vector3 P_control_loc = new Vector3(0f, 0.095f, 0.12f); // normal xyz FOR B
+
+            // Vector3 P_control_loc = new Vector3(-0.075f, -0.065f, 0.12f); // normal xyz FOR Top C Bott A
+            // Vector3 P_control_loc = new Vector3(-0.075f, 0.065f, 0.12f); // normal xyz FOR Top C Bott B
+
+            // Vector3 P_control_loc = new Vector3(0.075f, -0.065f, 0.12f); // normal xyz FOR Bott C Top A
+
+            // --------------- Changing solver size and center to match selected fpgas
+
+            // Vector3 P_control_loc = new Vector3(0f, -0.071f, 0.122f); // normal xyz FOR A
+            // Vector3 P_control_loc = new Vector3(0f, 0.0714f, 0.122f); // normal xyz FOR B
+
+            // Vector3 P_control_loc = new Vector3(-0.062f,-0.036f, 0.122f); // normal xyz FOR Top C Bott A
+            // Vector3 P_control_loc = new Vector3(-0.062f, 0.036f, 0.122f); // normal xyz FOR Top C Bott B
+
+            // Vector3 P_control_loc = new Vector3(0.062f, -0.036f, 0.122f); // normal xyz FOR Bott C Top A
+            // Vector3 P_control_loc = new Vector3(0.062f, 0.036f, 0.122f); // normal xyz FOR Bott C Top B
+
+            // Vector3 P_control_loc = solvrCenterVector;
+            Vector3 P_control_loc = new Vector3(0f, -0.071f, 0.122f);
+
+
+            Focus focus = this.GetComponent<Focus>();
+            double[] phases_f = focus.SimpleFocus(TArray, P_control_loc);
+
+
+            bool fmode = true;
+            if (fmode)
+            {
+                phases_f = focus.TwinTrap(TArray, phases_f, solvrSizeVector, solvrCenterVector, Math.PI / 2f);
+            }
+            else
+            {
+                phases_f = focus.VortexTrap(TArray, phases_f, solvrSizeVector, solvrCenterVector, 1);
+            }
+
+            phis = phases_f;
+            onOff = new int[1442];
+
+            for (int i = 0; i < 1442; i++)
+            {
+                // Debug.Log(phis[i]);
+                // double d_offset = Math.Round((offsets[i] / Math.PI) * 16) % 32;
+                // Debug.Log(d_offset);
+                // phis[i] = Math.Round((phis[i] + ((-offsets[i]) / Math.PI)) * 16) % 32;
+                phis[i] = Math.Round(((phis[i] + ((-offsets[i]) / Math.PI)) % 2) * 16) % 32;
+                // phis[i] = Math.Round((phis[i]) * 16) % 32;
+
+                // Debug.Log(phis[i]);
+                while (phis[i] < 0)
+                {
+                    phis[i] += 32;
+                }
+
+                // System.Random random = new System.Random();
+                // random.NextDouble();
+
+                // Debug.Log(phis[i]);
+
+                onOff[i] = 1;
+                // if(i>721){
+                //     onOff[i] = 0;
+                // }
+            }
+        }
+        else if (opt == 4)
+        {
+            List<Transducer> TArray = BottArray.ToList<Transducer>();
+            TArray.AddRange(TopArray.ToList<Transducer>());
+
+            Vector3 P_control_loc = new Vector3(0f, 0f, 0.12f); // normal xyz
+
+            Focus focus = this.GetComponent<Focus>();
+            double[] phases_f = focus.BerritTrap_2(TArray, P_control_loc, 1);
+
+
+            phis = phases_f;
+            onOff = new int[1442];
+
+            for (int i = 0; i < 1442; i++)
+            {
+                // Debug.Log(phis[i]);
+                // double d_offset = Math.Round((offsets[i] / Math.PI) * 16) % 32;
+                double d_offset = offsets[i];
+                // if(d_offset<0){
+                //     d_offset = (2*Math.PI + d_offset);
+                // }
+                // Debug.Log(d_offset);
+                // phis[i] = Math.Round((phis[i] + ((-offsets[i]) / Math.PI)) * 16) % 32;
+                // phis[i] = Math.Round((phis[i]) * 16) % 32;
+                // phis[i] = Math.Round((phis[i]+(2 * Math.PI)) % (2 * Math.PI));
+                //
+                phis[i] = (int)Math.Round(16 * ((phis[i] - d_offset) % (2 * Math.PI)) / Math.PI) % 32;
+
+                Debug.Log(phis[i]);
+
+                while (phis[i] < 0)
+                {
+                    phis[i] += 32;
+                }
+
+                // Debug.Log(phis[i]);
+
+                onOff[i] = 1;
+                // if(i>721){
+                //     onOff[i] = 0;
+                // }
+            }
+
+        }
+        else
+        {
+            throw new Exception("Invalid Option");
+            // phis = new double[]{};
+            // onOff = new int[]{};
         }
 
 
 
+        
         for (int i = 0; i < 721; i++)
         {
             int bott_ind = i;
             int top_ind = i + 721;
 
+            // int bott_brd = 0;
+            // int top_brd = 3;
+            int bott_brd = BOTT_BRD;
+            int top_brd = TOP_BRD;
+            //no need now
+            if (fpgaIndexArray[bott_ind] != bott_brd && BRD_DEBUG)
+            {
+                onOff[bott_ind] = 0;
+            }
+
+            if (fpgaIndexArray[top_ind] != top_brd && BRD_DEBUG)
+            {
+                onOff[top_ind] = 0;
+            }
+
+            // onOff[bott_ind] = 0;
+
             // Debug.Log(4*onOff[bott_ind]);
 
             if (SERIALON)
             {
-                SetPixel(FPGA_Serial[fpgaIndexArray[bott_ind]], inBankIndexArray[bott_ind], 4 * onOff[bott_ind], (int)phis[bott_ind]);
-                SetPixel(FPGA_Serial[fpgaIndexArray[top_ind]], inBankIndexArray[top_ind], 4 * onOff[top_ind], (int)phis[top_ind]);
+                int amp = 4; // 4
+                // if ((fpgaIndexArray[bott_ind] == bott_brd && BRD_DEBUG) || !BRD_DEBUG)
+                {
+                    var retrytime1 = Time.realtimeSinceStartup;
+                    (int, int) resp1 = SetPixel(FPGA_Serial[fpgaIndexArray[bott_ind]], inBankIndexArray[bott_ind], amp * onOff[bott_ind], (int)phis[bott_ind]);
+
+                    while (resp1 != (amp * onOff[bott_ind], (int)phis[bott_ind]))
+                    {
+                        while (Time.realtimeSinceStartup - retrytime1 < 1) { }
+                        resp1 = SetPixel(FPGA_Serial[fpgaIndexArray[bott_ind]], inBankIndexArray[bott_ind], amp * onOff[bott_ind], (int)phis[bott_ind]);
+                    }
+                }
+
+                // if ((fpgaIndexArray[top_ind] == top_brd && BRD_DEBUG) || !BRD_DEBUG)
+                {
+                    var retrytime2 = Time.realtimeSinceStartup;
+                    (int, int) resp2 = SetPixel(FPGA_Serial[fpgaIndexArray[top_ind]], inBankIndexArray[top_ind], amp * onOff[top_ind], (int)phis[top_ind]);
+
+                    while (resp2 != (amp * onOff[top_ind], (int)phis[top_ind]))
+                    {
+                        while (Time.realtimeSinceStartup - retrytime2 < 1) { }
+                        resp2 = SetPixel(FPGA_Serial[fpgaIndexArray[top_ind]], inBankIndexArray[top_ind], amp * onOff[top_ind], (int)phis[top_ind]);
+                    }
+                }
+
             }
         }
 
+
         Debug.Log("Time taken for solver and serial output : " + (Time.realtimeSinceStartup - temptime));
-
-
-        // for (int i = 0; i < 241; i++)
-        // {
-        //     foreach (SerialPort fpga_ser in FPGA_Serial)
-        //     {
-        //         SetPixel(fpga_ser, i, 4, 2);
-        //     }
-        //     Debug.Log("Set "+i);
-        // }
-        // SetPixel(FPGA_Serial[0], 1, 4, 2);
-        // Debug.Log(GetPixel(FPGA_Serial[0], 1));
     }
 
     private (int, int) SetPixel(SerialPort ser, int address, int duty, int phase)

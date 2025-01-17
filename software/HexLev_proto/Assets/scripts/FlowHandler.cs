@@ -71,6 +71,8 @@ public class FlowHandler : MonoBehaviour
     /// </summary>
     public Material selectedMaterial;
 
+    public Material TransducerMaterial;
+
     /// <summary>
     /// Keeps track of whether a LevParticle is selected or not.
     /// </summary>
@@ -100,11 +102,25 @@ public class FlowHandler : MonoBehaviour
     public TMP_InputField DebugInputField2;
     public TMP_InputField DebugInputField3_1;
     public TMP_InputField DebugInputField3_2;
+    public TMP_InputField DebugInputField4;
+
+    public TMP_InputField DebugInputField5_1;
+    public TMP_InputField DebugInputField5_2;
+
     private int d1_value;
     private int d2_value;
 
     private int d3_1_value;
     private int d3_2_value;
+
+    private int d4_value;
+
+    // public int[] counterArray;
+    private bool uia_prog_flag;
+    private int uia_counter;
+    private float settime;
+    private bool uia_pause;
+
 
 
     void Awake()
@@ -115,6 +131,8 @@ public class FlowHandler : MonoBehaviour
         d3_1_value = 0;
         d3_2_value = 0;
 
+        d4_value = 497;
+
     }
     void Start()
     {
@@ -123,13 +141,97 @@ public class FlowHandler : MonoBehaviour
         DebugInputField3_1.onEndEdit.AddListener(DebugInputField3_1_func);
         DebugInputField3_2.onEndEdit.AddListener(DebugInputField3_2_func);
 
+        DebugInputField4.onEndEdit.AddListener(DebugInputField4_func);
+
         isSelected = false;
         isCreatingTraj = false;
         trLayer = 1 << 6; // Set Transducer Layer
+
+        // counterArray = this.GetComponent<StateInit>().unityIndexArray;
+        uia_prog_flag = true;
+        settime = 0;
+        uia_counter = 0;
+        uia_pause = true;
+
     }
+
 
     void Update()
     {
+        int[] counterArray = this.GetComponent<StateInit>().unityIndexArray;
+        int[] testArray = this.GetComponent<StateInit>().xyTestIndexArray;
+        Transducer[] bottarr = this.GetComponent<StateInit>().BottArray;
+        Transducer[] toparr = this.GetComponent<StateInit>().BottArray;
+        int pt = 0;
+        int sm = 0;
+
+        if (uia_pause || uia_counter >= 1442)
+        {
+
+        }
+        else if (uia_prog_flag)
+        {
+            uia_prog_flag = false;
+
+            sm = 0;
+            
+            if (uia_counter >= 721)
+            {
+                pt = 1;
+                UIA_setter(counterArray[uia_counter], sm, pt);
+                // UIA_setter(toparr[testArray[uia_counter - 721] - 1].GetUnityIndex(), sm, pt);
+            }
+            else
+            {
+                pt = 0;
+                UIA_setter(counterArray[uia_counter], sm, pt);
+                // UIA_setter(bottarr[testArray[uia_counter] - 1].GetUnityIndex(), sm, pt);
+            }
+
+            uia_counter++;
+            sm = 1;
+
+            
+            if(uia_counter >= 1442){
+
+            }
+            else if (uia_counter >= 721)
+            {
+                pt = 1;
+                UIA_setter(counterArray[uia_counter], sm, pt);
+                // UIA_setter(toparr[testArray[uia_counter - 721] - 1].GetUnityIndex(), sm, pt);
+            }
+            else
+            {
+                pt = 0;
+                UIA_setter(counterArray[uia_counter], sm, pt);
+                // UIA_setter(bottarr[testArray[uia_counter] - 1].GetUnityIndex(), sm, pt);
+            }
+
+            settime = Time.realtimeSinceStartup;
+        }
+        else if (Time.realtimeSinceStartup - settime > 0.005)
+        {
+            uia_prog_flag = true;
+        }
+
+        DebugInputField5_1.text = (uia_counter + 1).ToString();
+
+        // DebugInputField5_2.text = counterArray[uia_counter].ToString();
+        if (uia_counter >= 1442)
+        {
+
+        }
+        else if (uia_counter >= 721)
+        {
+            DebugInputField5_2.text = toparr[uia_counter - 721].GetUnityIndex().ToString();
+        }
+        else
+        {
+            DebugInputField5_2.text = bottarr[uia_counter].GetUnityIndex().ToString();
+        }
+
+
         // Hit Handler
         if (Input.GetMouseButtonDown(0))
         {
@@ -217,8 +319,24 @@ public class FlowHandler : MonoBehaviour
                             case "D3off":
                                 this.GetComponent<StateInit>().D3TestFunc(d3_1_value, d3_2_value, 0);
                                 break;
+                            case "D4on":
+                                D4_update(1);
+                                break;
+                            case "D4off":
+                                D4_update(0);
+                                break;
+                            case "D4prev":
+                                D4_update(2);
+                                break;
+                            case "D4next":
+                                D4_update(3);
+                                break;
+                            case "D5pause":
+                                uia_pause = !uia_pause;
+                                break;
                             case "StartSerial":
-                                if(!this.GetComponent<StateInit>().SERIALON){
+                                if (!this.GetComponent<StateInit>().SERIALON)
+                                {
                                     this.GetComponent<StateInit>().StartSerial();
                                 }
                                 break;
@@ -296,7 +414,7 @@ public class FlowHandler : MonoBehaviour
     }
 
     public void DebugInputField2_func(string text)
-    {   
+    {
         try
         {
             int val;
@@ -311,7 +429,7 @@ public class FlowHandler : MonoBehaviour
     }
 
     public void DebugInputField3_1_func(string text)
-    {   
+    {
         try
         {
             int val;
@@ -326,7 +444,7 @@ public class FlowHandler : MonoBehaviour
     }
 
     public void DebugInputField3_2_func(string text)
-    {   
+    {
         try
         {
             int val;
@@ -339,5 +457,117 @@ public class FlowHandler : MonoBehaviour
         }
         catch (Exception ex) { Debug.Log(ex); }
     }
+
+
+    public void DebugInputField4_func(string text)
+    {
+        try
+        {
+            int val;
+            val = Int32.Parse(text);
+            // if((val < 0) || (val > 32)){
+            //     throw new Exception("Out of range");
+            // }
+
+            d4_value = val;
+        }
+        catch (Exception ex) { Debug.Log(ex); }
+    }
+
+    public void D4_update(int tk)
+    {
+        try
+        {
+            String d4str = "";
+
+            if (d4_value < 10)
+            {
+                d4str = "00" + d4_value.ToString();
+            }
+            else if (d4_value < 100)
+            {
+                d4str = "0" + d4_value.ToString();
+            }
+            else
+            {
+                d4str = d4_value.ToString();
+            }
+
+            String tr = "HexLev/BottomPlate/BottomTransducers/Transducer." + d4str;
+            if (tk == 0)
+            {
+                GameObject.Find(tr).GetComponent<Renderer>().material = TransducerMaterial;
+            }
+            else if (tk == 1)
+            {
+                GameObject.Find(tr).GetComponent<Renderer>().material = selectedMaterial;
+            }
+            else if (tk == 2)
+            {
+                d4_value--;
+                DebugInputField4.text = d4_value.ToString();
+            }
+            else if (tk == 3)
+            {
+                d4_value++;
+                DebugInputField4.text = d4_value.ToString();
+            }
+
+        }
+
+        catch (Exception ex) { Debug.Log(ex); }
+    }
+
+    public void UIA_setter(int x, int tk, int pt)
+    {
+        try
+        {
+            String tr;
+            int xval = x;
+
+
+            if (pt == 1)
+            {
+                tr = "HexLev/TopPlate/TopTransducers/Transducer.";
+                // x -= 721;
+            }
+            else
+            {
+                tr = "HexLev/BottomPlate/BottomTransducers/Transducer.";
+            }
+
+            String xstr = "";
+
+            if (x < 10)
+            {
+                xstr = "00" + x.ToString();
+            }
+            else if (x < 100)
+            {
+                xstr = "0" + x.ToString();
+            }
+            else
+            {
+                xstr = x.ToString();
+            }
+
+            tr += xstr;
+
+
+            if (tk == 0)
+            {
+                GameObject.Find(tr).GetComponent<Renderer>().material = normalMaterial;
+            }
+            else if (tk == 1)
+            {
+                GameObject.Find(tr).GetComponent<Renderer>().material = selectedMaterial;
+            }
+
+        }
+
+        catch (Exception ex) { Debug.Log(ex); }
+    }
+
+
 
 }

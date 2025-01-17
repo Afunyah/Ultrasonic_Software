@@ -59,13 +59,15 @@ private double[] hexCoords;
         solver_unity_csv = Resources.Load<TextAsset>("solver_unity_coords");
         solver_xytest_csv = Resources.Load<TextAsset>("solver_xytest_index");
 
-        offsets_csv = Resources.Load<TextAsset>("offsets_bott_top_rad");
+        // offsets_csv = Resources.Load<TextAsset>("offsets_bott_top_rad");
+        offsets_csv = Resources.Load<TextAsset>("offsets_bott_top_rad_new");
 
         // Splitting the dataset in the end of line
         solver_fpga_coords = solver_fpga_csv.text.Split('\n');
         solver_unity_coords = solver_unity_csv.text.Split('\n');
         solver_xytest_coords = solver_xytest_csv.text.Split('\n');
 
+        // offsets_text = offsets_csv.text.Split('\n');
         offsets_text = offsets_csv.text.Split('\n');
 
         // Iterating through the split dataset to split into rows
@@ -79,7 +81,6 @@ private double[] hexCoords;
             unityIndexArray[i] = Int32.Parse(solver_unity_coords[i]);
 
             xyTestIndexArray[i] = Int32.Parse(solver_xytest_coords[i]);
-
             offsets[i] = Double.Parse(offsets_text[i]);
         }
 
